@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>FF · 工作台</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="FF">
+<meta name="theme-color" content="#3a7d44">
+<meta name="description" content="FF 工作台 - 生活日常 · 饮茶日常 · 英语口语 · 攻略制作">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">FF</div>
+      <div class="logo-text">工作台</div>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" data-module="life">
+        <span class="nav-emoji">📝</span>
+        <div class="nav-info">
+          <div class="nav-title">生活日常</div>
+          <div class="nav-desc">记录每日待办事项</div>
+        </div>
+      </button>
+      <button class="nav-item" data-module="tea">
+        <span class="nav-emoji">🍵</span>
+        <div class="nav-info">
+          <div class="nav-title">饮茶日常</div>
+          <div class="nav-desc">查询茶叶泡制品饮方法</div>
+        </div>
+      </button>
+      <button class="nav-item" data-module="english">
+        <span class="nav-emoji">🎙️</span>
+        <div class="nav-info">
+          <div class="nav-title">英语口语</div>
+          <div class="nav-desc">每天跟读 VOA</div>
+        </div>
+      </button>
+      <button class="nav-item" data-module="guide">
+        <span class="nav-emoji">🗺️</span>
+        <div class="nav-info">
+          <div class="nav-title">攻略制作</div>
+          <div class="nav-desc">旅游/景区博物馆攻略</div>
+        </div>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="quote-card">
+        <div class="quote-label">每日一句</div>
+        <div class="quote-text" id="dailyQuote">加载中...</div>
+      </div>
+      <div class="data-mgmt">
+        <button class="data-btn" id="exportDataBtn" title="导出所有数据">📤 导出数据</button>
+        <button class="data-btn" id="importDataBtn" title="从备份文件恢复数据">📥 导入数据</button>
+        <input type="file" id="importFileInput" accept=".json" style="display:none">
+      </div>
+    </div>
+  </aside>
+
+  <!-- 侧边栏遮罩 -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- 主内容 -->
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle" title="菜单">☰</button>
+        <div>
+          <h1 id="moduleTitle">生活日常</h1>
+          <div class="breadcrumb" id="moduleDesc">记录每日待办事项与灵感想法</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="date-display" id="dateDisplay"></div>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- 生活日常 -->
+      <section class="module active" id="module-life">
+        <div class="life-wrap">
+          <!-- 子 Tab -->
+          <div class="life-tabs">
+            <button class="life-tab active" data-sub="todo">📝 待办事项</button>
+            <button class="life-tab" data-sub="inspire">💡 每日灵感</button>
+          </div>
+
+          <!-- 待办子面板 -->
+          <div class="life-panel active" id="panel-todo">
+            <div class="todo-input-card">
+              <div class="card-label">添加待办</div>
+              <div class="todo-form">
+                <input type="text" id="todoInput" placeholder="今天要做什么？例如：晨跑30分钟" class="todo-input">
+                <select id="todoPriority" class="todo-select">
+                  <option value="high">🔥 高优先级</option>
+                  <option value="mid" selected>⭐ 中等</option>
+                  <option value="low">🌱 低优先级</option>
+                </select>
+                <button class="btn-primary" id="addTodoBtn">添加</button>
+              </div>
+            </div>
+
+            <div class="todo-stats">
+              <div class="stat-card">
+                <div class="stat-num" id="statTotal">0</div>
+                <div class="stat-label">总任务</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num stat-done" id="statDone">0</div>
+                <div class="stat-label">已完成</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num stat-pending" id="statPending">0</div>
+                <div class="stat-label">待办中</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num stat-rate" id="statRate">0%</div>
+                <div class="stat-label">完成率</div>
+              </div>
+            </div>
+
+            <div class="todo-filter">
+              <button class="filter-btn active" data-filter="all">全部</button>
+              <button class="filter-btn" data-filter="pending">待办</button>
+              <button class="filter-btn" data-filter="done">已完成</button>
+              <button class="filter-btn" data-filter="high">🔥 高优先级</button>
+              <button class="btn-clear" id="clearDoneBtn">清除已完成</button>
+            </div>
+
+            <div class="todo-list" id="todoList"></div>
+            <div class="empty-state" id="todoEmpty">
+              <div class="empty-icon">📋</div>
+              <div>今日还没有待办事项，开始添加吧～</div>
+            </div>
+          </div>
+
+          <!-- 每日灵感子面板 -->
+          <div class="life-panel" id="panel-inspire">
+            <div class="inspire-input-card">
+              <div class="card-label">今天有什么想法？</div>
+              <div class="inspire-form">
+                <textarea id="inspireInput" placeholder="记录今天的灵感、想法、新鲜事……&#10;例如：突然想到一个项目点子 / 今天看到一篇有趣的文章 / 对某件事有了新看法" class="inspire-textarea"></textarea>
+                <div class="inspire-img-row">
+                  <label class="inspire-img-btn" for="inspireImgInput">📷 添加图片</label>
+                  <input type="file" id="inspireImgInput" accept="image/*" multiple style="display:none">
+                  <span class="inspire-img-tip" id="inspireImgTip">可选，最多9张</span>
+                </div>
+                <div class="inspire-img-preview" id="inspireImgPreview"></div>
+                <button class="btn-primary" id="addInspireBtn">💡 记录灵感</button>
+              </div>
+            </div>
+            <div class="inspire-list" id="inspireList"></div>
+            <div class="empty-state" id="inspireEmpty">
+              <div class="empty-icon">💡</div>
+              <div>还没有灵感记录，把今天的想法写下来吧～</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 饮茶日常 -->
+      <section class="module" id="module-tea">
+        <div class="tea-wrap">
+          <!-- 每日茶知识推送 -->
+          <div class="tea-daily-card" id="teaDailyCard">
+            <div class="tea-daily-header">
+              <span class="tea-daily-icon">📚</span>
+              <span class="tea-daily-label">今日茶知识</span>
+            </div>
+            <div class="tea-daily-content" id="teaDailyContent"></div>
+          </div>
+
+          <div class="tea-search-card">
+            <div class="card-label">查询茶叶</div>
+            <div class="tea-search-row">
+              <input type="text" id="teaSearch" placeholder="搜索茶名，如：龙井、铁观音、普洱..." class="tea-input">
+              <button class="btn-primary" id="teaSearchBtn">🔍 搜索</button>
+            </div>
+            <div class="tea-tags" id="teaTags"></div>
+          </div>
+
+          <div class="tea-detail" id="teaDetail">
+            <div class="tea-welcome">
+              <div class="welcome-icon">🍵</div>
+              <div class="welcome-title">饮茶日常</div>
+              <div class="welcome-desc">选择或搜索一种茶，查看泡制参数与品饮要点</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 英语口语 -->
+      <section class="module" id="module-english">
+        <div class="eng-wrap">
+          <div class="eng-control-card">
+            <div class="card-label">VOA 跟读训练</div>
+            <div class="eng-controls">
+              <select id="voaArticle" class="eng-select"></select>
+              <button class="btn-secondary" id="prevArticle">⏮ 上一篇</button>
+              <button class="btn-primary" id="playBtn">▶ 朗读</button>
+              <button class="btn-secondary" id="recordBtn">🎙 录音跟读</button>
+              <button class="btn-secondary" id="stopRecordBtn" disabled>⏹ 停止</button>
+              <select id="speedSelect" class="eng-select eng-speed">
+                <option value="0.6">慢速 0.6x</option>
+                <option value="0.8" selected>稍慢 0.8x</option>
+                <option value="1">常速 1.0x</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="eng-article-card">
+            <div class="eng-article-title" id="engTitle"></div>
+            <div class="eng-article-meta" id="engMeta"></div>
+            <div class="eng-article-text" id="engText"></div>
+          </div>
+
+          <div class="eng-record-card">
+            <div class="card-label">我的跟读录音</div>
+            <div class="eng-record-list" id="recordList"></div>
+            <div class="empty-state" id="recordEmpty">
+              <div class="empty-icon">🎙️</div>
+              <div>点击"录音跟读"开始练习，录音会保存到这里供回放对比</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 攻略制作 -->
+      <section class="module" id="module-guide">
+        <div class="guide-wrap">
+          <div class="guide-tabs">
+            <button class="guide-tab active" data-tab="browse">📚 浏览攻略</button>
+            <button class="guide-tab" data-tab="create">✍️ 制作攻略</button>
+          </div>
+
+          <div class="guide-panel active" id="panel-browse">
+            <div class="guide-search-card">
+              <div class="card-label">查找攻略</div>
+              <div class="tea-search-row">
+                <input type="text" id="guideSearch" placeholder="搜索目的地，如：故宫、西湖、成都..." class="tea-input">
+                <button class="btn-primary" id="guideSearchBtn">🔍 搜索</button>
+              </div>
+              <div class="tea-tags" id="guideTags"></div>
+            </div>
+            <div class="guide-detail" id="guideDetail">
+              <div class="tea-welcome">
+                <div class="welcome-icon">🗺️</div>
+                <div class="welcome-title">攻略制作</div>
+                <div class="welcome-desc">选择一个目的地查看参考攻略，或切换到"制作攻略"创建你自己的</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="guide-panel" id="panel-create">
+            <div class="guide-create-card">
+              <div class="card-label">新建攻略</div>
+              <div class="guide-form">
+                <input type="text" id="guideTitle" placeholder="攻略标题，例如：故宫一日游攻略" class="guide-input">
+                <input type="text" id="guideDestination" placeholder="目的地" class="guide-input">
+                <input type="text" id="guideDuration" placeholder="游玩时长，例如：1天 / 3天2晚" class="guide-input">
+                <textarea id="guideOverview" placeholder="攻略概述：简述目的地亮点、最佳季节、注意事项..." class="guide-textarea"></textarea>
+
+                <div class="card-label" style="margin-top:16px">行程安排</div>
+                <div id="scheduleList"></div>
+                <button class="btn-secondary" id="addScheduleBtn">+ 添加一段行程</button>
+
+                <div class="card-label" style="margin-top:16px">必备清单</div>
+                <div id="checklist"></div>
+                <div class="checklist-add">
+                  <input type="text" id="checklistInput" placeholder="添加清单项，例如：身份证、充电宝..." class="guide-input">
+                  <button class="btn-secondary" id="addChecklistBtn">添加</button>
+                </div>
+
+                <div class="guide-actions">
+                  <button class="btn-primary" id="saveGuideBtn">💾 保存攻略</button>
+                  <button class="btn-secondary" id="clearGuideBtn">清空</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="my-guides-card">
+              <div class="card-label">我的攻略</div>
+              <div id="myGuidesList"></div>
+              <div class="empty-state" id="myGuidesEmpty">
+                <div class="empty-icon">📂</div>
+                <div>你还没有保存攻略，制作完成后点击"保存攻略"即可查看</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
