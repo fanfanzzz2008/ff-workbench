@@ -76,7 +76,7 @@ $('#dailyQuote').textContent = quotes[new Date().getDate() % quotes.length];
 /* ============================================
    数据导出/导入
 ============================================ */
-$('#exportDataBtn').addEventListener('click', () => {
+function exportAllData(){
   const allData = {};
   for(let i = 0; i < localStorage.length; i++){
     const key = localStorage.key(i);
@@ -89,13 +89,8 @@ $('#exportDataBtn').addEventListener('click', () => {
   a.download = 'FF-backup-' + new Date().toISOString().slice(0,10) + '.json';
   a.click();
   URL.revokeObjectURL(url);
-});
-
-$('#importDataBtn').addEventListener('click', () => {
-  $('#importFileInput').click();
-});
-$('#importFileInput').addEventListener('change', e => {
-  const file = e.target.files[0];
+}
+function importAllData(file){
   if(!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
@@ -114,8 +109,15 @@ $('#importFileInput').addEventListener('change', e => {
     }
   };
   reader.readAsText(file);
-  e.target.value = '';
-});
+}
+// 侧边栏按钮
+$('#exportDataBtn').addEventListener('click', exportAllData);
+$('#importDataBtn').addEventListener('click', () => $('#importFileInput').click());
+$('#importFileInput').addEventListener('change', e => { importAllData(e.target.files[0]); e.target.value = ''; });
+// 顶栏按钮
+$('#exportDataBtn2').addEventListener('click', exportAllData);
+$('#importDataBtn2').addEventListener('click', () => $('#importFileInput2').click());
+$('#importFileInput2').addEventListener('change', e => { importAllData(e.target.files[0]); e.target.value = ''; });
 
 
 /* ============================================
@@ -908,68 +910,65 @@ $('#teaDailyContent').innerHTML = `<b>${todayFact.title}</b>：${todayFact.text}
 /* ============================================
    模块三：英语口语 - VOA 跟读
 ============================================ */
-const voaArticles = [
+// VOA 文章 —— 内置备用 + 在线拉取
+const fallbackArticles = [
   {
     title:'The Value of Time Management',
-    meta:'VOA Special English · 生活方式 · 约2分钟',
-    text:[
-      'Time is one of our most valuable resources, yet many people struggle to use it wisely.',
-      'Good time management begins with setting clear priorities for each day.',
-      'Experts suggest making a list of tasks the night before, so you can start fresh in the morning.',
-      'It is also important to take short breaks during the day to stay focused and energized.',
-      'Research shows that people who plan their time well feel less stress and get more done.',
-      'Remember, managing your time is really about managing your life.'
-    ]
+    meta:'VOA Learning English',
+    text:['Time is one of our most valuable resources, yet many people struggle to use it wisely.','Good time management begins with setting clear priorities for each day.','Experts suggest making a list of tasks the night before, so you can start fresh in the morning.','It is also important to take short breaks during the day to stay focused and energized.','Research shows that people who plan their time well feel less stress and get more done.','Remember, managing your time is really about managing your life.']
   },
   {
     title:'A Walk in the Morning',
-    meta:'VOA Special English · 健康生活 · 约2分钟',
-    text:[
-      'Walking in the morning is a simple habit that brings many health benefits.',
-      'Doctors say just thirty minutes of walking each day can improve your heart health.',
-      'Morning walks also help clear your mind and reduce feelings of anxiety.',
-      'Many people enjoy listening to music or podcasts while they walk.',
-      'Some prefer to walk in silence, paying attention to the sounds of nature around them.',
-      'Whatever you choose, a morning walk is a gentle way to start the day.'
-    ]
+    meta:'VOA Learning English',
+    text:['Walking in the morning is a simple habit that brings many health benefits.','Doctors say just thirty minutes of walking each day can improve your heart health.','Morning walks also help clear your mind and reduce feelings of anxiety.','Many people enjoy listening to music or podcasts while they walk.','Some prefer to walk in silence, paying attention to the sounds of nature around them.','Whatever you choose, a morning walk is a gentle way to start the day.']
   },
   {
     title:'The Joy of Learning Languages',
-    meta:'VOA Special English · 教育学习 · 约2分钟',
-    text:[
-      'Learning a new language opens doors to different cultures and ideas.',
-      'Studies show that bilingual people often have better memory and problem-solving skills.',
-      'The key to success is practice a little bit every single day.',
-      'Reading aloud is one of the most effective ways to improve your pronunciation.',
-      'Do not be afraid of making mistakes, because mistakes are part of learning.',
-      'Over time, your confidence will grow, and speaking will feel more natural.'
-    ]
-  },
-  {
-    title:'The Tradition of Afternoon Tea',
-    meta:'VOA Special English · 文化习俗 · 约2分钟',
-    text:[
-      'Afternoon tea is a tradition that began in England in the nineteenth century.',
-      'It usually includes a pot of tea served with small sandwiches and cakes.',
-      'People gather in the late afternoon to enjoy tea and conversation with friends.',
-      'Today, afternoon tea is popular in many countries around the world.',
-      'Each culture has added its own foods and customs to this tradition.',
-      'The simple act of sharing tea reminds us to slow down and appreciate life.'
-    ]
-  },
-  {
-    title:'Planning a Meaningful Trip',
-    meta:'VOA Special English · 旅行出行 · 约2分钟',
-    text:[
-      'Traveling can be one of the most rewarding experiences in life.',
-      'Before you go, it helps to read about the history and culture of your destination.',
-      'Making a flexible plan allows you to see the sights without feeling rushed.',
-      'Local food markets are often the best place to understand a place and its people.',
-      'Always leave some free time in your schedule for unexpected discoveries.',
-      'In the end, the best souvenirs are the stories and memories you bring home.'
-    ]
+    meta:'VOA Learning English',
+    text:['Learning a new language opens doors to different cultures and ideas.','Studies show that bilingual people often have better memory and problem-solving skills.','The key to success is practice a little bit every single day.','Reading aloud is one of the most effective ways to improve your pronunciation.','Do not be afraid of making mistakes, because mistakes are part of learning.','Over time, your confidence will grow, and speaking will feel more natural.']
   }
 ];
+
+let voaArticles = load('voaCache') || fallbackArticles;
+let currentArticleIdx = 0;
+let currentUtterance = null;
+let records = load('records') || [];
+
+// 每天自动拉取 VOA Learning English 最新文章
+async function fetchVOAArticles(){
+  try {
+    const rssUrl = 'https://learningenglish.voanews.com/api/zq$omekvi_omzrto';
+    // 使用 rss2json 免费 API 代理
+    const resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssUrl));
+    if(!resp.ok) throw new Error('fetch failed');
+    const data = await resp.json();
+    if(data.items && data.items.length){
+      voaArticles = data.items.slice(0, 15).map(item => {
+        // 清洗 HTML 标签，拆分为句子
+        const raw = (item.description || item.content || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+        const sentences = raw.match(/[^.!?]+[.!?]+/g) || [raw];
+        return {
+          title: item.title,
+          meta: 'VOA Learning English · ' + new Date(item.pubDate).toLocaleDateString('zh-CN'),
+          text: sentences.filter(s => s.length > 20).slice(0, 10)
+        };
+      });
+      save('voaCache', voaArticles);
+    }
+  } catch(e){
+    // 网络不通就用缓存或内置备用
+    voaArticles = load('voaCache') || fallbackArticles;
+  }
+  renderArticleList();
+  renderArticle();
+}
+
+// 检查是否需要刷新（每天一次）
+const lastFetch = load('voaLastFetch') || 0;
+if(Date.now() - lastFetch > 86400000){
+  save('voaLastFetch', Date.now());
+  fetchVOAArticles();
+}
 
 let currentArticleIdx = 0;
 let currentUtterance = null;
@@ -1099,153 +1098,6 @@ if('speechSynthesis' in window){
 }
 
 
-/* ============================================
-   模块四：攻略制作
-============================================ */
-const guideDB = [
-  {
-    name:'北京故宫', emoji:'🏯', tags:['北京','博物馆','故宫'],
-    duration:'1天（建议全天）', best:'3-5月 / 9-11月',
-    overview:'故宫又称紫禁城，是明清两代皇宫，世界上现存规模最大、保存最完整的木质结构古建筑群。建议提前网上预约门票，从午门进、神武门出，单向参观。',
-    timeline:[
-      {time:'08:30', item:'午门入场，先租讲解器或下载官方导览App'},
-      {time:'09:00', item:'中轴线参观：太和殿 → 中和殿 → 保和殿'},
-      {time:'10:30', item:'东路：珍宝馆（需另购票）、钟表馆'},
-      {time:'12:00', item:'冰窖餐厅或自带午餐休息'},
-      {time:'13:30', item:'西路：慈宁宫、寿康宫、御花园'},
-      {time:'15:30', item:'神武门出场，可登景山看故宫全景'}
-    ],
-    tips:['提前7天在故宫官网预约','周一闭馆','大件行李需寄存','穿舒适鞋子，全程步行约2万步','禁止携带打火机']
-  },
-  {
-    name:'杭州西湖', emoji:'🌊', tags:['杭州','西湖','自然'],
-    duration:'1-2天', best:'3-5月（春）、9-11月（秋）',
-    overview:'西湖三面环山，一水抱城，以"一山、二塔、三岛、三堤、五湖"为格局。建议骑行+步行结合，环湖约15公里。',
-    timeline:[
-      {time:'08:00', item:'断桥残雪 → 白堤步行'},
-      {time:'09:30', item:'孤山公园、西泠印社'},
-      {time:'10:30', item:'乘船游湖至三潭印月（小瀛洲）'},
-      {time:'12:00', item:'楼外楼或知味观点餐：西湖醋鱼、龙井虾仁'},
-      {time:'14:00', item:'苏堤春晓步行或骑行'},
-      {time:'16:00', item:'雷峰塔登塔看夕照'}
-    ],
-    tips:['西湖景区免费','游船约55元/人','春季周末人流大','推荐租公共自行车','晚上可看《最忆是杭州》演出']
-  },
-  {
-    name:'成都大熊猫繁育研究基地', emoji:'🐼', tags:['成都','大熊猫','亲子'],
-    duration:'半天', best:'全年，建议上午前往',
-    overview:'位于成都北郊，是世界最大的大熊猫迁地保护基地。建议早上7:30开门即到，此时熊猫最活跃，进食场景最精彩。',
-    timeline:[
-      {time:'07:30', item:'入场，乘观光车至月亮产房'},
-      {time:'08:00', item:'观看幼年熊猫活动、进食'},
-      {time:'09:30', item:'太阳产房看新生熊猫'},
-      {time:'10:30', item:'成年熊猫别墅区'},
-      {time:'11:30', item:'天鹅湖、熊猫博物馆'},
-      {time:'12:30', item:'离场，返市区吃火锅'}
-    ],
-    tips:['门票55元，观光车10元','必须早上到，下午熊猫多在睡觉','不要大声喧哗、不要用闪光灯','可顺路去附近三星堆博物馆','地铁3号线可达']
-  },
-  {
-    name:'西安兵马俑', emoji:'🏛️', tags:['西安','兵马俑','博物馆'],
-    duration:'半天-1天', best:'3-11月',
-    overview:'秦始皇兵马俑博物馆位于西安临潼，被誉为"世界第八大奇迹"。分为一号坑、二号坑、三号坑和铜车马展厅，建议按顺序参观。',
-    timeline:[
-      {time:'09:00', item:'入场，先参观一号坑（最大最壮观）'},
-      {time:'10:00', item:'二号坑（精品陈列，跪射俑等）'},
-      {time:'11:00', item:'三号坑（指挥所）'},
-      {time:'11:30', item:'铜车马展厅'},
-      {time:'12:30', item:'午餐'},
-      {time:'13:30', item:'可前往秦始皇陵遗址公园（含在门票内）'}
-    ],
-    tips:['门票120元，含丽山园','强烈建议请讲解或租讲解器','从西安市区可乘游5路公交','不要触碰文物','可与华清宫组合一日游']
-  },
-  {
-    name:'苏州博物馆', emoji:'🏛️', tags:['苏州','博物馆','建筑'],
-    duration:'半天', best:'全年（室内）',
-    overview:'苏州博物馆本馆由贝聿铭设计，集现代建筑与传统苏州园林之美。馆藏以吴门书画、瓷器、青铜器为主，建筑本身就是展品。',
-    timeline:[
-      {time:'09:00', item:'入馆，先看主展区：吴门书画'},
-      {time:'10:00', item:'瓷器、青铜器展厅'},
-      {time:'11:00', item:'建筑欣赏：中庭、片石假山、水景院落'},
-      {time:'11:30', item:'忠王府（太平天国遗址）'},
-      {time:'12:00', item:'离场，步行至拙政园'}
-    ],
-    tips:['免费但需提前预约','周一闭馆','禁止使用闪光灯和三脚架','建议与拙政园、狮子林串联游览','馆内商店有特色文创']
-  }
-];
-
-function renderGuideTags(){
-  const tagBox = $('#guideTags');
-  tagBox.innerHTML = '';
-  guideDB.forEach((g,i) => {
-    const tag = document.createElement('span');
-    tag.className = 'tea-tag';
-    tag.textContent = g.name;
-    tag.addEventListener('click', () => renderGuide(i));
-    tagBox.appendChild(tag);
-  });
-}
-function renderGuide(idx){
-  const g = guideDB[idx];
-  $('#guideDetail').innerHTML = `
-    <div class="guide-info">
-      <div class="guide-info-header">
-        <div class="guide-info-emoji">${g.emoji}</div>
-        <div>
-          <div class="guide-info-title">${g.name}</div>
-          <div class="guide-info-sub">建议时长：${g.duration} ｜ 最佳季节：${g.best}</div>
-        </div>
-      </div>
-      <div class="guide-section">
-        <div class="guide-section-title">📖 概述</div>
-        <div class="guide-section-text">${g.overview}</div>
-      </div>
-      <div class="guide-section">
-        <div class="guide-section-title">🕒 行程时间线</div>
-        <div class="guide-timeline">
-          ${g.timeline.map(t=>`
-            <div class="guide-timeline-item">
-              <span class="guide-timeline-time">${t.time}</span>${t.item}
-            </div>
-          `).join('')}
-        </div>
-      </div>
-      <div class="guide-section">
-        <div class="guide-section-title">💡 实用贴士</div>
-        <div class="guide-tips">${g.tips.map(t=>`<span class="guide-tip">${t}</span>`).join('')}</div>
-      </div>
-    </div>
-  `;
-}
-function searchGuide(){
-  const kw = $('#guideSearch').value.trim().toLowerCase();
-  if(!kw){ renderGuideTags(); return; }
-  const idx = guideDB.findIndex(g =>
-    g.name.toLowerCase().includes(kw) || g.tags.some(t=>t.toLowerCase().includes(kw))
-  );
-  if(idx>=0) renderGuide(idx);
-  else {
-    $('#guideDetail').innerHTML = `
-      <div class="tea-welcome">
-        <div class="welcome-icon">🔍</div>
-        <div class="welcome-title">未找到相关攻略</div>
-        <div class="welcome-desc">试试搜索：故宫、西湖、成都、西安、苏州...<br>或切换到"制作攻略"自己创建！</div>
-      </div>`;
-  }
-}
-$('#guideSearchBtn').addEventListener('click', searchGuide);
-$('#guideSearch').addEventListener('keydown', e=>{ if(e.key==='Enter') searchGuide(); });
-renderGuideTags();
-
-$$('.guide-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    $$('.guide-tab').forEach(t=>t.classList.remove('active'));
-    tab.classList.add('active');
-    $$('.guide-panel').forEach(p=>p.classList.remove('active'));
-    $('#panel-' + tab.dataset.tab).classList.add('active');
-  });
-});
-
 let schedules = [];
 let checklist = [];
 
@@ -1315,7 +1167,6 @@ function renderMyGuides(){
     `;
     card.addEventListener('click', e => {
       if(e.target.classList.contains('my-guide-del')) return;
-      showMyGuide(i);
     });
     box.appendChild(card);
   });
@@ -1328,14 +1179,6 @@ $('#myGuidesList').addEventListener('click', e => {
     renderMyGuides();
   }
 });
-function showMyGuide(i){
-  const g = myGuides[i];
-  $('#guideDetail').innerHTML = `
-    <div class="guide-info">
-      <div class="guide-info-header">
-        <div class="guide-info-emoji">⭐</div>
-        <div>
-          <div class="guide-info-title">${escapeHtml(g.title)}</div>
           <div class="guide-info-sub">${escapeHtml(g.destination)} · ${escapeHtml(g.duration)} · 我的攻略</div>
         </div>
       </div>
@@ -1357,10 +1200,6 @@ function showMyGuide(i){
         <div class="guide-tips">${g.checklist.map(t=>`<span class="guide-tip">${escapeHtml(t)}</span>`).join('') || '<span style="color:var(--text-light)">暂无清单项</span>'}</div>
       </div>
     </div>`;
-  $$('.guide-tab').forEach(t=>t.classList.remove('active'));
-  $$('.guide-tab')[0].classList.add('active');
-  $$('.guide-panel').forEach(p=>p.classList.remove('active'));
-  $('#panel-browse').classList.add('active');
 }
 
 $('#saveGuideBtn').addEventListener('click', () => {

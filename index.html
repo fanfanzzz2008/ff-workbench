@@ -78,6 +78,11 @@
         </div>
       </div>
       <div class="topbar-right">
+        <div class="topbar-actions">
+          <button class="topbar-action-btn" id="exportDataBtn2" title="导出数据备份">📤</button>
+          <button class="topbar-action-btn" id="importDataBtn2" title="导入数据恢复">📥</button>
+          <input type="file" id="importFileInput2" accept=".json" style="display:none">
+        </div>
         <div class="date-display" id="dateDisplay"></div>
       </div>
     </header>
@@ -235,64 +240,40 @@
       <!-- 攻略制作 -->
       <section class="module" id="module-guide">
         <div class="guide-wrap">
-          <div class="guide-tabs">
-            <button class="guide-tab active" data-tab="browse">📚 浏览攻略</button>
-            <button class="guide-tab" data-tab="create">✍️ 制作攻略</button>
+          <div class="guide-create-card">
+            <div class="card-label">新建攻略</div>
+            <div class="guide-form">
+              <input type="text" id="guideTitle" placeholder="攻略标题，例如：故宫一日游攻略" class="guide-input">
+              <input type="text" id="guideDestination" placeholder="目的地" class="guide-input">
+              <input type="text" id="guideDuration" placeholder="游玩时长，例如：1天 / 3天2晚" class="guide-input">
+              <textarea id="guideOverview" placeholder="攻略概述：简述目的地亮点、最佳季节、注意事项..." class="guide-textarea"></textarea>
+
+              <div class="card-label" style="margin-top:16px">行程安排</div>
+              <div id="scheduleList"></div>
+              <button class="btn-secondary" id="addScheduleBtn">+ 添加一段行程</button>
+
+              <div class="card-label" style="margin-top:16px">必备清单</div>
+              <div id="checklist"></div>
+              <div class="checklist-add">
+                <input type="text" id="checklistInput" placeholder="添加清单项，例如：身份证、充电宝..." class="guide-input">
+                <button class="btn-secondary" id="addChecklistBtn">添加</button>
+              </div>
+
+              <div class="guide-actions">
+                <button class="btn-primary" id="saveGuideBtn">💾 保存攻略</button>
+                <button class="btn-secondary" id="clearGuideBtn">清空</button>
+              </div>
+            </div>
           </div>
 
-          <div class="guide-panel active" id="panel-browse">
-            <div class="guide-search-card">
-              <div class="card-label">查找攻略</div>
-              <div class="tea-search-row">
-                <input type="text" id="guideSearch" placeholder="搜索目的地，如：故宫、西湖、成都..." class="tea-input">
-                <button class="btn-primary" id="guideSearchBtn">🔍 搜索</button>
-              </div>
-              <div class="tea-tags" id="guideTags"></div>
-            </div>
-            <div class="guide-detail" id="guideDetail">
-              <div class="tea-welcome">
-                <div class="welcome-icon">🗺️</div>
-                <div class="welcome-title">攻略制作</div>
-                <div class="welcome-desc">选择一个目的地查看参考攻略，或切换到"制作攻略"创建你自己的</div>
-              </div>
+          <div class="my-guides-card">
+            <div class="card-label">我的攻略</div>
+            <div id="myGuidesList"></div>
+            <div class="empty-state" id="myGuidesEmpty">
+              <div class="empty-icon">📂</div>
+              <div>你还没有保存攻略，制作完成后点击"保存攻略"即可查看</div>
             </div>
           </div>
-
-          <div class="guide-panel" id="panel-create">
-            <div class="guide-create-card">
-              <div class="card-label">新建攻略</div>
-              <div class="guide-form">
-                <input type="text" id="guideTitle" placeholder="攻略标题，例如：故宫一日游攻略" class="guide-input">
-                <input type="text" id="guideDestination" placeholder="目的地" class="guide-input">
-                <input type="text" id="guideDuration" placeholder="游玩时长，例如：1天 / 3天2晚" class="guide-input">
-                <textarea id="guideOverview" placeholder="攻略概述：简述目的地亮点、最佳季节、注意事项..." class="guide-textarea"></textarea>
-
-                <div class="card-label" style="margin-top:16px">行程安排</div>
-                <div id="scheduleList"></div>
-                <button class="btn-secondary" id="addScheduleBtn">+ 添加一段行程</button>
-
-                <div class="card-label" style="margin-top:16px">必备清单</div>
-                <div id="checklist"></div>
-                <div class="checklist-add">
-                  <input type="text" id="checklistInput" placeholder="添加清单项，例如：身份证、充电宝..." class="guide-input">
-                  <button class="btn-secondary" id="addChecklistBtn">添加</button>
-                </div>
-
-                <div class="guide-actions">
-                  <button class="btn-primary" id="saveGuideBtn">💾 保存攻略</button>
-                  <button class="btn-secondary" id="clearGuideBtn">清空</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="my-guides-card">
-              <div class="card-label">我的攻略</div>
-              <div id="myGuidesList"></div>
-              <div class="empty-state" id="myGuidesEmpty">
-                <div class="empty-icon">📂</div>
-                <div>你还没有保存攻略，制作完成后点击"保存攻略"即可查看</div>
-              </div>
-            </div>
           </div>
         </div>
       </section>

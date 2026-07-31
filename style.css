@@ -125,6 +125,15 @@ body{
 }
 .topbar-left{display:flex;align-items:center}
 .topbar-left h1{font-size:20px;font-weight:700;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-actions{display:flex;gap:4px}
+.topbar-action-btn{
+  width:32px;height:32px;border:none;border-radius:8px;
+  background:var(--primary-bg);color:var(--primary-deep);
+  cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.topbar-action-btn:hover{background:var(--primary);color:#fff}
 .breadcrumb{font-size:13px;color:var(--text-light);margin-top:2px}
 .date-display{
   font-size:13px;color:var(--text-soft);
