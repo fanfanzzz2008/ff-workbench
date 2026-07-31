@@ -11,7 +11,7 @@ const todayStr = () => new Date().toLocaleDateString('zh-CN',{year:'numeric',mon
 const moduleMap = {
   life: { title:'生活日常', desc:'记录每日待办事项与灵感想法' },
   tea:  { title:'饮茶日常', desc:'查询茶叶泡制方法与品饮要点' },
-  english:{ title:'英语口语', desc:'每天跟读 VOA，提升发音语感' },
+  english:{ title:'每日打卡', desc:'坚持每日好习惯' },
   guide:{ title:'攻略制作', desc:'查询与制作旅游/博物馆攻略' }
 };
 $$('.nav-item').forEach(btn => {
@@ -927,191 +927,77 @@ $('#teaDailyContent').innerHTML = `<b>${todayFact.title}</b>：${todayFact.text}
 
 
 /* ============================================
-   模块三：英语口语 - VOA 跟读
+   模块三：每日打卡
 ============================================ */
-// VOA 文章 —— 内置备用 + 在线拉取
-const fallbackArticles = [
-  {
-    title:'The Value of Time Management',
-    meta:'VOA Learning English',
-    text:['Time is one of our most valuable resources, yet many people struggle to use it wisely.','Good time management begins with setting clear priorities for each day.','Experts suggest making a list of tasks the night before, so you can start fresh in the morning.','It is also important to take short breaks during the day to stay focused and energized.','Research shows that people who plan their time well feel less stress and get more done.','Remember, managing your time is really about managing your life.']
-  },
-  {
-    title:'A Walk in the Morning',
-    meta:'VOA Learning English',
-    text:['Walking in the morning is a simple habit that brings many health benefits.','Doctors say just thirty minutes of walking each day can improve your heart health.','Morning walks also help clear your mind and reduce feelings of anxiety.','Many people enjoy listening to music or podcasts while they walk.','Some prefer to walk in silence, paying attention to the sounds of nature around them.','Whatever you choose, a morning walk is a gentle way to start the day.']
-  },
-  {
-    title:'The Joy of Learning Languages',
-    meta:'VOA Learning English',
-    text:['Learning a new language opens doors to different cultures and ideas.','Studies show that bilingual people often have better memory and problem-solving skills.','The key to success is practice a little bit every single day.','Reading aloud is one of the most effective ways to improve your pronunciation.','Do not be afraid of making mistakes, because mistakes are part of learning.','Over time, your confidence will grow, and speaking will feel more natural.']
-  }
-];
+const defaultCheckinTasks = ['💊 吃维生素', '🎙️ 听VOA', '🏃 运动'];
+let checkinTasks = load('checkinTasks') || [...defaultCheckinTasks];
+let checkinDate = load('checkinDate') || '';
+let checkinDone = load('checkinDone') || {};
 
-let voaArticles = load('voaCache') || fallbackArticles;
-let records = load('records') || [];
-
-// 每天自动拉取 VOA Learning English 最新文章
-async function fetchVOAArticles(){
-  try {
-    const rssUrl = 'https://learningenglish.voanews.com/api/zq$omekvi_omzrto';
-    // 使用 rss2json 免费 API 代理
-    const resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssUrl));
-    if(!resp.ok) throw new Error('fetch failed');
-    const data = await resp.json();
-    if(data.items && data.items.length){
-      voaArticles = data.items.slice(0, 15).map(item => {
-        // 清洗 HTML 标签，拆分为句子
-        const raw = (item.description || item.content || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
-        const sentences = raw.match(/[^.!?]+[.!?]+/g) || [raw];
-        return {
-          title: item.title,
-          meta: 'VOA Learning English · ' + new Date(item.pubDate).toLocaleDateString('zh-CN'),
-          text: sentences.filter(s => s.length > 20).slice(0, 10)
-        };
-      });
-      save('voaCache', voaArticles);
-    }
-  } catch(e){
-    // 网络不通就用缓存或内置备用
-    voaArticles = load('voaCache') || fallbackArticles;
-  }
-  renderArticleList();
-  renderArticle();
+// 跨天自动重置
+const todayDate = new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'});
+if(checkinDate !== todayDate){
+  checkinDate = todayDate;
+  checkinDone = {};
+  save('checkinDate', checkinDate);
+  save('checkinDone', checkinDone);
 }
 
-// 检查是否需要刷新（每天一次）
-const lastFetch = load('voaLastFetch') || 0;
-if(Date.now() - lastFetch > 86400000){
-  save('voaLastFetch', Date.now());
-  fetchVOAArticles();
-}
-
-let currentArticleIdx = 0;
-let currentUtterance = null;
-
-function renderArticleList(){
-  const sel = $('#voaArticle');
-  sel.innerHTML = voaArticles.map((a,i)=>`<option value="${i}">${a.title}</option>`).join('');
-  sel.value = currentArticleIdx;
-}
-function renderArticle(){
-  const a = voaArticles[currentArticleIdx];
-  $('#engTitle').textContent = a.title;
-  $('#engMeta').textContent = a.meta;
-  $('#engText').innerHTML = a.text.map((s,i)=>
-    `<span class="sentence" data-i="${i}">${s}</span>`
-  ).join('');
-  $$('#engText .sentence').forEach(s => {
-    s.addEventListener('click', () => speak(s.textContent, true));
-  });
-}
-function speak(text, highlightEl){
-  if(!('speechSynthesis' in window)){ alert('当前浏览器不支持语音合成'); return; }
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US';
-  u.rate = parseFloat($('#speedSelect').value);
-  const voices = window.speechSynthesis.getVoices();
-  const enVoice = voices.find(v => v.lang.startsWith('en') && /female|samantha|zira|google/i.test(v.name)) || voices.find(v=>v.lang.startsWith('en'));
-  if(enVoice) u.voice = enVoice;
-
-  $$('#engText .sentence').forEach(el => el.classList.remove('reading'));
-  if(highlightEl) highlightEl.classList.add('reading');
-
-  u.onend = () => { if(highlightEl) highlightEl.classList.remove('reading'); currentUtterance=null; };
-  currentUtterance = u;
-  window.speechSynthesis.speak(u);
-}
-
-$('#voaArticle').addEventListener('change', e => { currentArticleIdx = +e.target.value; renderArticle(); });
-$('#prevArticle').addEventListener('click', () => {
-  currentArticleIdx = (currentArticleIdx - 1 + voaArticles.length) % voaArticles.length;
-  $('#voaArticle').value = currentArticleIdx;
-  renderArticle();
-});
-$('#playBtn').addEventListener('click', () => {
-  const a = voaArticles[currentArticleIdx];
-  speak(a.text.join(' '));
-});
-$('#speedSelect').addEventListener('change', () => {
-  if(currentUtterance){ window.speechSynthesis.cancel(); }
-});
-
-// 录音跟读
-let mediaRecorder = null, audioChunks = [];
-async function startRecord(){
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
-    mediaRecorder = new MediaRecorder(stream);
-    audioChunks = [];
-    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(audioChunks, {type:'audio/webm'});
-      const url = URL.createObjectURL(blob);
-      const rec = {
-        id: Date.now(),
-        article: voaArticles[currentArticleIdx].title,
-        time: new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
-        url
-      };
-      records.unshift(rec);
-      save('records', records.map(r => ({...r, url: r.url.startsWith('blob:') ? null : r.url})));
-      renderRecords();
-      stream.getTracks().forEach(t=>t.stop());
-    };
-    mediaRecorder.start();
-    $('#recordBtn').disabled = true;
-    $('#stopRecordBtn').disabled = false;
-    $('#recordBtn').textContent = '🔴 录音中...';
-  } catch(err){
-    alert('无法访问麦克风：' + err.message + '\n请允许浏览器使用麦克风权限。');
-  }
-}
-function stopRecord(){
-  if(mediaRecorder && mediaRecorder.state !== 'inactive'){
-    mediaRecorder.stop();
-  }
-  $('#recordBtn').disabled = false;
-  $('#stopRecordBtn').disabled = true;
-  $('#recordBtn').textContent = '🎙 录音跟读';
-}
-$('#recordBtn').addEventListener('click', startRecord);
-$('#stopRecordBtn').addEventListener('click', stopRecord);
-
-function renderRecords(){
-  const list = $('#recordList');
-  list.innerHTML = '';
-  records.forEach(r => {
-    const item = document.createElement('div');
-    item.className = 'record-item';
-    const playBtn = r.url ? `<button class="record-play" data-url="${r.url}">▶ 播放</button>` : '<span style="font-size:12px;color:var(--text-light)">本会话录音已失效</span>';
-    item.innerHTML = `
-      <div class="record-name"><span class="rec-article">${escapeHtml(r.article)}</span><span class="rec-time">${r.time}</span></div>
-      ${playBtn}
-      <button class="record-del" data-id="${r.id}">✕</button>
+function renderCheckins(){
+  const grid = $('#checkinGrid');
+  grid.innerHTML = '';
+  checkinTasks.forEach(name => {
+    const done = !!checkinDone[name];
+    const card = document.createElement('div');
+    card.className = 'checkin-card' + (done ? ' done' : '');
+    card.innerHTML = `
+      <div class="checkin-check">${done ? '✓' : ''}</div>
+      <div class="checkin-name">${escapeHtml(name)}</div>
+      <button class="checkin-del" data-name="${escapeAttr(name)}" title="删除任务">✕</button>
     `;
-    list.appendChild(item);
+    card.addEventListener('click', e => {
+      if(e.target.closest('.checkin-del')) return;
+      checkinDone[name] = !checkinDone[name];
+      save('checkinDone', checkinDone);
+      renderCheckins();
+    });
+    grid.appendChild(card);
   });
-  $('#recordEmpty').style.display = records.length ? 'none' : 'block';
+  $('#checkinEmpty').style.display = checkinTasks.length ? 'none' : 'block';
+  $('#checkinTip').textContent = `📅 ${todayDate} · 已完成 ${Object.values(checkinDone).filter(Boolean).length}/${checkinTasks.length}`;
 }
-$('#recordList').addEventListener('click', e => {
-  if(e.target.classList.contains('record-play')){
-    new Audio(e.target.dataset.url).play();
-  } else if(e.target.classList.contains('record-del')){
-    records = records.filter(r=>r.id!==Number(e.target.dataset.id));
-    save('records', records);
-    renderRecords();
+
+function addCheckinTask(){
+  const input = $('#checkinAddInput');
+  const name = input.value.trim();
+  if(!name) return;
+  if(checkinTasks.includes(name)){ alert('该任务已存在'); return; }
+  checkinTasks.push(name);
+  save('checkinTasks', checkinTasks);
+  input.value = '';
+  renderCheckins();
+}
+
+function deleteCheckinTask(name){
+  if(!confirm(`确定删除"${name}"吗？`)) return;
+  checkinTasks = checkinTasks.filter(t => t !== name);
+  delete checkinDone[name];
+  save('checkinTasks', checkinTasks);
+  save('checkinDone', checkinDone);
+  renderCheckins();
+}
+
+$('#checkinAddBtn').addEventListener('click', addCheckinTask);
+$('#checkinAddInput').addEventListener('keydown', e => { if(e.key==='Enter') addCheckinTask(); });
+
+$('#checkinGrid').addEventListener('click', e => {
+  if(e.target.closest('.checkin-del')){
+    const name = e.target.closest('.checkin-del').dataset.name;
+    deleteCheckinTask(name);
   }
 });
 
-renderArticleList();
-renderArticle();
-renderRecords();
-if('speechSynthesis' in window){
-  window.speechSynthesis.onvoiceschanged = () => {};
-  window.speechSynthesis.getVoices();
-}
+renderCheckins();
 
 
 let schedules = [];

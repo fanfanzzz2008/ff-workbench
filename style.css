@@ -374,18 +374,18 @@ body{
 
 /* ============ 饮茶日常 ============ */
 .tea-wrap{display:grid;grid-template-columns:1fr;gap:18px;max-width:1000px}
-.tea-search-card,.eng-control-card,.eng-article-card,.eng-record-card,
+.tea-search-card,
 .guide-search-card,.guide-detail,.guide-create-card,.my-guides-card{
   background:var(--card);border-radius:var(--radius);
   padding:20px;box-shadow:var(--shadow);border:1px solid var(--border-soft);
 }
 .tea-search-row{display:flex;gap:10px;margin-bottom:14px}
-.tea-input,.eng-select,.guide-input{
+.tea-input,.guide-input{
   flex:1;border:1px solid var(--border);border-radius:8px;
   padding:10px 14px;font-size:14px;background:#fafdfb;
   font-family:inherit;color:var(--text);
 }
-.tea-input:focus,.eng-select:focus,.guide-input:focus{outline:none;border-color:var(--primary);background:#fff}
+.tea-input:focus,.guide-input:focus{outline:none;border-color:var(--primary);background:#fff}
 .tea-tags{display:flex;flex-wrap:wrap;gap:8px}
 .tea-tag{
   background:var(--primary-bg);color:var(--primary-deep);
@@ -433,33 +433,47 @@ body{
 }
 .tea-steps{counter-reset:step}
 
-/* ============ 英语口语 ============ */
-.eng-wrap{display:flex;flex-direction:column;gap:18px;max-width:1000px}
-.eng-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.eng-select{flex:0 0 auto;min-width:200px}
-.eng-speed{min-width:120px}
-.eng-article-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px}
-.eng-article-meta{font-size:12px;color:var(--text-light);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border-soft)}
-.eng-article-text{font-size:15px;line-height:1.9;color:var(--text)}
-.eng-article-text .sentence{display:block;margin-bottom:8px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .2s}
-.eng-article-text .sentence:hover{background:var(--primary-bg)}
-.eng-article-text .sentence.reading{background:var(--primary-light);color:#fff}
-
-.eng-record-list{display:flex;flex-direction:column;gap:8px}
-.record-item{
+/* ============ 每日打卡 ============ */
+.checkin-wrap{display:flex;flex-direction:column;gap:18px;max-width:900px}
+.checkin-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.checkin-card{
+  background:var(--card);border:1px solid var(--border-soft);
+  border-radius:var(--radius-sm);padding:16px;cursor:pointer;
+  box-shadow:var(--shadow);transition:all .2s;
   display:flex;align-items:center;gap:12px;
-  background:var(--primary-bg);border-radius:8px;padding:10px 14px;
-  border:1px solid var(--border);
 }
-.record-name{flex:1;font-size:13px;color:var(--text)}
-.record-name .rec-article{font-weight:600;color:var(--text)}
-.record-name .rec-time{font-size:11px;color:var(--text-light);margin-left:6px}
-.record-play{
-  background:var(--primary);color:#fff;border:none;
-  border-radius:6px;padding:6px 12px;cursor:pointer;font-size:12px;font-family:inherit;
+.checkin-card:hover{box-shadow:var(--shadow-hover);transform:translateY(-1px)}
+.checkin-card.done{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-color:var(--primary-light)}
+.checkin-check{
+  width:28px;height:28px;border:2px solid var(--border);
+  border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:#fff;font-size:16px;color:transparent;transition:all .2s;
 }
-.record-play:hover{background:var(--primary-deep)}
-.record-del{background:transparent;border:none;color:var(--text-light);cursor:pointer;font-size:14px}
+.checkin-card.done .checkin-check{background:var(--primary);border-color:var(--primary);color:#fff}
+.checkin-name{flex:1;font-size:15px;font-weight:500;color:var(--text)}
+.checkin-card.done .checkin-name{color:var(--primary-deep)}
+.checkin-del{
+  background:transparent;border:none;color:var(--text-light);
+  cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;
+  opacity:0;transition:all .2s;
+}
+.checkin-card:hover .checkin-del{opacity:1}
+.checkin-del:hover{color:var(--danger);background:#ffebee}
+
+.checkin-add-card{
+  background:var(--card);border:2px dashed var(--border);
+  border-radius:var(--radius-sm);padding:16px;
+  box-shadow:var(--shadow);
+}
+.checkin-add-row{display:flex;gap:10px}
+.checkin-add-input{
+  flex:1;border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;font-size:14px;background:#fafdfb;
+  font-family:inherit;color:var(--text);
+}
+.checkin-add-input:focus{outline:none;border-color:var(--primary);background:#fff}
+.checkin-tip{font-size:12px;color:var(--text-light);margin-top:8px;text-align:center}
 
 /* ============ 攻略制作 ============ */
 .guide-wrap{display:flex;flex-direction:column;gap:18px}
