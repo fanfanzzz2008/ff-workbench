@@ -1,17 +1,19 @@
 <!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" name="viewport"/>
 <title>FF · 工作台</title>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="FF">
-<meta name="theme-color" content="#3a7d44">
-<meta name="description" content="FF 工作台 - 生活日常 · 饮茶日常 · 英语口语 · 攻略制作">
-<link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkZGIMK3IOW3peS9nOWPsCIsCiAgInNob3J0X25hbWUiOiAiRkYiLAogICJkZXNjcmlwdGlvbiI6ICLnlJ/mtLvml6XluLggwrcg6aWu6Iy25pel5bi4IMK3IOiLseivreWPo+ivrSDCtyDmlLvnlaXliLbkvZwiLAogICJzdGFydF91cmwiOiAiLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjZjBmN2YxIiwKICAidGhlbWVfY29sb3IiOiAiIzNhN2Q0NCIsCiAgImljb25zIjogWwogICAgeyAic3JjIjogImljb24tMTkyLnBuZyIsICJzaXplcyI6ICIxOTJ4MTkyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIiB9LAogICAgeyAic3JjIjogImljb24tNTEyLnBuZyIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIiB9CiAgXQp9Cg==">
-<link rel="apple-touch-icon" href="data:image/png;base64,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">
-<style>:root{
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="default" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="FF" name="apple-mobile-web-app-title"/>
+<meta content="#3a7d44" name="theme-color"/>
+<meta content="FF 工作台 - 生活日常 · 饮茶日常 · 英语口语 · 攻略制作" name="description"/>
+<link href="manifest.json" rel="manifest"/>
+<link href="icon-192.png" rel="apple-touch-icon"/>
+<style>
+:root{
   --bg:#f0f7f1;
   --bg-soft:#e8f3e9;
   --sidebar:#3a7d44;
@@ -577,277 +579,261 @@ body{
   .nav-emoji{font-size:24px}
   .todo-stats{grid-template-columns:repeat(2,1fr)}
 }
+
 </style>
 </head>
 <body>
 <div class="app">
-  <!-- 侧边栏 -->
-  <aside class="sidebar">
-    <div class="logo">
-      <div class="logo-icon">FF</div>
-      <div class="logo-text">工作台</div>
-    </div>
-    <nav class="nav">
-      <button class="nav-item active" data-module="life">
-        <span class="nav-emoji">📝</span>
-        <div class="nav-info">
-          <div class="nav-title">生活日常</div>
-          <div class="nav-desc">记录每日待办事项</div>
-        </div>
-      </button>
-      <button class="nav-item" data-module="tea">
-        <span class="nav-emoji">🍵</span>
-        <div class="nav-info">
-          <div class="nav-title">饮茶日常</div>
-          <div class="nav-desc">查询茶叶泡制品饮方法</div>
-        </div>
-      </button>
-      <button class="nav-item" data-module="english">
-        <span class="nav-emoji">🎙️</span>
-        <div class="nav-info">
-          <div class="nav-title">英语口语</div>
-          <div class="nav-desc">每天跟读 VOA</div>
-        </div>
-      </button>
-      <button class="nav-item" data-module="guide">
-        <span class="nav-emoji">🗺️</span>
-        <div class="nav-info">
-          <div class="nav-title">攻略制作</div>
-          <div class="nav-desc">旅游/景区博物馆攻略</div>
-        </div>
-      </button>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="quote-card">
-        <div class="quote-label">每日一句</div>
-        <div class="quote-text" id="dailyQuote">加载中...</div>
-      </div>
-      <div class="data-mgmt">
-        <button class="data-btn" id="exportDataBtn" title="导出所有数据">📤 导出数据</button>
-        <button class="data-btn" id="importDataBtn" title="从备份文件恢复数据">📥 导入数据</button>
-        <input type="file" id="importFileInput" accept=".json" style="display:none">
-      </div>
-    </div>
-  </aside>
+<!-- 侧边栏 -->
+<aside class="sidebar">
+<div class="logo">
+<div class="logo-icon">FF</div>
+<div class="logo-text">工作台</div>
+</div>
+<nav class="nav">
+<button class="nav-item active" data-module="life">
+<span class="nav-emoji">📝</span>
+<div class="nav-info">
+<div class="nav-title">生活日常</div>
+<div class="nav-desc">记录每日待办事项</div>
+</div>
+</button>
+<button class="nav-item" data-module="tea">
+<span class="nav-emoji">🍵</span>
+<div class="nav-info">
+<div class="nav-title">饮茶日常</div>
+<div class="nav-desc">查询茶叶泡制品饮方法</div>
+</div>
+</button>
+<button class="nav-item" data-module="english">
+<span class="nav-emoji">🎙️</span>
+<div class="nav-info">
+<div class="nav-title">英语口语</div>
+<div class="nav-desc">每天跟读 VOA</div>
+</div>
+</button>
+<button class="nav-item" data-module="guide">
+<span class="nav-emoji">🗺️</span>
+<div class="nav-info">
+<div class="nav-title">攻略制作</div>
+<div class="nav-desc">旅游/景区博物馆攻略</div>
+</div>
+</button>
+</nav>
+<div class="sidebar-footer">
+<div class="quote-card">
+<div class="quote-label">每日一句</div>
+<div class="quote-text" id="dailyQuote">加载中...</div>
+</div>
+<div class="data-mgmt">
+<button class="data-btn" id="exportDataBtn" title="导出所有数据">📤 导出数据</button>
+<button class="data-btn" id="importDataBtn" title="从备份文件恢复数据">📥 导入数据</button>
+<input accept=".json" id="importFileInput" style="display:none" type="file"/>
+</div>
+</div>
+</aside>
+<!-- 侧边栏遮罩 -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<!-- 主内容 -->
+<main class="main">
+<header class="topbar">
+<div class="topbar-left">
+<button class="sidebar-toggle" id="sidebarToggle" title="菜单">☰</button>
+<div>
+<h1 id="moduleTitle">生活日常</h1>
+<div class="breadcrumb" id="moduleDesc">记录每日待办事项与灵感想法</div>
+</div>
+</div>
+<div class="topbar-right">
+<div class="topbar-actions" style="margin-right:8px"><button class="topbar-action-btn" id="exportDataBtn2" title="导出所有数据">📤</button><button class="topbar-action-btn" id="importDataBtn2" title="从备份文件恢复数据">📥</button><input accept=".json" id="importFileInput2" style="display:none" type="file"/></div><div class="date-display" id="dateDisplay"></div>
+</div>
+</header>
+<div class="content">
+<!-- 生活日常 -->
+<section class="module active" id="module-life">
+<div class="life-wrap">
+<!-- 子 Tab -->
+<div class="life-tabs">
+<button class="life-tab active" data-sub="todo">📝 待办事项</button>
+<button class="life-tab" data-sub="inspire">💡 每日灵感</button>
+</div>
+<!-- 待办子面板 -->
+<div class="life-panel active" id="panel-todo">
+<div class="todo-input-card">
+<div class="card-label">添加待办</div>
+<div class="todo-form">
+<input class="todo-input" id="todoInput" placeholder="今天要做什么？例如：晨跑30分钟" type="text"/>
+<select class="todo-select" id="todoPriority">
+<option value="high">🔥 高优先级</option>
+<option selected="" value="mid">⭐ 中等</option>
+<option value="low">🌱 低优先级</option>
+</select>
+<button class="btn-primary" id="addTodoBtn">添加</button>
+</div>
+</div>
+<div class="todo-stats">
+<div class="stat-card">
+<div class="stat-num" id="statTotal">0</div>
+<div class="stat-label">总任务</div>
+</div>
+<div class="stat-card">
+<div class="stat-num stat-done" id="statDone">0</div>
+<div class="stat-label">已完成</div>
+</div>
+<div class="stat-card">
+<div class="stat-num stat-pending" id="statPending">0</div>
+<div class="stat-label">待办中</div>
+</div>
+<div class="stat-card">
+<div class="stat-num stat-rate" id="statRate">0%</div>
+<div class="stat-label">完成率</div>
+</div>
+</div>
+<div class="todo-filter">
+<button class="filter-btn active" data-filter="all">全部</button>
+<button class="filter-btn" data-filter="pending">待办</button>
+<button class="filter-btn" data-filter="done">已完成</button>
+<button class="filter-btn" data-filter="high">🔥 高优先级</button>
+<button class="btn-clear" id="clearDoneBtn">清除已完成</button>
+</div>
+<div class="todo-list" id="todoList"></div>
+<div class="empty-state" id="todoEmpty">
+<div class="empty-icon">📋</div>
+<div>今日还没有待办事项，开始添加吧～</div>
+</div>
+</div>
+<!-- 每日灵感子面板 -->
+<div class="life-panel" id="panel-inspire">
+<div class="inspire-input-card">
+<div class="card-label">今天有什么想法？</div>
+<div class="inspire-form">
+<textarea class="inspire-textarea" id="inspireInput" placeholder="记录今天的灵感、想法、新鲜事……
+例如：突然想到一个项目点子 / 今天看到一篇有趣的文章 / 对某件事有了新看法"></textarea>
+<div class="inspire-img-row">
+<label class="inspire-img-btn" for="inspireImgInput">📷 添加图片</label>
+<input accept="image/*" id="inspireImgInput" multiple="" style="display:none" type="file"/>
+<span class="inspire-img-tip" id="inspireImgTip">可选，最多9张</span>
+</div>
+<div class="inspire-img-preview" id="inspireImgPreview"></div>
+<button class="btn-primary" id="addInspireBtn">💡 记录灵感</button>
+</div>
+</div>
+<div class="inspire-list" id="inspireList"></div>
+<div class="empty-state" id="inspireEmpty">
+<div class="empty-icon">💡</div>
+<div>还没有灵感记录，把今天的想法写下来吧～</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 饮茶日常 -->
+<section class="module" id="module-tea">
+<div class="tea-wrap">
+<!-- 每日茶知识推送 -->
+<div class="tea-daily-card" id="teaDailyCard">
+<div class="tea-daily-header">
+<span class="tea-daily-icon">📚</span>
+<span class="tea-daily-label">今日茶知识</span>
+</div>
+<div class="tea-daily-content" id="teaDailyContent"></div>
+</div>
+<div class="tea-search-card">
+<div class="card-label">查询茶叶</div>
+<div class="tea-search-row">
+<input class="tea-input" id="teaSearch" placeholder="搜索茶名，如：龙井、铁观音、普洱..." type="text"/>
+<button class="btn-primary" id="teaSearchBtn">🔍 搜索</button>
+</div>
+<div class="tea-tags" id="teaTags"></div>
+</div>
+<div class="tea-detail" id="teaDetail">
+<div class="tea-welcome">
+<div class="welcome-icon">🍵</div>
+<div class="welcome-title">饮茶日常</div>
+<div class="welcome-desc">选择或搜索一种茶，查看泡制参数与品饮要点</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 英语口语 -->
+<section class="module" id="module-english">
+<div class="eng-wrap">
+<div class="eng-control-card">
+<div class="card-label">VOA 跟读训练</div>
+<div class="eng-controls">
+<select class="eng-select" id="voaArticle"></select>
+<button class="btn-secondary" id="prevArticle">⏮ 上一篇</button>
+<button class="btn-primary" id="playBtn">▶ 朗读</button>
+<button class="btn-secondary" id="recordBtn">🎙 录音跟读</button>
+<button class="btn-secondary" disabled="" id="stopRecordBtn">⏹ 停止</button>
+<select class="eng-select eng-speed" id="speedSelect">
+<option value="0.6">慢速 0.6x</option>
+<option selected="" value="0.8">稍慢 0.8x</option>
+<option value="1">常速 1.0x</option>
+</select>
+</div>
+</div>
+<div class="eng-article-card">
+<div class="eng-article-title" id="engTitle"></div>
+<div class="eng-article-meta" id="engMeta"></div>
+<div class="eng-article-text" id="engText"></div>
+</div>
+<div class="eng-record-card">
+<div class="card-label">我的跟读录音</div>
+<div class="eng-record-list" id="recordList"></div>
+<div class="empty-state" id="recordEmpty">
+<div class="empty-icon">🎙️</div>
+<div>点击"录音跟读"开始练习，录音会保存到这里供回放对比</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 攻略制作 -->
+<section class="module" id="module-guide">
+<div class="guide-wrap">
+<div class="guide-tabs">
 
-  <!-- 侧边栏遮罩 -->
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-  <!-- 主内容 -->
-  <main class="main">
-    <header class="topbar">
-      <div class="topbar-left">
-        <button class="sidebar-toggle" id="sidebarToggle" title="菜单">☰</button>
-        <div>
-          <h1 id="moduleTitle">生活日常</h1>
-          <div class="breadcrumb" id="moduleDesc">记录每日待办事项与灵感想法</div>
-        </div>
-      </div>
-      <div class="topbar-right">
-        <div class="topbar-actions">
-          <button class="topbar-action-btn" id="exportDataBtn2" title="导出数据备份">📤</button>
-          <button class="topbar-action-btn" id="importDataBtn2" title="导入数据恢复">📥</button>
-          <input type="file" id="importFileInput2" accept=".json" style="display:none">
-        </div>
-        <div class="date-display" id="dateDisplay"></div>
-      </div>
-    </header>
-
-    <div class="content">
-      <!-- 生活日常 -->
-      <section class="module active" id="module-life">
-        <div class="life-wrap">
-          <!-- 子 Tab -->
-          <div class="life-tabs">
-            <button class="life-tab active" data-sub="todo">📝 待办事项</button>
-            <button class="life-tab" data-sub="inspire">💡 每日灵感</button>
-          </div>
-
-          <!-- 待办子面板 -->
-          <div class="life-panel active" id="panel-todo">
-            <div class="todo-input-card">
-              <div class="card-label">添加待办</div>
-              <div class="todo-form">
-                <input type="text" id="todoInput" placeholder="今天要做什么？例如：晨跑30分钟" class="todo-input">
-                <select id="todoPriority" class="todo-select">
-                  <option value="high">🔥 高优先级</option>
-                  <option value="mid" selected>⭐ 中等</option>
-                  <option value="low">🌱 低优先级</option>
-                </select>
-                <button class="btn-primary" id="addTodoBtn">添加</button>
-              </div>
-            </div>
-
-            <div class="todo-stats">
-              <div class="stat-card">
-                <div class="stat-num" id="statTotal">0</div>
-                <div class="stat-label">总任务</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-num stat-done" id="statDone">0</div>
-                <div class="stat-label">已完成</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-num stat-pending" id="statPending">0</div>
-                <div class="stat-label">待办中</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-num stat-rate" id="statRate">0%</div>
-                <div class="stat-label">完成率</div>
-              </div>
-            </div>
-
-            <div class="todo-filter">
-              <button class="filter-btn active" data-filter="all">全部</button>
-              <button class="filter-btn" data-filter="pending">待办</button>
-              <button class="filter-btn" data-filter="done">已完成</button>
-              <button class="filter-btn" data-filter="high">🔥 高优先级</button>
-              <button class="btn-clear" id="clearDoneBtn">清除已完成</button>
-            </div>
-
-            <div class="todo-list" id="todoList"></div>
-            <div class="empty-state" id="todoEmpty">
-              <div class="empty-icon">📋</div>
-              <div>今日还没有待办事项，开始添加吧～</div>
-            </div>
-          </div>
-
-          <!-- 每日灵感子面板 -->
-          <div class="life-panel" id="panel-inspire">
-            <div class="inspire-input-card">
-              <div class="card-label">今天有什么想法？</div>
-              <div class="inspire-form">
-                <textarea id="inspireInput" placeholder="记录今天的灵感、想法、新鲜事……&#10;例如：突然想到一个项目点子 / 今天看到一篇有趣的文章 / 对某件事有了新看法" class="inspire-textarea"></textarea>
-                <div class="inspire-img-row">
-                  <label class="inspire-img-btn" for="inspireImgInput">📷 添加图片</label>
-                  <input type="file" id="inspireImgInput" accept="image/*" multiple style="display:none">
-                  <span class="inspire-img-tip" id="inspireImgTip">可选，最多9张</span>
-                </div>
-                <div class="inspire-img-preview" id="inspireImgPreview"></div>
-                <button class="btn-primary" id="addInspireBtn">💡 记录灵感</button>
-              </div>
-            </div>
-            <div class="inspire-list" id="inspireList"></div>
-            <div class="empty-state" id="inspireEmpty">
-              <div class="empty-icon">💡</div>
-              <div>还没有灵感记录，把今天的想法写下来吧～</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 饮茶日常 -->
-      <section class="module" id="module-tea">
-        <div class="tea-wrap">
-          <!-- 每日茶知识推送 -->
-          <div class="tea-daily-card" id="teaDailyCard">
-            <div class="tea-daily-header">
-              <span class="tea-daily-icon">📚</span>
-              <span class="tea-daily-label">今日茶知识</span>
-            </div>
-            <div class="tea-daily-content" id="teaDailyContent"></div>
-          </div>
-
-          <div class="tea-search-card">
-            <div class="card-label">查询茶叶</div>
-            <div class="tea-search-row">
-              <input type="text" id="teaSearch" placeholder="搜索茶名，如：龙井、铁观音、普洱..." class="tea-input">
-              <button class="btn-primary" id="teaSearchBtn">🔍 搜索</button>
-            </div>
-            <div class="tea-tags" id="teaTags"></div>
-          </div>
-
-          <div class="tea-detail" id="teaDetail">
-            <div class="tea-welcome">
-              <div class="welcome-icon">🍵</div>
-              <div class="welcome-title">饮茶日常</div>
-              <div class="welcome-desc">选择或搜索一种茶，查看泡制参数与品饮要点</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 英语口语 -->
-      <section class="module" id="module-english">
-        <div class="eng-wrap">
-          <div class="eng-control-card">
-            <div class="card-label">VOA 跟读训练</div>
-            <div class="eng-controls">
-              <select id="voaArticle" class="eng-select"></select>
-              <button class="btn-secondary" id="prevArticle">⏮ 上一篇</button>
-              <button class="btn-primary" id="playBtn">▶ 朗读</button>
-              <button class="btn-secondary" id="recordBtn">🎙 录音跟读</button>
-              <button class="btn-secondary" id="stopRecordBtn" disabled>⏹ 停止</button>
-              <select id="speedSelect" class="eng-select eng-speed">
-                <option value="0.6">慢速 0.6x</option>
-                <option value="0.8" selected>稍慢 0.8x</option>
-                <option value="1">常速 1.0x</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="eng-article-card">
-            <div class="eng-article-title" id="engTitle"></div>
-            <div class="eng-article-meta" id="engMeta"></div>
-            <div class="eng-article-text" id="engText"></div>
-          </div>
-
-          <div class="eng-record-card">
-            <div class="card-label">我的跟读录音</div>
-            <div class="eng-record-list" id="recordList"></div>
-            <div class="empty-state" id="recordEmpty">
-              <div class="empty-icon">🎙️</div>
-              <div>点击"录音跟读"开始练习，录音会保存到这里供回放对比</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 攻略制作 -->
-      <section class="module" id="module-guide">
-        <div class="guide-wrap">
-          <div class="guide-create-card">
-            <div class="card-label">新建攻略</div>
-            <div class="guide-form">
-              <input type="text" id="guideTitle" placeholder="攻略标题，例如：故宫一日游攻略" class="guide-input">
-              <input type="text" id="guideDestination" placeholder="目的地" class="guide-input">
-              <input type="text" id="guideDuration" placeholder="游玩时长，例如：1天 / 3天2晚" class="guide-input">
-              <textarea id="guideOverview" placeholder="攻略概述：简述目的地亮点、最佳季节、注意事项..." class="guide-textarea"></textarea>
-
-              <div class="card-label" style="margin-top:16px">行程安排</div>
-              <div id="scheduleList"></div>
-              <button class="btn-secondary" id="addScheduleBtn">+ 添加一段行程</button>
-
-              <div class="card-label" style="margin-top:16px">必备清单</div>
-              <div id="checklist"></div>
-              <div class="checklist-add">
-                <input type="text" id="checklistInput" placeholder="添加清单项，例如：身份证、充电宝..." class="guide-input">
-                <button class="btn-secondary" id="addChecklistBtn">添加</button>
-              </div>
-
-              <div class="guide-actions">
-                <button class="btn-primary" id="saveGuideBtn">💾 保存攻略</button>
-                <button class="btn-secondary" id="clearGuideBtn">清空</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="my-guides-card">
-            <div class="card-label">我的攻略</div>
-            <div id="myGuidesList"></div>
-            <div class="empty-state" id="myGuidesEmpty">
-              <div class="empty-icon">📂</div>
-              <div>你还没有保存攻略，制作完成后点击"保存攻略"即可查看</div>
-            </div>
-          </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  </main>
+<button class="guide-tab active" data-tab="create">✍️ 制作攻略</button>
 </div>
 
-<script>/* ============ FF 工作台 - 主逻辑 v2 ============ */
+<div class="guide-panel active" id="panel-create">
+<div class="guide-create-card">
+<div class="card-label">新建攻略</div>
+<div class="guide-form">
+<input class="guide-input" id="guideTitle" placeholder="攻略标题，例如：故宫一日游攻略" type="text"/>
+<input class="guide-input" id="guideDestination" placeholder="目的地" type="text"/>
+<input class="guide-input" id="guideDuration" placeholder="游玩时长，例如：1天 / 3天2晚" type="text"/>
+<textarea class="guide-textarea" id="guideOverview" placeholder="攻略概述：简述目的地亮点、最佳季节、注意事项..."></textarea>
+<div class="card-label" style="margin-top:16px">行程安排</div>
+<div id="scheduleList"></div>
+<button class="btn-secondary" id="addScheduleBtn">+ 添加一段行程</button>
+<div class="card-label" style="margin-top:16px">必备清单</div>
+<div id="checklist"></div>
+<div class="checklist-add">
+<input class="guide-input" id="checklistInput" placeholder="添加清单项，例如：身份证、充电宝..." type="text"/>
+<button class="btn-secondary" id="addChecklistBtn">添加</button>
+</div>
+<div class="guide-actions">
+<button class="btn-primary" id="saveGuideBtn">💾 保存攻略</button>
+<button class="btn-secondary" id="clearGuideBtn">清空</button>
+</div>
+</div>
+</div>
+<div class="my-guides-card">
+<div class="card-label">我的攻略</div>
+<div id="myGuidesList"></div>
+<div class="empty-state" id="myGuidesEmpty">
+<div class="empty-icon">📂</div>
+<div>你还没有保存攻略，制作完成后点击"保存攻略"即可查看</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+<script>
+/* ============ FF 工作台 - 主逻辑 v2 ============ */
 
 /* ---------- 工具函数 ---------- */
 const $ = s => document.querySelector(s);
@@ -1779,8 +1765,6 @@ const fallbackArticles = [
 ];
 
 let voaArticles = load('voaCache') || fallbackArticles;
-let currentArticleIdx = 0;
-let currentUtterance = null;
 let records = load('records') || [];
 
 // 每天自动拉取 VOA Learning English 最新文章
@@ -1821,7 +1805,6 @@ if(Date.now() - lastFetch > 86400000){
 
 let currentArticleIdx = 0;
 let currentUtterance = null;
-let records = load('records') || [];
 
 function renderArticleList(){
   const sel = $('#voaArticle');
@@ -2028,29 +2011,6 @@ $('#myGuidesList').addEventListener('click', e => {
     renderMyGuides();
   }
 });
-          <div class="guide-info-sub">${escapeHtml(g.destination)} · ${escapeHtml(g.duration)} · 我的攻略</div>
-        </div>
-      </div>
-      <div class="guide-section">
-        <div class="guide-section-title">📖 概述</div>
-        <div class="guide-section-text">${escapeHtml(g.overview) || '（未填写）'}</div>
-      </div>
-      <div class="guide-section">
-        <div class="guide-section-title">🕒 行程时间线</div>
-        <div class="guide-timeline">
-          ${g.schedules.filter(s=>s.time||s.item).map(s=>`
-            <div class="guide-timeline-item">
-              <span class="guide-timeline-time">${escapeHtml(s.time)}</span>${escapeHtml(s.item)}
-            </div>`).join('') || '<div style="color:var(--text-light)">暂无行程</div>'}
-        </div>
-      </div>
-      <div class="guide-section">
-        <div class="guide-section-title">💡 必备清单</div>
-        <div class="guide-tips">${g.checklist.map(t=>`<span class="guide-tip">${escapeHtml(t)}</span>`).join('') || '<span style="color:var(--text-light)">暂无清单项</span>'}</div>
-      </div>
-    </div>`;
-}
-
 $('#saveGuideBtn').addEventListener('click', () => {
   const title = $('#guideTitle').value.trim();
   if(!title){ alert('请填写攻略标题'); return; }
@@ -2085,6 +2045,7 @@ renderMyGuides();
 /* ---------- 工具：HTML 转义 ---------- */
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
 function escapeAttr(s){ return String(s).replace(/"/g,'&quot;') }
+
 </script>
 </body>
 </html>

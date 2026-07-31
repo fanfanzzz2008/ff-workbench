@@ -930,8 +930,6 @@ const fallbackArticles = [
 ];
 
 let voaArticles = load('voaCache') || fallbackArticles;
-let currentArticleIdx = 0;
-let currentUtterance = null;
 let records = load('records') || [];
 
 // 每天自动拉取 VOA Learning English 最新文章
@@ -972,7 +970,6 @@ if(Date.now() - lastFetch > 86400000){
 
 let currentArticleIdx = 0;
 let currentUtterance = null;
-let records = load('records') || [];
 
 function renderArticleList(){
   const sel = $('#voaArticle');
@@ -1179,29 +1176,6 @@ $('#myGuidesList').addEventListener('click', e => {
     renderMyGuides();
   }
 });
-          <div class="guide-info-sub">${escapeHtml(g.destination)} · ${escapeHtml(g.duration)} · 我的攻略</div>
-        </div>
-      </div>
-      <div class="guide-section">
-        <div class="guide-section-title">📖 概述</div>
-        <div class="guide-section-text">${escapeHtml(g.overview) || '（未填写）'}</div>
-      </div>
-      <div class="guide-section">
-        <div class="guide-section-title">🕒 行程时间线</div>
-        <div class="guide-timeline">
-          ${g.schedules.filter(s=>s.time||s.item).map(s=>`
-            <div class="guide-timeline-item">
-              <span class="guide-timeline-time">${escapeHtml(s.time)}</span>${escapeHtml(s.item)}
-            </div>`).join('') || '<div style="color:var(--text-light)">暂无行程</div>'}
-        </div>
-      </div>
-      <div class="guide-section">
-        <div class="guide-section-title">💡 必备清单</div>
-        <div class="guide-tips">${g.checklist.map(t=>`<span class="guide-tip">${escapeHtml(t)}</span>`).join('') || '<span style="color:var(--text-light)">暂无清单项</span>'}</div>
-      </div>
-    </div>`;
-}
-
 $('#saveGuideBtn').addEventListener('click', () => {
   const title = $('#guideTitle').value.trim();
   if(!title){ alert('请填写攻略标题'); return; }
