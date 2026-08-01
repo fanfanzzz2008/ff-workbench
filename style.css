@@ -98,13 +98,41 @@ body{
 .nav-desc{font-size:12px;opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 .sidebar-footer{margin-top:14px}
+.weather-card{
+  background:rgba(255,255,255,.12);
+  border-radius:10px;padding:12px;
+  border:1px solid rgba(255,255,255,.15);
+  margin-bottom:8px;
+}
+.weather-card.loading{opacity:.6}
+.weather-row{
+  display:flex;align-items:center;gap:8px;
+}
+.weather-icon{font-size:24px}
+.weather-temp{font-size:22px;font-weight:700}
+.weather-desc{font-size:11px;opacity:.8;margin-top:2px}
+.weather-city{font-size:10px;opacity:.6;margin-top:2px}
+.weather-forecast{
+  display:flex;gap:8px;margin-top:10px;padding-top:8px;
+  border-top:1px solid rgba(255,255,255,.1);
+}
+.weather-day{
+  flex:1;text-align:center;
+}
+.weather-day-date{font-size:10px;opacity:.6}
+.weather-day-icon{font-size:16px;margin:2px 0}
+.weather-day-temp{font-size:10px;opacity:.8}
+.weather-error{font-size:11px;opacity:.7;text-align:center;padding:8px 0}
+
 .quote-card{
   background:rgba(255,255,255,.12);
   border-radius:10px;padding:12px;
   border:1px solid rgba(255,255,255,.15);
 }
 .quote-label{font-size:11px;opacity:.7;margin-bottom:6px;letter-spacing:1px}
-.quote-text{font-size:13px;line-height:1.5}
+.quote-text{font-size:13px;line-height:1.6}
+.quote-source{font-size:10px;opacity:.6;margin-top:6px;text-align:right}
+.quote-loading{font-size:12px;opacity:.6}
 
 .data-mgmt{display:flex;gap:6px;margin-top:10px}
 .data-btn{

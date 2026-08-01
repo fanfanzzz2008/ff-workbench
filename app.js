@@ -59,18 +59,171 @@ $$('.nav-item').forEach(btn => {
   });
 });
 
-/* ---------- 每日一句 ---------- */
-const quotes = [
+/* ---------- 每日一句（一言 API） ---------- */
+const fallbackQuotes = [
   '把每一天都当作新的开始。',
   '日拱一卒，功不唐捐。',
   '一口茶，一段时光，慢即是快。',
   '坚持，是平凡人非凡的秘诀。',
-  '语言是通向世界的钥匙。',
   '行万里路，读万卷书。',
   '今天的努力，是明天的底气。',
   '小步快跑，持续迭代。'
 ];
-$('#dailyQuote').textContent = quotes[new Date().getDate() % quotes.length];
+
+async function fetchHitokoto(){
+  try {
+    const resp = await fetch('https://v1.hitokoto.cn/');
+    if(!resp.ok) throw new Error('fetch failed');
+    const data = await resp.json();
+    const hitokoto = data.hitokoto;
+    const from = data.from || '';
+    const fromWho = data.from_who || '';
+    let source = '';
+    if(fromWho && from) source = '—— ' + from + ' · ' + fromWho;
+    else if(from) source = '—— ' + from;
+    else if(fromWho) source = '—— ' + fromWho;
+
+    $('#dailyQuote').textContent = hitokoto;
+    const srcEl = $('#dailySource');
+    if(srcEl) srcEl.textContent = source;
+
+    // 缓存到 localStorage，同一天不重复请求
+    save('quoteCache', { text: hitokoto, source, date: new Date().toLocaleDateString('zh-CN') });
+  } catch(e){
+    // 尝试用缓存
+    const cached = load('quoteCache');
+    if(cached && cached.date === new Date().toLocaleDateString('zh-CN')){
+      $('#dailyQuote').textContent = cached.text;
+      const srcEl = $('#dailySource');
+      if(srcEl) srcEl.textContent = cached.source || '';
+    } else {
+      // 回退到本地
+      $('#dailyQuote').textContent = fallbackQuotes[new Date().getDate() % fallbackQuotes.length];
+    }
+  }
+}
+
+// 检查缓存，有的话先显示缓存内容
+const cachedQuote = load('quoteCache');
+if(cachedQuote && cachedQuote.date === new Date().toLocaleDateString('zh-CN')){
+  $('#dailyQuote').textContent = cachedQuote.text;
+  const srcEl = $('#dailySource');
+  if(srcEl) srcEl.textContent = cachedQuote.source || '';
+} else {
+  $('#dailyQuote').textContent = fallbackQuotes[new Date().getDate() % fallbackQuotes.length];
+}
+// 异步更新为网络版
+fetchHitokoto();
+
+/* ---------- 天气（Open-Meteo + 自动定位） ---------- */
+const wmoCodes = {
+  0:  { icon:'☀️', text:'晴' },
+  1:  { icon:'🌤️', text:'少云' },
+  2:  { icon:'⛅', text:'多云' },
+  3:  { icon:'☁️', text:'阴' },
+  45: { icon:'🌫️', text:'雾' },
+  48: { icon:'🌫️', text:'雾凇' },
+  51: { icon:'🌦️', text:'小雨' },
+  53: { icon:'🌦️', text:'中雨' },
+  55: { icon:'🌧️', text:'大雨' },
+  56: { icon:'🌧️', text:'冻雨' },
+  57: { icon:'🌧️', text:'冻雨' },
+  61: { icon:'🌧️', text:'小雨' },
+  63: { icon:'🌧️', text:'中雨' },
+  65: { icon:'🌧️', text:'大雨' },
+  71: { icon:'❄️', text:'小雪' },
+  73: { icon:'❄️', text:'中雪' },
+  75: { icon:'❄️', text:'大雪' },
+  80: { icon:'🌦️', text:'阵雨' },
+  81: { icon:'🌧️', text:'大阵雨' },
+  82: { icon:'⛈️', text:'雷暴' },
+  95: { icon:'⛈️', text:'雷阵雨' },
+  96: { icon:'⛈️', text:'雷暴冰雹' },
+  99: { icon:'⛈️', text:'强雷暴' }
+};
+
+async function fetchWeatherByCoords(lat, lon){
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Asia%2FShanghai&forecast_days=3`;
+    const resp = await fetch(url);
+    if(!resp.ok) throw new Error('fetch failed');
+    const data = await resp.json();
+
+    const cur = data.current_weather;
+    const w = wmoCodes[cur.weathercode] || { icon:'🌈', text:'未知' };
+
+    // 渲染当前天气
+    $('#weatherIcon').textContent = w.icon;
+    $('#weatherTemp').textContent = Math.round(cur.temperature) + '°';
+    $('#weatherDesc').textContent = w.text;
+    $('#weatherCity').textContent = '📍 ' + lat.toFixed(1) + '°N, ' + lon.toFixed(1) + '°E';
+    $('#weatherCard').classList.remove('loading');
+
+    // 渲染未来3天预报
+    const forecastEl = $('#weatherForecast');
+    if(forecastEl && data.daily){
+      let html = '';
+      for(let i = 0; i < 3; i++){
+        const date = new Date(data.daily.time[i]);
+        const dayLabel = i === 0 ? '今天' : i === 1 ? '明天' : '后天';
+        const wCode = data.daily.weathercode[i];
+        const wInfo = wmoCodes[wCode] || { icon:'🌈', text:'?' };
+        html += `<div class="weather-day">
+          <div class="weather-day-date">${dayLabel}</div>
+          <div class="weather-day-icon">${wInfo.icon}</div>
+          <div class="weather-day-temp">${Math.round(data.daily.temperature_2m_max[i])}° ${Math.round(data.daily.temperature_2m_min[i])}°</div>
+        </div>`;
+      }
+      forecastEl.innerHTML = html;
+    }
+
+    // 缓存1小时
+    save('weatherCache', {
+      lat, lon, temp: cur.temperature, code: cur.weathercode,
+      daily: data.daily, fetchedAt: Date.now()
+    });
+  } catch(e){
+    showWeatherFallback();
+  }
+}
+
+function showWeatherFallback(){
+  // 尝试用缓存
+  const cached = load('weatherCache');
+  if(cached && Date.now() - cached.fetchedAt < 3600000){
+    const w = wmoCodes[cached.code] || { icon:'🌈', text:'未知' };
+    $('#weatherIcon').textContent = w.icon;
+    $('#weatherTemp').textContent = Math.round(cached.temp) + '°';
+    $('#weatherDesc').textContent = w.text;
+    $('#weatherCity').textContent = '📍 缓存数据';
+    $('#weatherCard').classList.remove('loading');
+  } else {
+    $('#weatherCard').innerHTML = '<div class="weather-error">📍 天气获取失败<br><span style="font-size:10px">请检查网络或定位权限</span></div>';
+  }
+}
+
+async function initWeather(){
+  // 先检查缓存
+  const cached = load('weatherCache');
+  if(cached && Date.now() - cached.fetchedAt < 3600000){
+    fetchWeatherByCoords(cached.lat, cached.lon);
+    return;
+  }
+
+  if(!navigator.geolocation){
+    // 不支持定位，使用北京
+    fetchWeatherByCoords(39.9, 116.4);
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    pos => fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude),
+    () => fetchWeatherByCoords(39.9, 116.4), // 定位失败回退北京
+    { timeout: 5000, maximumAge: 600000 }
+  );
+}
+
+initWeather();
 
 
 /* ============================================
