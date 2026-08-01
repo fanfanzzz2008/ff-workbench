@@ -987,63 +987,87 @@ if(cachedQuote && cachedQuote.date === new Date().toLocaleDateString('zh-CN')){
 // 异步更新为网络版
 fetchHitokoto();
 
-/* ---------- 天气（Open-Meteo + 自动定位） ---------- */
-const wmoCodes = {
-  0:  { icon:'☀️', text:'晴' },
-  1:  { icon:'🌤️', text:'少云' },
-  2:  { icon:'⛅', text:'多云' },
-  3:  { icon:'☁️', text:'阴' },
-  45: { icon:'🌫️', text:'雾' },
-  48: { icon:'🌫️', text:'雾凇' },
-  51: { icon:'🌦️', text:'小雨' },
-  53: { icon:'🌦️', text:'中雨' },
-  55: { icon:'🌧️', text:'大雨' },
-  56: { icon:'🌧️', text:'冻雨' },
-  57: { icon:'🌧️', text:'冻雨' },
-  61: { icon:'🌧️', text:'小雨' },
-  63: { icon:'🌧️', text:'中雨' },
-  65: { icon:'🌧️', text:'大雨' },
-  71: { icon:'❄️', text:'小雪' },
-  73: { icon:'❄️', text:'中雪' },
-  75: { icon:'❄️', text:'大雪' },
-  80: { icon:'🌦️', text:'阵雨' },
-  81: { icon:'🌧️', text:'大阵雨' },
-  82: { icon:'⛈️', text:'雷暴' },
-  95: { icon:'⛈️', text:'雷阵雨' },
-  96: { icon:'⛈️', text:'雷暴冰雹' },
-  99: { icon:'⛈️', text:'强雷暴' }
+/* ---------- 天气（wttr.in + 自动定位） ---------- */
+const weatherCodeMap = {
+  '113': { icon:'☀️', text:'晴' },
+  '116': { icon:'⛅', text:'多云' },
+  '119': { icon:'☁️', text:'阴' },
+  '122': { icon:'☁️', text:'阴' },
+  '143': { icon:'🌫️', text:'薄雾' },
+  '176': { icon:'🌦️', text:'小雨' },
+  '179': { icon:'🌧️', text:'小雨夹雪' },
+  '182': { icon:'🌫️', text:'雾霾' },
+  '185': { icon:'🌫️', text:'雾霾' },
+  '200': { icon:'🌫️', text:'薄雾' },
+  '227': { icon:'🌨️', text:'小雪' },
+  '230': { icon:'❄️', text:'大雪' },
+  '248': { icon:'🌫️', text:'雾' },
+  '260': { icon:'🌫️', text:'冻雾' },
+  '263': { icon:'🌦️', text:'毛毛雨' },
+  '266': { icon:'🌦️', text:'小雨' },
+  '281': { icon:'🌧️', text:'冻雨' },
+  '284': { icon:'🌧️', text:'冻雨' },
+  '293': { icon:'🌦️', text:'小雨' },
+  '296': { icon:'🌦️', text:'小雨' },
+  '299': { icon:'🌧️', text:'中雨' },
+  '302': { icon:'🌧️', text:'中雨' },
+  '305': { icon:'🌧️', text:'大雨' },
+  '308': { icon:'🌧️', text:'大雨' },
+  '311': { icon:'🌧️', text:'冻雨' },
+  '314': { icon:'🌧️', text:'冻雨' },
+  '317': { icon:'🌨️', text:'雨夹雪' },
+  '320': { icon:'🌨️', text:'雨夹雪' },
+  '323': { icon:'❄️', text:'小雪' },
+  '326': { icon:'❄️', text:'小雪' },
+  '329': { icon:'❄️', text:'大雪' },
+  '332': { icon:'❄️', text:'大雪' },
+  '335': { icon:'❄️', text:'暴雪' },
+  '338': { icon:'❄️', text:'暴雪' },
+  '350': { icon:'🌧️', text:'冻雨' },
+  '353': { icon:'🌦️', text:'阵雨' },
+  '356': { icon:'🌧️', text:'阵雨' },
+  '359': { icon:'🌧️', text:'暴雨' },
+  '362': { icon:'🌨️', text:'阵雪' },
+  '365': { icon:'🌨️', text:'阵雪' },
+  '368': { icon:'🌨️', text:'小雪' },
+  '371': { icon:'❄️', text:'大雪' },
+  '374': { icon:'🌧️', text:'冻雨夹雪' },
+  '377': { icon:'🌨️', text:'冰粒' },
+  '386': { icon:'⛈️', text:'雷阵雨' },
+  '389': { icon:'⛈️', text:'雷暴' },
+  '392': { icon:'⛈️', text:'雷阵雪' },
+  '395': { icon:'⛈️', text:'雷暴雪' }
 };
 
 async function fetchWeatherByCoords(lat, lon){
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Asia%2FShanghai&forecast_days=3`;
+    const url = `https://wttr.in/${lat},${lon}?format=j1`;
     const resp = await fetch(url);
     if(!resp.ok) throw new Error('fetch failed');
     const data = await resp.json();
 
-    const cur = data.current_weather;
-    const w = wmoCodes[cur.weathercode] || { icon:'🌈', text:'未知' };
+    const cur = data.current_condition[0];
+    const code = cur.weatherCode;
+    const w = weatherCodeMap[code] || { icon:'🌈', text: cur.weatherDesc[0].value };
 
     // 渲染当前天气
     $('#weatherIcon').textContent = w.icon;
-    $('#weatherTemp').textContent = Math.round(cur.temperature) + '°';
-    $('#weatherDesc').textContent = w.text;
-    $('#weatherCity').textContent = '📍 ' + lat.toFixed(1) + '°N, ' + lon.toFixed(1) + '°E';
+    $('#weatherTemp').textContent = cur.temp_C + '°';
+    $('#weatherDesc').textContent = w.text + ' · 湿度' + cur.humidity + '%';
+    $('#weatherCity').textContent = '📍 ' + lat.toFixed(1) + '°N ' + lon.toFixed(1) + '°E';
     $('#weatherCard').classList.remove('loading');
 
     // 渲染未来3天预报
     const forecastEl = $('#weatherForecast');
-    if(forecastEl && data.daily){
+    if(forecastEl && data.weather){
       let html = '';
-      for(let i = 0; i < 3; i++){
-        const date = new Date(data.daily.time[i]);
+      for(let i = 0; i < Math.min(3, data.weather.length); i++){
         const dayLabel = i === 0 ? '今天' : i === 1 ? '明天' : '后天';
-        const wCode = data.daily.weathercode[i];
-        const wInfo = wmoCodes[wCode] || { icon:'🌈', text:'?' };
+        const wInfo = weatherCodeMap[data.weather[i].hourly[4].weatherCode] || { icon:'🌈', text:'?' };
         html += `<div class="weather-day">
           <div class="weather-day-date">${dayLabel}</div>
           <div class="weather-day-icon">${wInfo.icon}</div>
-          <div class="weather-day-temp">${Math.round(data.daily.temperature_2m_max[i])}° ${Math.round(data.daily.temperature_2m_min[i])}°</div>
+          <div class="weather-day-temp">${data.weather[i].maxtempC}° ${data.weather[i].mintempC}°</div>
         </div>`;
       }
       forecastEl.innerHTML = html;
@@ -1051,8 +1075,9 @@ async function fetchWeatherByCoords(lat, lon){
 
     // 缓存1小时
     save('weatherCache', {
-      lat, lon, temp: cur.temperature, code: cur.weathercode,
-      daily: data.daily, fetchedAt: Date.now()
+      lat, lon, temp: cur.temp_C, code, desc: w.text, humidity: cur.humidity,
+      forecast: data.weather ? data.weather.slice(0,3).map(w => ({max:w.maxtempC,min:w.mintempC,code:w.hourly[4].weatherCode})) : [],
+      fetchedAt: Date.now()
     });
   } catch(e){
     showWeatherFallback();
@@ -1060,37 +1085,50 @@ async function fetchWeatherByCoords(lat, lon){
 }
 
 function showWeatherFallback(){
-  // 尝试用缓存
   const cached = load('weatherCache');
   if(cached && Date.now() - cached.fetchedAt < 3600000){
-    const w = wmoCodes[cached.code] || { icon:'🌈', text:'未知' };
+    const w = weatherCodeMap[cached.code] || { icon:'🌈', text: cached.desc || '未知' };
     $('#weatherIcon').textContent = w.icon;
-    $('#weatherTemp').textContent = Math.round(cached.temp) + '°';
-    $('#weatherDesc').textContent = w.text;
+    $('#weatherTemp').textContent = cached.temp + '°';
+    $('#weatherDesc').textContent = w.text + (cached.humidity ? ' · 湿度' + cached.humidity + '%' : '');
     $('#weatherCity').textContent = '📍 缓存数据';
     $('#weatherCard').classList.remove('loading');
+
+    if(cached.forecast && cached.forecast.length){
+      const forecastEl = $('#weatherForecast');
+      let html = '';
+      cached.forecast.forEach((f, i) => {
+        const dayLabel = i === 0 ? '今天' : i === 1 ? '明天' : '后天';
+        const wInfo = weatherCodeMap[f.code] || { icon:'🌈', text:'?' };
+        html += `<div class="weather-day">
+          <div class="weather-day-date">${dayLabel}</div>
+          <div class="weather-day-icon">${wInfo.icon}</div>
+          <div class="weather-day-temp">${f.max}° ${f.min}°</div>
+        </div>`;
+      });
+      forecastEl.innerHTML = html;
+    }
   } else {
-    $('#weatherCard').innerHTML = '<div class="weather-error">📍 天气获取失败<br><span style="font-size:10px">请检查网络或定位权限</span></div>';
+    $('#weatherCard').innerHTML = '<div class="weather-error">📍 天气获取失败<br><span style="font-size:10px">请检查网络</span></div>';
   }
 }
 
 async function initWeather(){
-  // 先检查缓存
   const cached = load('weatherCache');
   if(cached && Date.now() - cached.fetchedAt < 3600000){
+    showWeatherFallback();
     fetchWeatherByCoords(cached.lat, cached.lon);
     return;
   }
 
   if(!navigator.geolocation){
-    // 不支持定位，使用北京
     fetchWeatherByCoords(39.9, 116.4);
     return;
   }
 
   navigator.geolocation.getCurrentPosition(
     pos => fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude),
-    () => fetchWeatherByCoords(39.9, 116.4), // 定位失败回退北京
+    () => fetchWeatherByCoords(39.9, 116.4),
     { timeout: 5000, maximumAge: 600000 }
   );
 }
