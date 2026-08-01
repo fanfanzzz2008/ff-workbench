@@ -601,8 +601,19 @@ body{
 
 @media(max-width:768px){
   .sidebar{width:70px}
-  .logo-text,.nav-info,.sidebar-footer{display:none}
+  .logo-text,.nav-info{display:none}
+  .sidebar-footer{display:none}
   .nav-item{justify-content:center;padding:12px 8px}
   .nav-emoji{font-size:24px}
   .todo-stats{grid-template-columns:repeat(2,1fr)}
+}
+/* 移动端侧边栏展开时显示底部区域 */
+@media(max-width:768px){
+  .sidebar:not(.collapsed){
+    width:260px;
+    overflow-y:auto;
+  }
+  .sidebar:not(.collapsed) .sidebar-footer{display:block}
+  .sidebar:not(.collapsed) .logo-text{display:block}
+  .sidebar:not(.collapsed) .nav-info{display:block}
 }
