@@ -599,6 +599,59 @@ body{
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 ::-webkit-scrollbar-thumb:hover{background:var(--primary-light)}
 
+/* ============ 今日速览 ============ */
+.today-wrap{display:flex;flex-direction:column;gap:18px;max-width:700px}
+.today-weather-card,.today-quote-card,.today-tea-card{
+  background:var(--card);border-radius:var(--radius);
+  padding:24px;box-shadow:var(--shadow);border:1px solid var(--border-soft);
+}
+.today-weather-card{
+  background:linear-gradient(135deg,#e3f2fd 0%,#e8f5e9 100%);
+}
+.today-card-label{
+  font-size:14px;font-weight:600;color:var(--text-soft);
+  margin-bottom:16px;display:flex;align-items:center;gap:6px;
+}
+.today-card-label::before{
+  content:"";width:3px;height:16px;background:var(--primary);
+  border-radius:2px;
+}
+.today-weather-card .weather-row{
+  display:flex;align-items:center;gap:16px;margin-bottom:8px;
+}
+.today-weather-card .weather-icon{font-size:48px}
+.today-weather-card .weather-temp{font-size:42px;font-weight:700;color:var(--text)}
+.today-weather-card .weather-desc{font-size:18px;color:var(--text-soft)}
+.today-weather-card .weather-city{font-size:13px;color:var(--text-light);margin-bottom:12px}
+.today-weather-card .weather-forecast{
+  display:flex;gap:12px;padding-top:12px;
+  border-top:1px solid var(--border);
+}
+.today-weather-card .weather-day{
+  flex:1;text-align:center;padding:8px;
+  background:rgba(255,255,255,.6);border-radius:8px;
+}
+.today-weather-card .weather-day-date{font-size:12px;color:var(--text-soft);font-weight:500}
+.today-weather-card .weather-day-icon{font-size:24px;margin:4px 0}
+.today-weather-card .weather-day-temp{font-size:13px;color:var(--text)}
+
+.today-quote-card{
+  background:linear-gradient(135deg,#fffde7 0%,#fff8e1 100%);
+}
+.today-quote-text{
+  font-size:18px;line-height:1.8;color:var(--text);
+  font-style:italic;margin-bottom:12px;
+}
+.today-quote-source{
+  font-size:13px;color:var(--text-light);text-align:right;
+}
+
+.today-tea-card{
+  background:linear-gradient(135deg,#e8f5e9 0%,#f1f8e9 100%);
+}
+.today-tea-content{font-size:14px;color:var(--text-soft);line-height:1.8}
+.today-tea-content p{margin:0}
+
 @media(max-width:768px){
   .sidebar{width:70px}
   .logo-text,.nav-info{display:none}

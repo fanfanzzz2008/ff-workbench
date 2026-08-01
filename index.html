@@ -9,7 +9,7 @@
 <meta content="default" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="FF" name="apple-mobile-web-app-title"/>
 <meta content="#3a7d44" name="theme-color"/>
-<meta content="FF 工作台 - 生活日常 · 饮茶日常 · 每日打卡 · 攻略制作" name="description"/>
+<meta content="FF 工作台 - 生活日常 · 饮茶日常 · 每日打卡 · 攻略制作 · 今日速览" name="description"/>
 <link href="manifest.json" rel="manifest"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
 <style>
@@ -614,6 +614,59 @@ body{
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 ::-webkit-scrollbar-thumb:hover{background:var(--primary-light)}
 
+/* ============ 今日速览 ============ */
+.today-wrap{display:flex;flex-direction:column;gap:18px;max-width:700px}
+.today-weather-card,.today-quote-card,.today-tea-card{
+  background:var(--card);border-radius:var(--radius);
+  padding:24px;box-shadow:var(--shadow);border:1px solid var(--border-soft);
+}
+.today-weather-card{
+  background:linear-gradient(135deg,#e3f2fd 0%,#e8f5e9 100%);
+}
+.today-card-label{
+  font-size:14px;font-weight:600;color:var(--text-soft);
+  margin-bottom:16px;display:flex;align-items:center;gap:6px;
+}
+.today-card-label::before{
+  content:"";width:3px;height:16px;background:var(--primary);
+  border-radius:2px;
+}
+.today-weather-card .weather-row{
+  display:flex;align-items:center;gap:16px;margin-bottom:8px;
+}
+.today-weather-card .weather-icon{font-size:48px}
+.today-weather-card .weather-temp{font-size:42px;font-weight:700;color:var(--text)}
+.today-weather-card .weather-desc{font-size:18px;color:var(--text-soft)}
+.today-weather-card .weather-city{font-size:13px;color:var(--text-light);margin-bottom:12px}
+.today-weather-card .weather-forecast{
+  display:flex;gap:12px;padding-top:12px;
+  border-top:1px solid var(--border);
+}
+.today-weather-card .weather-day{
+  flex:1;text-align:center;padding:8px;
+  background:rgba(255,255,255,.6);border-radius:8px;
+}
+.today-weather-card .weather-day-date{font-size:12px;color:var(--text-soft);font-weight:500}
+.today-weather-card .weather-day-icon{font-size:24px;margin:4px 0}
+.today-weather-card .weather-day-temp{font-size:13px;color:var(--text)}
+
+.today-quote-card{
+  background:linear-gradient(135deg,#fffde7 0%,#fff8e1 100%);
+}
+.today-quote-text{
+  font-size:18px;line-height:1.8;color:var(--text);
+  font-style:italic;margin-bottom:12px;
+}
+.today-quote-source{
+  font-size:13px;color:var(--text-light);text-align:right;
+}
+
+.today-tea-card{
+  background:linear-gradient(135deg,#e8f5e9 0%,#f1f8e9 100%);
+}
+.today-tea-content{font-size:14px;color:var(--text-soft);line-height:1.8}
+.today-tea-content p{margin:0}
+
 @media(max-width:768px){
   .sidebar{width:70px}
   .logo-text,.nav-info{display:none}
@@ -672,22 +725,15 @@ body{
 <div class="nav-desc">旅游/景区博物馆攻略</div>
 </div>
 </button>
+<button class="nav-item" data-module="today">
+<span class="nav-emoji">🌅</span>
+<div class="nav-info">
+<div class="nav-title">今日速览</div>
+<div class="nav-desc">天气 · 一言 · 茶知识</div>
+</div>
+</button>
 </nav>
 <div class="sidebar-footer">
-<div class="weather-card loading" id="weatherCard">
-<div class="weather-row">
-<span class="weather-icon" id="weatherIcon">⏳</span>
-<span class="weather-temp" id="weatherTemp">--°</span>
-</div>
-<div class="weather-desc" id="weatherDesc">获取中...</div>
-<div class="weather-city" id="weatherCity"></div>
-<div class="weather-forecast" id="weatherForecast"></div>
-</div>
-<div class="quote-card">
-<div class="quote-label">每日一句</div>
-<div class="quote-text" id="dailyQuote">加载中...</div>
-<div class="quote-source" id="dailySource"></div>
-</div>
 <div class="data-mgmt">
 <button class="data-btn" id="exportDataBtn" title="导出所有数据">📤 导出数据</button>
 <button class="data-btn" id="importDataBtn" title="从备份文件恢复数据">📥 导入数据</button>
@@ -877,6 +923,33 @@ body{
 </div>
 </div>
 </section>
+<!-- 今日速览 -->
+<section class="module" id="module-today">
+<div class="today-wrap">
+<!-- 天气卡片 -->
+<div class="today-weather-card" id="weatherCard">
+<div class="today-card-label">🌤️ 今日天气</div>
+<div class="weather-row">
+<span class="weather-icon" id="weatherIcon">⏳</span>
+<span class="weather-temp" id="weatherTemp">--°</span>
+<span class="weather-desc" id="weatherDesc">获取中...</span>
+</div>
+<div class="weather-city" id="weatherCity"></div>
+<div class="weather-forecast" id="weatherForecast"></div>
+</div>
+<!-- 每日一言 -->
+<div class="today-quote-card">
+<div class="today-card-label">💬 每日一言</div>
+<div class="today-quote-text" id="dailyQuote">加载中...</div>
+<div class="today-quote-source" id="dailySource"></div>
+</div>
+<!-- 每日茶知识（复用已有数据） -->
+<div class="today-tea-card">
+<div class="today-card-label">🍵 今日茶知识</div>
+<div class="today-tea-content" id="teaDailyContent2"></div>
+</div>
+</div>
+</section>
 </div>
 </main>
 </div>
@@ -895,7 +968,8 @@ const moduleMap = {
   life: { title:'生活日常', desc:'记录每日待办事项与灵感想法' },
   tea:  { title:'饮茶日常', desc:'查询茶叶泡制方法与品饮要点' },
   english:{ title:'每日打卡', desc:'坚持每日好习惯' },
-  guide:{ title:'攻略制作', desc:'查询与制作旅游/博物馆攻略' }
+  guide:{ title:'攻略制作', desc:'查询与制作旅游/博物馆攻略' },
+  today:{ title:'今日速览', desc:'天气 · 一言 · 每日茶知识' }
 };
 $$('.nav-item').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1998,6 +2072,8 @@ const teaFacts = [
 ];
 const todayFact = teaFacts[new Date().getDate() % teaFacts.length];
 $('#teaDailyContent').innerHTML = `<b>${todayFact.title}</b>：${todayFact.text}`;
+const teaDaily2 = $('#teaDailyContent2');
+if(teaDaily2) teaDaily2.innerHTML = `<b>${todayFact.title}</b>：${todayFact.text}`;
 
 
 /* ============================================

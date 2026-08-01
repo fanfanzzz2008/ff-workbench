@@ -12,7 +12,8 @@ const moduleMap = {
   life: { title:'生活日常', desc:'记录每日待办事项与灵感想法' },
   tea:  { title:'饮茶日常', desc:'查询茶叶泡制方法与品饮要点' },
   english:{ title:'每日打卡', desc:'坚持每日好习惯' },
-  guide:{ title:'攻略制作', desc:'查询与制作旅游/博物馆攻略' }
+  guide:{ title:'攻略制作', desc:'查询与制作旅游/博物馆攻略' },
+  today:{ title:'今日速览', desc:'天气 · 一言 · 每日茶知识' }
 };
 $$('.nav-item').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1115,6 +1116,8 @@ const teaFacts = [
 ];
 const todayFact = teaFacts[new Date().getDate() % teaFacts.length];
 $('#teaDailyContent').innerHTML = `<b>${todayFact.title}</b>：${todayFact.text}`;
+const teaDaily2 = $('#teaDailyContent2');
+if(teaDaily2) teaDaily2.innerHTML = `<b>${todayFact.title}</b>：${todayFact.text}`;
 
 
 /* ============================================
