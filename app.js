@@ -23,7 +23,6 @@ $$('.nav-item').forEach(btn => {
     $$('.module').forEach(s => s.classList.remove('active'));
     $('#module-' + m).classList.add('active');
     $('#moduleTitle').textContent = moduleMap[m].title;
-    $('#moduleDesc').textContent = moduleMap[m].desc;
   });
 });
 
@@ -266,14 +265,15 @@ initWeather();
 
 
 /* ============================================
-   数据导出/导入
+   数据导出/导入 + 自动备份
 ============================================ */
 function exportAllData(){
   const allData = {};
   for(let i = 0; i < localStorage.length; i++){
     const key = localStorage.key(i);
-    if(key.startsWith('ff_')) allData[key] = JSON.parse(localStorage.getItem(key));
+    if(key.startsWith('ff_') && !key.startsWith('ff_autoBackup_')) allData[key] = JSON.parse(localStorage.getItem(key));
   }
+  allData['_exportTime'] = new Date().toISOString();
   const blob = new Blob([JSON.stringify(allData, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -281,6 +281,8 @@ function exportAllData(){
   a.download = 'FF-backup-' + new Date().toISOString().slice(0,10) + '.json';
   a.click();
   URL.revokeObjectURL(url);
+  // 记录上次导出时间
+  save('lastExportDate', new Date().toLocaleDateString('zh-CN'));
 }
 function importAllData(file){
   if(!file) return;
@@ -302,14 +304,106 @@ function importAllData(file){
   };
   reader.readAsText(file);
 }
+
+/* ---------- 自动本地备份（保留最近 7 天） ---------- */
+function autoBackup(){
+  const allData = {};
+  for(let i = 0; i < localStorage.length; i++){
+    const key = localStorage.key(i);
+    if(key.startsWith('ff_') && !key.startsWith('ff_autoBackup_')) allData[key] = JSON.parse(localStorage.getItem(key));
+  }
+  const today = new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'});
+  // 存今天的数据快照
+  localStorage.setItem('ff_autoBackup_' + today, JSON.stringify({
+    time: new Date().toISOString(),
+    data: allData
+  }));
+  // 清理 7 天前的自动备份
+  const cutoff = Date.now() - 7 * 86400000;
+  for(let i = localStorage.length - 1; i >= 0; i--){
+    const key = localStorage.key(i);
+    if(key && key.startsWith('ff_autoBackup_')){
+      try{
+        const snap = JSON.parse(localStorage.getItem(key));
+        if(new Date(snap.time).getTime() < cutoff) localStorage.removeItem(key);
+      }catch(e){ localStorage.removeItem(key); }
+    }
+  }
+}
+
+/* ---------- 备份提醒 ---------- */
+function checkBackupReminder(){
+  const lastExport = load('lastExportDate');
+  const today = new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'});
+  if(lastExport === today) return; // 今天已导出过
+  
+  // 计算距上次导出天数
+  const lastReminder = load('lastBackupReminder');
+  if(lastReminder === today) return; // 今天已提醒过
+  
+  let daysSince = 999;
+  if(lastExport){
+    const last = new Date(lastExport.replace(/\//g,'-'));
+    daysSince = Math.floor((Date.now() - last.getTime()) / 86400000);
+  }
+  
+  // 超过 7 天未导出备份，提醒
+  if(daysSince >= 7){
+    setTimeout(() => {
+      if(confirm(`📅 数据安全提醒\n\n您已经 ${daysSince >= 999 ? '很久' : daysSince + ' 天'} 没有导出备份数据了。\n\n建议定期导出备份文件保存到安全位置，防止数据丢失。\n\n现在导出备份吗？`)){
+        exportAllData();
+      }
+      save('lastBackupReminder', today);
+    }, 2000);
+  }
+}
+
 // 侧边栏按钮
 $('#exportDataBtn').addEventListener('click', exportAllData);
 $('#importDataBtn').addEventListener('click', () => $('#importFileInput').click());
 $('#importFileInput').addEventListener('change', e => { importAllData(e.target.files[0]); e.target.value = ''; });
-// 顶栏按钮
-$('#exportDataBtn2').addEventListener('click', exportAllData);
-$('#importDataBtn2').addEventListener('click', () => $('#importFileInput2').click());
-$('#importFileInput2').addEventListener('change', e => { importAllData(e.target.files[0]); e.target.value = ''; });
+
+// 恢复自动备份
+$('#restoreBackupBtn').addEventListener('click', () => {
+  const backups = [];
+  for(let i = 0; i < localStorage.length; i++){
+    const key = localStorage.key(i);
+    if(key && key.startsWith('ff_autoBackup_')){
+      try{
+        const snap = JSON.parse(localStorage.getItem(key));
+        backups.push({ key, time: snap.time, dataKeys: Object.keys(snap.data || {}).length });
+      }catch(e){}
+    }
+  }
+  if(backups.length === 0){
+    alert('📭 暂无自动备份记录。\n\n自动备份会在每次打开应用时创建，保留最近 7 天。');
+    return;
+  }
+  backups.sort((a,b) => new Date(b.time) - new Date(a.time));
+  const list = backups.map((b,i) => {
+    const d = new Date(b.time);
+    return `${i+1}. ${d.toLocaleDateString('zh-CN')} ${d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})} (${b.dataKeys} 组数据)`;
+  }).join('\n');
+  const choice = prompt(`🔄 恢复自动备份\n\n可用备份（最近 ${backups.length} 条）：\n\n${list}\n\n输入序号选择要恢复的备份（1 为最新）：`, '1');
+  if(!choice) return;
+  const idx = parseInt(choice) - 1;
+  if(isNaN(idx) || idx < 0 || idx >= backups.length){
+    alert('❌ 无效的序号');
+    return;
+  }
+  const snap = JSON.parse(localStorage.getItem(backups[idx].key));
+  if(confirm(`确定恢复 ${new Date(snap.time).toLocaleString('zh-CN')} 的备份吗？\n\n当前数据会被覆盖！`)){
+    Object.entries(snap.data).forEach(([k,v]) => {
+      if(k.startsWith('ff_')) localStorage.setItem(k, JSON.stringify(v));
+    });
+    alert('✅ 备份恢复成功！页面将刷新。');
+    location.reload();
+  }
+});
+
+// 页面加载时自动备份 + 检查提醒
+autoBackup();
+checkBackupReminder();
 
 
 /* ============================================
@@ -337,25 +431,52 @@ function renderTodos(){
   else if(currentFilter === 'high') filtered = todos.filter(t=>t.priority==='high');
 
   list.innerHTML = '';
+  // 按日期分组
+  const groups = {};
   filtered.forEach(t => {
-    const item = document.createElement('div');
-    item.className = 'todo-item' + (t.done ? ' done' : '');
-    item.innerHTML = `
-      <div class="todo-check ${t.done?'done':''}" data-id="${t.id}"></div>
-      <div class="todo-content">${escapeHtml(t.content)}</div>
-      <span class="todo-priority ${t.priority}">${t.priority==='high'?'🔥 高':t.priority==='mid'?'⭐ 中':'🌱 低'}</span>
-      <span class="todo-time">${t.time}</span>
-      <button class="todo-delete" data-id="${t.id}">✕</button>
-    `;
-    list.appendChild(item);
+    const d = t.date || '未标注日期';
+    if(!groups[d]) groups[d] = [];
+    groups[d].push(t);
+  });
+
+  Object.keys(groups).sort((a,b) => b.localeCompare(a)).forEach(date => {
+    // 日期标题
+    const header = document.createElement('div');
+    header.className = 'todo-date-header';
+    const isToday = date === new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'});
+    const dayLabel = isToday ? '📅 今天' : '📅 ' + date;
+    header.textContent = dayLabel;
+    list.appendChild(header);
+
+    // 同一天内按 id（时间戳）倒序，最新的在前
+    groups[date].sort((a,b) => b.id - a.id).forEach(t => {
+      const item = document.createElement('div');
+      item.className = 'todo-item' + (t.done ? ' done' : '');
+      item.innerHTML = `
+        <div class="todo-check ${t.done?'done':''}" data-id="${t.id}"></div>
+        <div class="todo-content">${escapeHtml(t.content)}</div>
+        <span class="todo-priority ${t.priority}">${t.priority==='high'?'🔥 高':t.priority==='mid'?'⭐ 中':'🌱 低'}</span>
+        <span class="todo-time">${t.time}</span>
+        <button class="todo-delete" data-id="${t.id}">✕</button>
+      `;
+      list.appendChild(item);
+    });
   });
 
   $('#todoEmpty').style.display = filtered.length ? 'none' : 'block';
   const total = todos.length, done = todos.filter(t=>t.done).length;
+  const rate = total ? Math.round(done/total*100) : 0;
   $('#statTotal').textContent = total;
   $('#statDone').textContent = done;
   $('#statPending').textContent = total - done;
-  $('#statRate').textContent = total ? Math.round(done/total*100)+'%' : '0%';
+  $('#statRate').textContent = rate + '%';
+  // 进度条
+  const bar = $('#todoProgress');
+  if(bar){
+    bar.style.width = rate + '%';
+    $('#todoProgressText').textContent = done + '/' + total + ' 已完成 (' + rate + '%)';
+    $('#todoProgressWrap').style.display = total ? 'block' : 'none';
+  }
 }
 
 function addTodo(){
@@ -366,7 +487,8 @@ function addTodo(){
   todos.unshift({
     id: Date.now(),
     content, priority, done:false,
-    time: new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})
+    time: new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}),
+    date: new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'})
   });
   save('todos', todos);
   input.value = '';
@@ -418,7 +540,10 @@ function renderInspires(){
     item.innerHTML = `
       <div class="inspire-item-header">
         <span class="inspire-item-date">${ins.date}${(ins.images&&ins.images.length)?' · 📷 '+ins.images.length+'张':''}</span>
-        <button class="inspire-item-del" data-id="${ins.id}">✕</button>
+        <div class="inspire-item-actions">
+          <button class="inspire-item-edit" data-id="${ins.id}" title="编辑">✏️</button>
+          <button class="inspire-item-del" data-id="${ins.id}" title="删除">✕</button>
+        </div>
       </div>
       <div class="inspire-item-body">${escapeHtml(ins.content)}</div>
       ${imgHtml}
@@ -517,8 +642,101 @@ $('#inspireList').addEventListener('click', e => {
 function showImageModal(src){
   const modal = document.createElement('div');
   modal.className = 'img-modal';
-  modal.innerHTML = `<button class="img-modal-close">✕</button><img src="${src}">`;
-  modal.addEventListener('click', () => modal.remove());
+  modal.innerHTML = `<button class="img-modal-close">✕</button><div class="img-modal-stage"><img src="${src}"></div>`;
+  
+  const stage = modal.querySelector('.img-modal-stage');
+  const img = stage.querySelector('img');
+  let scale = 1, tx = 0, ty = 0;
+  let dragging = false, lastX = 0, lastY = 0;
+  let pinchStartDist = 0, pinchStartScale = 1;
+  
+  function apply(){
+    img.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+  }
+  
+  // 滚轮缩放
+  stage.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect = stage.getBoundingClientRect();
+    const cx = e.clientX - rect.left - rect.width/2;
+    const cy = e.clientY - rect.top - rect.height/2;
+    const oldScale = scale;
+    scale = Math.min(5, Math.max(0.5, scale - e.deltaY * 0.002));
+    tx = cx - (cx - tx) * scale / oldScale;
+    ty = cy - (cy - ty) * scale / oldScale;
+    apply();
+  }, {passive: false});
+  
+  // 鼠标拖拽
+  stage.addEventListener('mousedown', e => {
+    if(e.target === stage || e.target === img){
+      dragging = true; lastX = e.clientX; lastY = e.clientY;
+      stage.style.cursor = 'grabbing';
+      e.preventDefault();
+    }
+  });
+  window.addEventListener('mousemove', e => {
+    if(!dragging) return;
+    tx += e.clientX - lastX; ty += e.clientY - lastY;
+    lastX = e.clientX; lastY = e.clientY;
+    apply();
+  });
+  window.addEventListener('mouseup', () => {
+    dragging = false; stage.style.cursor = scale > 1 ? 'grab' : 'default';
+  });
+  
+  // 触摸：双指缩放 + 单指拖拽
+  stage.addEventListener('touchstart', e => {
+    if(e.touches.length === 2){
+      pinchStartDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      pinchStartScale = scale;
+      dragging = false;
+    } else if(e.touches.length === 1){
+      dragging = true; lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+    }
+  }, {passive: false});
+  
+  stage.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if(e.touches.length === 2){
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      scale = Math.min(5, Math.max(0.5, pinchStartScale * dist / pinchStartDist));
+      apply();
+    } else if(e.touches.length === 1 && dragging){
+      tx += e.touches[0].clientX - lastX;
+      ty += e.touches[0].clientY - lastY;
+      lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+      apply();
+    }
+  }, {passive: false});
+  
+  stage.addEventListener('touchend', () => { dragging = false; });
+  
+  // 双击切换 1x / fit
+  stage.addEventListener('dblclick', () => {
+    if(scale > 1.01){ scale = 1; tx = 0; ty = 0; }
+    else { scale = 2; tx = 0; ty = 0; }
+    apply();
+    stage.style.cursor = scale > 1 ? 'grab' : 'default';
+  });
+  
+  // 关闭：点击背景或关闭按钮
+  modal.addEventListener('click', e => {
+    if(e.target === modal || e.target.classList.contains('img-modal-close')){
+      modal.remove();
+    }
+  });
+  
+  // ESC 关闭
+  const escHandler = e => { if(e.key==='Escape'){ modal.remove(); document.removeEventListener('keydown', escHandler); } };
+  document.addEventListener('keydown', escHandler);
+  
   document.body.appendChild(modal);
 }
 
@@ -527,8 +745,68 @@ $('#inspireList').addEventListener('click', e => {
     inspires = inspires.filter(x=>x.id!==Number(e.target.dataset.id));
     save('inspires', inspires);
     renderInspires();
+  } else if(e.target.classList.contains('inspire-item-edit')){
+    const id = Number(e.target.dataset.id);
+    const ins = inspires.find(x=>x.id===id);
+    if(!ins) return;
+    showEditInspireModal(ins);
   }
 });
+
+function showEditInspireModal(ins){
+  const modal = document.createElement('div');
+  modal.className = 'img-modal';
+  modal.style.alignItems = 'flex-start';
+  modal.style.paddingTop = '60px';
+  modal.innerHTML = `
+    <div class="inspire-edit-modal">
+      <div class="inspire-edit-header">
+        <span>✏️ 编辑灵感</span>
+        <button class="img-modal-close">✕</button>
+      </div>
+      <textarea class="inspire-edit-textarea" id="editInspireInput">${escapeHtml(ins.content)}</textarea>
+      <div class="inspire-edit-images" id="editInspireImages"></div>
+      <div class="inspire-edit-actions">
+        <button class="btn-secondary" id="editInspireCancel">取消</button>
+        <button class="btn-primary" id="editInspireSave">💾 保存</button>
+      </div>
+    </div>
+  `;
+  modal.addEventListener('click', e => {
+    if(e.target === modal || e.target.classList.contains('img-modal-close')) modal.remove();
+  });
+  document.body.appendChild(modal);
+
+  // 渲染已有图片（可删除）
+  const imgBox = modal.querySelector('#editInspireImages');
+  let editImages = [...(ins.images || [])];
+  function renderEditImages(){
+    imgBox.innerHTML = '';
+    editImages.forEach((src, i) => {
+      const thumb = document.createElement('div');
+      thumb.className = 'inspire-img-thumb';
+      thumb.innerHTML = `<img src="${src}"><button class="thumb-del" data-i="${i}">✕</button>`;
+      imgBox.appendChild(thumb);
+    });
+  }
+  renderEditImages();
+  imgBox.addEventListener('click', e => {
+    if(e.target.classList.contains('thumb-del')){
+      editImages.splice(Number(e.target.dataset.i), 1);
+      renderEditImages();
+    }
+  });
+
+  modal.querySelector('#editInspireCancel').addEventListener('click', () => modal.remove());
+  modal.querySelector('#editInspireSave').addEventListener('click', () => {
+    const newContent = modal.querySelector('#editInspireInput').value.trim();
+    ins.content = newContent || '（图片记录）';
+    ins.images = editImages;
+    save('inspires', inspires);
+    renderInspires();
+    modal.remove();
+  });
+}
 renderInspires();
 
 
@@ -1114,34 +1392,42 @@ const teaFacts = [
   { title:'工夫茶的"关公巡城"和"韩信点兵"', text:'这是潮州工夫茶的两个经典动作：<b>关公巡城</b>——用开水淋壶身一周，使壶温均匀；<b>韩信点兵</b>——出汤时在几个杯中来回均匀分茶，确保每杯茶汤浓度一致。' },
   { title:'茶的"回甘"是什么？', text:'回甘是指茶汤入喉后，口腔中自然涌现的甜润感。优质茶叶中的茶多酚先带来微涩，随后与唾液反应转化为甘甜。回甘越明显、越持久，说明茶叶品质越好。' }
 ];
-const todayFact = teaFacts[new Date().getDate() % teaFacts.length];
+const todayFact = teaFacts[Math.floor(Date.now() / 86400000) % teaFacts.length];
 $('#teaDailyContent').innerHTML = `<b>${todayFact.title}</b>：${todayFact.text}`;
-const teaDaily2 = $('#teaDailyContent2');
-if(teaDaily2) teaDaily2.innerHTML = `<b>${todayFact.title}</b>：${todayFact.text}`;
 
 
 /* ============================================
-   模块三：每日打卡
+   模块三：每日打卡（日历记录版）
 ============================================ */
 const defaultCheckinTasks = ['💊 吃维生素', '🎙️ 听VOA', '🏃 运动'];
 let checkinTasks = load('checkinTasks') || [...defaultCheckinTasks];
-let checkinDate = load('checkinDate') || '';
-let checkinDone = load('checkinDone') || {};
+// 历史记录：{ "2026/08/04": {"💊 吃维生素": true, "🏃 运动": false}, ... }
+let checkinHistory = load('checkinHistory') || {};
+let calCursor = new Date(); // 日历当前显示月份
 
-// 跨天自动重置
-const todayDate = new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'});
-if(checkinDate !== todayDate){
-  checkinDate = todayDate;
-  checkinDone = {};
-  save('checkinDate', checkinDate);
-  save('checkinDone', checkinDone);
+function todayStrCN(d){
+  return d.toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'});
+}
+
+// 兼容旧数据：把旧的 checkinDone 迁移到 checkinHistory
+if(!load('checkinHistory') && load('checkinDone')){
+  const oldDone = load('checkinDone');
+  const oldDate = load('checkinDate') || todayStrCN(new Date());
+  checkinHistory[oldDate] = {...oldDone};
+  save('checkinHistory', checkinHistory);
+}
+
+function getTodayCheckins(){
+  const today = todayStrCN(new Date());
+  return checkinHistory[today] || {};
 }
 
 function renderCheckins(){
   const grid = $('#checkinGrid');
   grid.innerHTML = '';
+  const todayDone = getTodayCheckins();
   checkinTasks.forEach(name => {
-    const done = !!checkinDone[name];
+    const done = !!todayDone[name];
     const card = document.createElement('div');
     card.className = 'checkin-card' + (done ? ' done' : '');
     card.innerHTML = `
@@ -1151,14 +1437,18 @@ function renderCheckins(){
     `;
     card.addEventListener('click', e => {
       if(e.target.closest('.checkin-del')) return;
-      checkinDone[name] = !checkinDone[name];
-      save('checkinDone', checkinDone);
+      const today = todayStrCN(new Date());
+      if(!checkinHistory[today]) checkinHistory[today] = {};
+      checkinHistory[today][name] = !checkinHistory[today][name];
+      save('checkinHistory', checkinHistory);
       renderCheckins();
+      renderCalendar();
     });
     grid.appendChild(card);
   });
   $('#checkinEmpty').style.display = checkinTasks.length ? 'none' : 'block';
-  $('#checkinTip').textContent = `📅 ${todayDate} · 已完成 ${Object.values(checkinDone).filter(Boolean).length}/${checkinTasks.length}`;
+  const doneCount = Object.values(todayDone).filter(Boolean).length;
+  $('#checkinTip').textContent = `📅 ${todayStrCN(new Date())} · 已完成 ${doneCount}/${checkinTasks.length}`;
 }
 
 function addCheckinTask(){
@@ -1173,12 +1463,13 @@ function addCheckinTask(){
 }
 
 function deleteCheckinTask(name){
-  if(!confirm(`确定删除"${name}"吗？`)) return;
+  if(!confirm(`确定删除"${name}"吗？\n\n（历史记录会保留，只是今后不再显示该任务）`)) return;
   checkinTasks = checkinTasks.filter(t => t !== name);
-  delete checkinDone[name];
+  // 不清理历史记录，保留以前的打卡数据
   save('checkinTasks', checkinTasks);
-  save('checkinDone', checkinDone);
+  save('checkinHistory', checkinHistory);
   renderCheckins();
+  renderCalendar();
 }
 
 $('#checkinAddBtn').addEventListener('click', addCheckinTask);
@@ -1191,7 +1482,160 @@ $('#checkinGrid').addEventListener('click', e => {
   }
 });
 
+/* ---------- 日历渲染 ---------- */
+function renderCalendar(){
+  const grid = $('#calGrid');
+  const title = $('#calTitle');
+  if(!grid) return;
+  grid.innerHTML = '';
+
+  const year = calCursor.getFullYear();
+  const month = calCursor.getMonth();
+  title.textContent = `${year}年${month+1}月`;
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month+1, 0);
+  const startWeekday = firstDay.getDay(); // 0=周日
+  const daysInMonth = lastDay.getDate();
+  const today = todayStrCN(new Date());
+
+  // 上月填充
+  const prevLastDay = new Date(year, month, 0).getDate();
+  for(let i = startWeekday - 1; i >= 0; i--){
+    const d = document.createElement('div');
+    d.className = 'cal-day other-month';
+    d.innerHTML = `<span class="cal-day-num">${prevLastDay - i}</span>`;
+    grid.appendChild(d);
+  }
+
+  // 本月
+  for(let day = 1; day <= daysInMonth; day++){
+    const dateObj = new Date(year, month, day);
+    const dateStr = todayStrCN(dateObj);
+    const rec = checkinHistory[dateStr];
+    const doneCount = rec ? Object.values(rec).filter(Boolean).length : 0;
+    // 今天用当前任务列表算，历史日期用当天记录的任务数算
+    const isToday = dateStr === today;
+    const taskCount = isToday ? checkinTasks.length : (rec ? Object.keys(rec).length : 0);
+
+    let cls = 'cal-day';
+    if(isToday) cls += ' today';
+    if(taskCount > 0 && doneCount >= taskCount) cls += ' cal-full';
+    else if(doneCount > 0) cls += ' cal-partial';
+    else cls += ' cal-none';
+
+    const d = document.createElement('div');
+    d.className = cls;
+    d.title = `${dateStr} · ${doneCount}/${taskCount} 完成`;
+    d.dataset.date = dateStr;
+    d.innerHTML = `<span class="cal-day-num">${day}</span>`;
+    grid.appendChild(d);
+  }
+
+  // 下月填充
+  const totalCells = startWeekday + daysInMonth;
+  const remain = (7 - totalCells % 7) % 7;
+  for(let i = 1; i <= remain; i++){
+    const d = document.createElement('div');
+    d.className = 'cal-day other-month';
+    d.innerHTML = `<span class="cal-day-num">${i}</span>`;
+    grid.appendChild(d);
+  }
+}
+
+$('#calPrev')?.addEventListener('click', () => {
+  calCursor.setMonth(calCursor.getMonth() - 1);
+  renderCalendar();
+});
+$('#calNext')?.addEventListener('click', () => {
+  calCursor.setMonth(calCursor.getMonth() + 1);
+  renderCalendar();
+});
+
+/* ---------- 日历点击详情 ---------- */
+$('#calGrid')?.addEventListener('click', e => {
+  const cell = e.target.closest('.cal-day:not(.other-month)');
+  if(!cell || !cell.dataset.date) return;
+  showDayDetail(cell.dataset.date, cell);
+});
+
+function showDayDetail(dateStr, anchorEl){
+  // 移除已有的详情面板
+  document.querySelectorAll('.cal-detail-popup').forEach(el => el.remove());
+
+  const rec = checkinHistory[dateStr] || {};
+  const recKeys = Object.keys(rec);
+  const dateObj = new Date(dateStr.replace(/\//g,'-'));
+  const weekday = ['周日','周一','周二','周三','周四','周五','周六'][dateObj.getDay()];
+  const today = todayStrCN(new Date());
+  const isFuture = dateStr > today;
+  const isToday = dateStr === today;
+  // 今天显示当前任务列表，历史日期显示当时的记录
+  const taskNames = isToday ? checkinTasks : (recKeys.length > 0 ? recKeys : checkinTasks);
+
+  let itemsHtml = '';
+  if(taskNames.length === 0){
+    itemsHtml = '<div class="cal-detail-empty">暂无打卡任务</div>';
+  } else {
+    itemsHtml = taskNames.map(name => {
+      const done = !!rec[name];
+      return `<div class="cal-detail-item ${done?'done':'undone'}">
+        <span class="cal-detail-check">${done?'✅':'⬜'}</span>
+        <span class="cal-detail-name">${escapeHtml(name)}</span>
+      </div>`;
+    }).join('');
+  }
+
+  const doneCount = Object.values(rec).filter(Boolean).length;
+  const taskCount = isToday ? checkinTasks.length : (recKeys.length > 0 ? recKeys.length : checkinTasks.length);
+  const rateText = taskCount > 0 ? `${doneCount}/${taskCount} 完成` : '无任务';
+
+  const popup = document.createElement('div');
+  popup.className = 'cal-detail-popup';
+  popup.innerHTML = `
+    <div class="cal-detail-header">
+      <span class="cal-detail-date">📅 ${dateStr} ${weekday}</span>
+      <button class="cal-detail-close">✕</button>
+    </div>
+    <div class="cal-detail-rate">${rateText}</div>
+    <div class="cal-detail-items">${itemsHtml}</div>
+    ${isFuture ? '<div class="cal-detail-future">📌 该日期尚未到来</div>' : ''}
+    ${!isFuture && taskCount === 0 ? '<div class="cal-detail-future">📭 当天无打卡记录</div>' : ''}
+  `;
+
+  // 定位到格子附近
+  const rect = anchorEl.getBoundingClientRect();
+  const popupW = 240;
+  let left = rect.left + rect.width/2 - popupW/2;
+  left = Math.max(8, Math.min(left, window.innerWidth - popupW - 8));
+  let top = rect.bottom + 6;
+  // 如果下方空间不够，弹到上方
+  if(top + 250 > window.innerHeight) top = rect.top - 250 - 6;
+  if(top < 8) top = 8;
+
+  popup.style.left = left + 'px';
+  popup.style.top = top + 'px';
+  popup.style.width = popupW + 'px';
+
+  // 关闭事件
+  popup.querySelector('.cal-detail-close').addEventListener('click', () => popup.remove());
+
+  document.body.appendChild(popup);
+
+  // 点击外部关闭
+  setTimeout(() => {
+    const outsideHandler = ev => {
+      if(!popup.contains(ev.target) && !ev.target.closest('.cal-day')){
+        popup.remove();
+        document.removeEventListener('click', outsideHandler);
+      }
+    };
+    document.addEventListener('click', outsideHandler);
+  }, 10);
+}
+
 renderCheckins();
+renderCalendar();
 
 
 let schedules = [];
@@ -1304,6 +1748,199 @@ $('#clearGuideBtn').addEventListener('click', () => {
 renderSchedules();
 renderChecklist();
 renderMyGuides();
+
+/* ============================================
+   Tips - 小经验记录（支持图片）
+============================================ */
+let tips = load('tips') || [];
+let pendingTipImages = [];
+
+function renderTips(){
+  const list = $('#tipsList');
+  list.innerHTML = '';
+  const groups = {};
+  tips.forEach(t => {
+    const d = t.date || '未标注日期';
+    if(!groups[d]) groups[d] = [];
+    groups[d].push(t);
+  });
+
+  Object.keys(groups).sort((a,b) => b.localeCompare(a)).forEach(date => {
+    const isToday = date === new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'});
+    const header = document.createElement('div');
+    header.className = 'todo-date-header';
+    header.textContent = isToday ? '📅 今天' : '📅 ' + date;
+    list.appendChild(header);
+
+    groups[date].forEach(t => {
+      const imgHtml = (t.images && t.images.length)
+        ? `<div class="inspire-item-images">${t.images.map((src,i) =>
+            `<div class="inspire-item-img" data-idx="${i}" data-tip="${t.id}"><img src="${src}" alt="图片"></div>`
+          ).join('')}</div>`
+        : '';
+      const item = document.createElement('div');
+      item.className = 'tip-item';
+      item.innerHTML = `
+        <div class="tip-item-header">
+          <span class="tip-item-time">${t.time}${(t.images&&t.images.length)?' · 📷 '+t.images.length+'张':''}</span>
+          <div class="tip-item-actions">
+            <button class="tip-item-edit" data-id="${t.id}">✏️</button>
+            <button class="tip-item-del" data-id="${t.id}">✕</button>
+          </div>
+        </div>
+        <div class="tip-item-body">${escapeHtml(t.content)}</div>
+        ${imgHtml}
+      `;
+      list.appendChild(item);
+    });
+  });
+  $('#tipsEmpty').style.display = tips.length ? 'none' : 'block';
+}
+
+function renderPendingTipImages(){
+  const box = $('#tipImgPreview');
+  box.innerHTML = '';
+  pendingTipImages.forEach((src, i) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'inspire-img-thumb';
+    thumb.innerHTML = `<img src="${src}"><button class="thumb-del" data-i="${i}">✕</button>`;
+    box.appendChild(thumb);
+  });
+  $('#tipImgTip').textContent = pendingTipImages.length ? `已选 ${pendingTipImages.length}/9 张` : '可选，最多9张';
+}
+
+function addTip(){
+  const input = $('#tipInput');
+  const content = input.value.trim();
+  if(!content && !pendingTipImages.length) return;
+  tips.unshift({
+    id: Date.now(),
+    content: content || '（图片记录）',
+    images: [...pendingTipImages],
+    date: new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'}),
+    time: new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})
+  });
+  save('tips', tips);
+  input.value = '';
+  pendingTipImages = [];
+  renderPendingTipImages();
+  renderTips();
+}
+
+$('#addTipBtn').addEventListener('click', addTip);
+$('#tipInput').addEventListener('keydown', e => { if(e.key==='Enter') addTip(); });
+
+// 图片选择
+$('#tipImgInput').addEventListener('change', e => {
+  const files = Array.from(e.target.files);
+  const remain = 9 - pendingTipImages.length;
+  if(remain <= 0){ alert('最多只能添加9张图片'); e.target.value=''; return; }
+  const toRead = files.slice(0, remain);
+  if(files.length > remain) alert(`最多9张，已添加前 ${remain} 张`);
+  let loaded = 0;
+  toRead.forEach(file => {
+    if(!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      compressImage(ev.target.result, 800, 0.7, compressed => {
+        pendingTipImages.push(compressed);
+        loaded++;
+        if(loaded === toRead.length){ renderPendingTipImages(); }
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value = '';
+});
+
+$('#tipImgPreview').addEventListener('click', e => {
+  if(e.target.classList.contains('thumb-del')){
+    pendingTipImages.splice(Number(e.target.dataset.i), 1);
+    renderPendingTipImages();
+  }
+});
+
+// 点击放大图片 + 编辑/删除
+$('#tipsList').addEventListener('click', e => {
+  if(e.target.closest('.inspire-item-img')){
+    const el = e.target.closest('.inspire-item-img');
+    const tipId = Number(el.dataset.tip);
+    const idx = Number(el.dataset.idx);
+    const tip = tips.find(x=>x.id===tipId);
+    if(tip && tip.images && tip.images[idx]){
+      showImageModal(tip.images[idx]);
+    }
+    return;
+  }
+  const btn = e.target.closest('[data-id]');
+  if(!btn) return;
+  const id = Number(btn.dataset.id);
+  if(btn.classList.contains('tip-item-del')){
+    tips = tips.filter(x=>x.id!==id);
+    save('tips', tips);
+    renderTips();
+  } else if(btn.classList.contains('tip-item-edit')){
+    const tip = tips.find(x=>x.id===id);
+    if(!tip) return;
+    showEditTipModal(tip);
+  }
+});
+
+function showEditTipModal(tip){
+  const modal = document.createElement('div');
+  modal.className = 'img-modal';
+  modal.style.alignItems = 'flex-start';
+  modal.style.paddingTop = '60px';
+  modal.innerHTML = `
+    <div class="inspire-edit-modal">
+      <div class="inspire-edit-header">
+        <span>✏️ 编辑 Tips</span>
+        <button class="img-modal-close">✕</button>
+      </div>
+      <textarea class="inspire-edit-textarea" id="editTipInput">${escapeHtml(tip.content)}</textarea>
+      <div class="inspire-edit-images" id="editTipImages"></div>
+      <div class="inspire-edit-actions">
+        <button class="btn-secondary" id="editTipCancel">取消</button>
+        <button class="btn-primary" id="editTipSave">💾 保存</button>
+      </div>
+    </div>
+  `;
+  modal.addEventListener('click', e => {
+    if(e.target === modal || e.target.classList.contains('img-modal-close')) modal.remove();
+  });
+  document.body.appendChild(modal);
+
+  let editImages = [...(tip.images || [])];
+  const imgBox = modal.querySelector('#editTipImages');
+  function renderEditImages(){
+    imgBox.innerHTML = '';
+    editImages.forEach((src, i) => {
+      const thumb = document.createElement('div');
+      thumb.className = 'inspire-img-thumb';
+      thumb.innerHTML = `<img src="${src}"><button class="thumb-del" data-i="${i}">✕</button>`;
+      imgBox.appendChild(thumb);
+    });
+  }
+  renderEditImages();
+  imgBox.addEventListener('click', e => {
+    if(e.target.classList.contains('thumb-del')){
+      editImages.splice(Number(e.target.dataset.i), 1);
+      renderEditImages();
+    }
+  });
+
+  modal.querySelector('#editTipCancel').addEventListener('click', () => modal.remove());
+  modal.querySelector('#editTipSave').addEventListener('click', () => {
+    const newContent = modal.querySelector('#editTipInput').value.trim();
+    tip.content = newContent || '（图片记录）';
+    tip.images = editImages;
+    save('tips', tips);
+    renderTips();
+    modal.remove();
+  });
+}
+
+renderTips();
 
 
 /* ---------- 工具：HTML 转义 ---------- */
