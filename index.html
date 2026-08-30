@@ -729,6 +729,10 @@ body{
 }
 .guide-timeline-item:last-child::after{display:none}
 .guide-timeline-time{font-weight:600;color:var(--primary-deep);margin-right:8px}
+.guide-timeline-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;background:var(--primary-bg);color:var(--primary-deep);border:1px solid var(--border);margin-right:8px;vertical-align:1px}
+.guide-timeline-badge-tp{background:#E6F1FB;color:#185FA5;border-color:#B5D4F4}
+.guide-timeline-dur{display:inline-block;font-size:12px;color:var(--text-soft);background:var(--card);border:1px dashed var(--border);border-radius:8px;padding:1px 8px;margin-left:8px}
+.guide-timeline-text{margin-top:6px;color:var(--text-soft);line-height:1.7}
 
 .guide-tips{display:flex;flex-wrap:wrap;gap:8px;padding-left:13px}
 .guide-tip{
@@ -750,11 +754,17 @@ body{
 
 .schedule-item{
   background:var(--primary-bg);border-radius:8px;padding:12px;
-  margin-bottom:8px;border:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;
+  margin-bottom:8px;border:1px solid var(--border);
+  display:flex;flex-direction:column;gap:8px;
 }
-.schedule-item input{flex:1;min-width:120px;border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;background:#fff;font-family:inherit}
+.sched-row1,.sched-row2{display:flex;gap:6px;align-items:center;flex-wrap:nowrap}
+.schedule-item input{flex:1;min-width:0;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:13px;background:#fff;font-family:inherit}
 .schedule-item input:focus{outline:none;border-color:var(--primary)}
 .schedule-time{flex:0 0 92px !important}
+.schedule-duration{flex:0 0 100px !important}
+.sched-type{flex:0 0 auto;font-size:11px;padding:3px 9px;border-radius:10px;font-weight:500;line-height:1.4}
+.sched-type-sp{background:#fff;color:var(--primary-deep);border:1px solid var(--primary-light)}
+.sched-type-tp{background:#fff;color:#185FA5;border:1px solid #85B7EB}
 .schedule-move{
   background:#fff;border:1px solid var(--border);border-radius:6px;
   cursor:pointer;font-size:13px;padding:8px 10px;color:var(--text-soft);
@@ -762,6 +772,8 @@ body{
 }
 .schedule-move:hover{border-color:var(--primary);color:var(--primary-deep)}
 .schedule-del{background:transparent;border:none;color:var(--danger);cursor:pointer;font-size:16px;padding:4px 8px}
+.schedule-add-btns{display:flex;gap:8px}
+.schedule-add-btns .btn-secondary{flex:1;text-align:center}
 
 .checklist-item{
   display:flex;align-items:center;gap:10px;
@@ -1114,7 +1126,10 @@ body{
 <textarea class="guide-textarea" id="guideOverview" placeholder="简述目的地亮点、最佳季节、注意事项..."></textarea>
 <div class="card-label" style="margin-top:16px">行程安排</div>
 <div id="scheduleList"></div>
-<button class="btn-secondary" id="addScheduleBtn">+ 添加一段行程</button>
+<div class="schedule-add-btns">
+<button class="btn-secondary" id="addSpotBtn">🏞️ 添加游玩</button>
+<button class="btn-secondary" id="addTransportBtn">🚄 添加交通</button>
+</div>
 <div class="card-label" style="margin-top:16px">必备清单</div>
 <div id="checklist"></div>
 <div class="checklist-add">
@@ -2810,21 +2825,28 @@ renderCheckins();
 renderCalendar();
 
 
-let schedules = [{time:'', item:''}];
+let schedules = [{type:'spot', time:'', duration:'', item:''}];
 let checklist = [];
 
 function renderSchedules(){
   const box = $('#scheduleList');
   box.innerHTML = '';
   schedules.forEach((s,i) => {
+    const isTp = s.type === 'transport';
     const item = document.createElement('div');
     item.className = 'schedule-item';
     item.innerHTML = `
-      <input type="text" class="schedule-time" placeholder="如 Day1 上午" value="${escapeAttr(s.time)}" data-i="${i}" data-k="time">
-      <input type="text" placeholder="行程内容，如：天安门广场" value="${escapeAttr(s.item)}" data-i="${i}" data-k="item">
-      <button class="schedule-move" data-i="${i}" data-dir="up" title="上移">↑</button>
-      <button class="schedule-move" data-i="${i}" data-dir="down" title="下移">↓</button>
-      <button class="schedule-del" data-i="${i}" title="删除">✕</button>
+      <div class="sched-row1">
+        <span class="sched-type ${isTp ? 'sched-type-tp' : 'sched-type-sp'}">${isTp ? '🚄 交通' : '🏞️ 游玩'}</span>
+        <input type="text" class="schedule-time" placeholder="如 Day1 上午" value="${escapeAttr(s.time)}" data-i="${i}" data-k="time">
+        <button class="schedule-move" data-i="${i}" data-dir="up" title="上移">↑</button>
+        <button class="schedule-move" data-i="${i}" data-dir="down" title="下移">↓</button>
+        <button class="schedule-del" data-i="${i}" title="删除">✕</button>
+      </div>
+      <div class="sched-row2">
+        <input type="text" placeholder="${isTp ? '如：高铁 G1 次 / 地铁1号线 / 打车' : '内容，如：天安门广场'}" value="${escapeAttr(s.item)}" data-i="${i}" data-k="item">
+        <input type="text" class="schedule-duration" placeholder="耗时，如 2小时" value="${escapeAttr(s.duration)}" data-i="${i}" data-k="duration">
+      </div>
     `;
     box.appendChild(item);
   });
@@ -2849,8 +2871,12 @@ $('#scheduleList').addEventListener('click', e => {
     renderSchedules();
   }
 });
-$('#addScheduleBtn').addEventListener('click', () => {
-  schedules.push({time:'', item:''});
+$('#addSpotBtn').addEventListener('click', () => {
+  schedules.push({type:'spot', time:'', duration:'', item:''});
+  renderSchedules();
+});
+$('#addTransportBtn').addEventListener('click', () => {
+  schedules.push({type:'transport', time:'', duration:'', item:''});
   renderSchedules();
 });
 
@@ -2903,7 +2929,7 @@ let myGuides = (load('myGuides') || []).map(g => ({
   destination: g.destination || '',
   duration: g.duration || '',
   overview: g.overview || '',
-  schedules: g.schedules || [],
+  schedules: (g.schedules || []).map(s => ({ type: s.type || 'spot', time: s.time || '', duration: s.duration || '', item: s.item || '' })),
   checklist: g.checklist || [],
   createdAt: g.createdAt || ''
 }));
@@ -2946,7 +2972,12 @@ function showGuideDetail(i){
   const chkList = g.checklist || [];
   const schedHtml = schedList.length
     ? `<div class="guide-timeline">${schedList.map(s =>
-        `<div class="guide-timeline-item">${s.time ? `<span class="guide-timeline-time">${escapeHtml(s.time)}</span>` : ''}${escapeHtml(s.item || '')}</div>`
+        `<div class="guide-timeline-item">
+          <span class="guide-timeline-badge ${s.type === 'transport' ? 'guide-timeline-badge-tp' : ''}">${s.type === 'transport' ? '🚄 交通' : '🏞️ 游玩'}</span>
+          ${s.time ? `<span class="guide-timeline-time">${escapeHtml(s.time)}</span>` : ''}
+          ${s.duration ? `<span class="guide-timeline-dur">⏱ ${escapeHtml(s.duration)}</span>` : ''}
+          <div class="guide-timeline-text">${escapeHtml(s.item || '')}</div>
+        </div>`
       ).join('')}</div>`
     : `<div class="guide-section-text">暂无行程安排</div>`;
   const chkHtml = chkList.length
@@ -2984,7 +3015,7 @@ function fillGuideForm(g){
   $('#guideDestination').value = g.destination || '';
   $('#guideDuration').value = g.duration || '';
   $('#guideOverview').value = g.overview || '';
-  schedules = (g.schedules || []).map(s => ({ time: s.time || '', item: s.item || '' }));
+  schedules = (g.schedules || []).map(s => ({ type: s.type || 'spot', time: s.time || '', duration: s.duration || '', item: s.item || '' }));
   checklist = [...(g.checklist || [])];
   renderSchedules();
   renderChecklist();
@@ -2993,7 +3024,7 @@ function fillGuideForm(g){
 function resetGuideForm(){
   $('#guideTitle').value=''; $('#guideDestination').value='';
   $('#guideDuration').value=''; $('#guideOverview').value='';
-  schedules = [{time:'', item:''}]; checklist = []; renderSchedules(); renderChecklist();
+  schedules = [{type:'spot', time:'', duration:'', item:''}]; checklist = []; renderSchedules(); renderChecklist();
 }
 
 function startEditGuide(i){
@@ -3031,7 +3062,7 @@ $('#saveGuideBtn').addEventListener('click', () => {
     destination: $('#guideDestination').value.trim(),
     duration: $('#guideDuration').value.trim(),
     overview: $('#guideOverview').value.trim(),
-    schedules: schedules.filter(s=>s.time||s.item),
+    schedules: schedules.filter(s=>s.time||s.item||s.duration),
     checklist: [...checklist],
     createdAt: new Date().toLocaleString('zh-CN')
   };
