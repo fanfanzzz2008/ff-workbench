@@ -774,6 +774,9 @@ body{
 .my-guide-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
 .my-guide-meta{font-size:12px;color:var(--text-light)}
 .my-guide-del{float:right;background:transparent;border:none;color:var(--danger);cursor:pointer;font-size:14px}
+.guide-detail{animation:fadein .3s}
+.guide-detail .guide-actions{justify-content:flex-start;flex-wrap:wrap}
+.guide-detail .btn-primary,.guide-detail .btn-secondary{flex:1;min-width:120px;text-align:center}
 
 /* 滚动条 */
 ::-webkit-scrollbar{width:8px;height:8px}
@@ -1082,8 +1085,8 @@ body{
 <section class="module" id="module-guide">
 <div class="guide-wrap">
 <div class="guide-tabs">
-
 <button class="guide-tab active" data-tab="create">✍️ 制作攻略</button>
+<button class="guide-tab" data-tab="mine">📖 我的攻略</button>
 </div>
 
 <div class="guide-panel active" id="panel-create">
@@ -1109,12 +1112,18 @@ body{
 </div>
 </div>
 </div>
+</div>
+
+<div class="guide-panel" id="panel-mine">
 <div class="my-guides-card">
 <div class="card-label">我的攻略</div>
+<div class="guide-detail" id="guideDetailView" style="display:none"></div>
+<div id="guideListView">
 <div id="myGuidesList"></div>
 <div class="empty-state" id="myGuidesEmpty">
 <div class="empty-icon">📂</div>
 <div>你还没有保存攻略，制作完成后点击"保存攻略"即可查看</div>
+</div>
 </div>
 </div>
 </div>
@@ -2841,7 +2850,28 @@ $('#addChecklistBtn').addEventListener('click', () => {
 });
 $('#checklistInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); $('#addChecklistBtn').click(); } });
 
-let myGuides = load('myGuides') || [];
+let myGuides = (load('myGuides') || []).map(g => ({
+  id: g.id || Date.now(),
+  title: g.title || '未命名攻略',
+  destination: g.destination || '',
+  duration: g.duration || '',
+  overview: g.overview || '',
+  schedules: g.schedules || [],
+  checklist: g.checklist || [],
+  createdAt: g.createdAt || ''
+}));
+let editingGuideId = null;
+
+function switchGuideTab(tab){
+  document.querySelectorAll('.guide-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.guide-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
+}
+
+function showGuideList(){
+  $('#guideDetailView').style.display = 'none';
+  $('#guideListView').style.display = 'block';
+}
+
 function renderMyGuides(){
   const box = $('#myGuidesList');
   box.innerHTML = '';
@@ -2851,15 +2881,92 @@ function renderMyGuides(){
     card.innerHTML = `
       <button class="my-guide-del" data-i="${i}">✕</button>
       <div class="my-guide-title">${escapeHtml(g.title)}</div>
-      <div class="my-guide-meta">${escapeHtml(g.destination)} · ${escapeHtml(g.duration)} · ${g.schedules.length}段行程</div>
+      <div class="my-guide-meta">${escapeHtml(g.destination || '未设目的地')} · ${escapeHtml(g.duration || '未设时长')} · ${(g.schedules||[]).length}段行程${g.createdAt ? ' · ' + escapeHtml(g.createdAt) : ''}</div>
     `;
     card.addEventListener('click', e => {
       if(e.target.classList.contains('my-guide-del')) return;
+      showGuideDetail(i);
     });
     box.appendChild(card);
   });
   $('#myGuidesEmpty').style.display = myGuides.length ? 'none' : 'block';
 }
+
+function showGuideDetail(i){
+  const g = myGuides[i];
+  if(!g) return;
+  const schedList = g.schedules || [];
+  const chkList = g.checklist || [];
+  const schedHtml = schedList.length
+    ? `<div class="guide-timeline">${schedList.map(s =>
+        `<div class="guide-timeline-item">${s.time ? `<span class="guide-timeline-time">${escapeHtml(s.time)}</span>` : ''}${escapeHtml(s.item || '')}</div>`
+      ).join('')}</div>`
+    : `<div class="guide-section-text">暂无行程安排</div>`;
+  const chkHtml = chkList.length
+    ? `<div class="guide-tips">${chkList.map(c => `<span class="guide-tip">${escapeHtml(c)}</span>`).join('')}</div>`
+    : `<div class="guide-section-text">暂无必备清单</div>`;
+  const box = $('#guideDetailView');
+  box.innerHTML = `
+    <div class="guide-info">
+      <div class="guide-info-header">
+        <div class="guide-info-emoji">🗺️</div>
+        <div>
+          <div class="guide-info-title">${escapeHtml(g.title)}</div>
+          <div class="guide-info-sub">${escapeHtml(g.destination || '未设目的地')}${g.duration ? ' · ' + escapeHtml(g.duration) : ''}${g.createdAt ? '<br>' + escapeHtml(g.createdAt) : ''}</div>
+        </div>
+      </div>
+      ${g.overview ? `<div class="guide-section"><div class="guide-section-title">📝 攻略概述</div><div class="guide-section-text">${escapeHtml(g.overview)}</div></div>` : ''}
+      <div class="guide-section"><div class="guide-section-title">🗓️ 行程安排</div>${schedHtml}</div>
+      <div class="guide-section"><div class="guide-section-title">🧳 必备清单</div>${chkHtml}</div>
+      <div class="guide-actions">
+        <button class="btn-primary" id="editGuideBtn">✏️ 编辑攻略</button>
+        <button class="btn-secondary" id="backGuidesBtn">← 返回列表</button>
+      </div>
+    </div>`;
+  $('#guideListView').style.display = 'none';
+  box.style.display = 'block';
+  $('#backGuidesBtn').addEventListener('click', showGuideList);
+  $('#editGuideBtn').addEventListener('click', () => {
+    showGuideList();
+    startEditGuide(i);
+  });
+}
+
+function fillGuideForm(g){
+  $('#guideTitle').value = g.title || '';
+  $('#guideDestination').value = g.destination || '';
+  $('#guideDuration').value = g.duration || '';
+  $('#guideOverview').value = g.overview || '';
+  schedules = (g.schedules || []).map(s => ({ time: s.time || '', item: s.item || '' }));
+  checklist = [...(g.checklist || [])];
+  renderSchedules();
+  renderChecklist();
+}
+
+function resetGuideForm(){
+  $('#guideTitle').value=''; $('#guideDestination').value='';
+  $('#guideDuration').value=''; $('#guideOverview').value='';
+  schedules = []; checklist = []; renderSchedules(); renderChecklist();
+}
+
+function startEditGuide(i){
+  const g = myGuides[i];
+  if(!g) return;
+  editingGuideId = g.id;
+  fillGuideForm(g);
+  $('#saveGuideBtn').textContent = '💾 更新攻略';
+  $('#clearGuideBtn').textContent = '取消编辑';
+  switchGuideTab('create');
+  $('#guideTitle').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+document.querySelectorAll('.guide-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    switchGuideTab(t.dataset.tab);
+    if(t.dataset.tab === 'mine') showGuideList();
+  });
+});
+
 $('#myGuidesList').addEventListener('click', e => {
   if(e.target.classList.contains('my-guide-del')){
     myGuides.splice(+e.target.dataset.i,1);
@@ -2871,7 +2978,7 @@ $('#saveGuideBtn').addEventListener('click', () => {
   const title = $('#guideTitle').value.trim();
   if(!title){ alert('请填写攻略标题'); return; }
   const guide = {
-    id: Date.now(),
+    id: editingGuideId || Date.now(),
     title,
     destination: $('#guideDestination').value.trim(),
     duration: $('#guideDuration').value.trim(),
@@ -2880,16 +2987,41 @@ $('#saveGuideBtn').addEventListener('click', () => {
     checklist: [...checklist],
     createdAt: new Date().toLocaleString('zh-CN')
   };
-  myGuides.unshift(guide);
-  save('myGuides', myGuides);
-  renderMyGuides();
-  alert('✅ 攻略已保存到"我的攻略"！');
+  if(editingGuideId){
+    const idx = myGuides.findIndex(g => g.id === editingGuideId);
+    if(idx > -1){
+      guide.createdAt = myGuides[idx].createdAt || guide.createdAt;
+      myGuides[idx] = guide;
+    } else {
+      myGuides.unshift(guide);
+    }
+    editingGuideId = null;
+    $('#saveGuideBtn').textContent = '💾 保存攻略';
+    $('#clearGuideBtn').textContent = '清空';
+    save('myGuides', myGuides);
+    renderMyGuides();
+    switchGuideTab('mine');
+    showGuideList();
+    alert('✅ 攻略已更新！');
+  } else {
+    myGuides.unshift(guide);
+    save('myGuides', myGuides);
+    renderMyGuides();
+    alert('✅ 攻略已保存到"我的攻略"！');
+  }
 });
 $('#clearGuideBtn').addEventListener('click', () => {
-  if(confirm('确定清空当前所有输入吗？')){
-    $('#guideTitle').value=''; $('#guideDestination').value='';
-    $('#guideDuration').value=''; $('#guideOverview').value='';
-    schedules = []; checklist = []; renderSchedules(); renderChecklist();
+  if(editingGuideId){
+    if(confirm('确定取消编辑吗？未保存的修改将丢失。')){
+      editingGuideId = null;
+      $('#saveGuideBtn').textContent = '💾 保存攻略';
+      $('#clearGuideBtn').textContent = '清空';
+      resetGuideForm();
+    }
+  } else {
+    if(confirm('确定清空当前所有输入吗？')){
+      resetGuideForm();
+    }
   }
 });
 
