@@ -733,6 +733,7 @@ body{
 .guide-timeline-badge-tp{background:#E6F1FB;color:#185FA5;border-color:#B5D4F4}
 .guide-timeline-dur{display:inline-block;font-size:12px;color:var(--text-soft);background:var(--card);border:1px dashed var(--border);border-radius:8px;padding:1px 8px;margin-left:8px}
 .guide-timeline-text{margin-top:6px;color:var(--text-soft);line-height:1.7}
+.guide-timeline-note{margin-top:6px;font-size:12px;color:var(--text-soft);background:var(--primary-bg);border-left:3px solid var(--primary-light);border-radius:4px;padding:6px 10px;line-height:1.6}
 
 .guide-tips{display:flex;flex-wrap:wrap;gap:8px;padding-left:13px}
 .guide-tip{
@@ -761,7 +762,8 @@ body{
 .schedule-item input{flex:1;min-width:0;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:13px;background:#fff;font-family:inherit}
 .schedule-item input:focus{outline:none;border-color:var(--primary)}
 .schedule-time{flex:0 0 92px !important}
-.schedule-duration{flex:0 0 100px !important}
+.schedule-duration{flex:1 1 0 !important;min-width:0}
+.sched-row3{display:flex}
 .sched-type{flex:0 0 auto;font-size:11px;padding:3px 9px;border-radius:10px;font-weight:500;line-height:1.4}
 .sched-type-sp{background:#fff;color:var(--primary-deep);border:1px solid var(--primary-light)}
 .sched-type-tp{background:#fff;color:#185FA5;border:1px solid #85B7EB}
@@ -2825,7 +2827,7 @@ renderCheckins();
 renderCalendar();
 
 
-let schedules = [{type:'spot', time:'', duration:'', item:''}];
+let schedules = [{type:'spot', time:'', duration:'', item:'', note:''}];
 let checklist = [];
 
 function renderSchedules(){
@@ -2845,7 +2847,10 @@ function renderSchedules(){
       </div>
       <div class="sched-row2">
         <input type="text" placeholder="${isTp ? '如：高铁 G1 次 / 地铁1号线 / 打车' : '内容，如：天安门广场'}" value="${escapeAttr(s.item)}" data-i="${i}" data-k="item">
-        <input type="text" class="schedule-duration" placeholder="耗时，如 2小时" value="${escapeAttr(s.duration)}" data-i="${i}" data-k="duration">
+        <input type="text" class="schedule-duration" placeholder="时间，如 09:00 / 2小时" value="${escapeAttr(s.duration)}" data-i="${i}" data-k="duration">
+      </div>
+      <div class="sched-row3">
+        <input type="text" placeholder="备注 / 注意事项，如：需提前预约、最佳拍摄位" value="${escapeAttr(s.note || '')}" data-i="${i}" data-k="note">
       </div>
     `;
     box.appendChild(item);
@@ -2929,7 +2934,7 @@ let myGuides = (load('myGuides') || []).map(g => ({
   destination: g.destination || '',
   duration: g.duration || '',
   overview: g.overview || '',
-  schedules: (g.schedules || []).map(s => ({ type: s.type || 'spot', time: s.time || '', duration: s.duration || '', item: s.item || '' })),
+  schedules: (g.schedules || []).map(s => ({ type: s.type || 'spot', time: s.time || '', duration: s.duration || '', item: s.item || '', note: s.note || '' })),
   checklist: g.checklist || [],
   createdAt: g.createdAt || ''
 }));
@@ -2975,8 +2980,9 @@ function showGuideDetail(i){
         `<div class="guide-timeline-item">
           <span class="guide-timeline-badge ${s.type === 'transport' ? 'guide-timeline-badge-tp' : ''}">${s.type === 'transport' ? '🚄 交通' : '🏞️ 游玩'}</span>
           ${s.time ? `<span class="guide-timeline-time">${escapeHtml(s.time)}</span>` : ''}
-          ${s.duration ? `<span class="guide-timeline-dur">⏱ ${escapeHtml(s.duration)}</span>` : ''}
+          ${s.duration ? `<span class="guide-timeline-dur">🕐 ${escapeHtml(s.duration)}</span>` : ''}
           <div class="guide-timeline-text">${escapeHtml(s.item || '')}</div>
+          ${s.note ? `<div class="guide-timeline-note">📝 ${escapeHtml(s.note)}</div>` : ''}
         </div>`
       ).join('')}</div>`
     : `<div class="guide-section-text">暂无行程安排</div>`;
@@ -3015,7 +3021,7 @@ function fillGuideForm(g){
   $('#guideDestination').value = g.destination || '';
   $('#guideDuration').value = g.duration || '';
   $('#guideOverview').value = g.overview || '';
-  schedules = (g.schedules || []).map(s => ({ type: s.type || 'spot', time: s.time || '', duration: s.duration || '', item: s.item || '' }));
+  schedules = (g.schedules || []).map(s => ({ type: s.type || 'spot', time: s.time || '', duration: s.duration || '', item: s.item || '', note: s.note || '' }));
   checklist = [...(g.checklist || [])];
   renderSchedules();
   renderChecklist();
@@ -3062,7 +3068,7 @@ $('#saveGuideBtn').addEventListener('click', () => {
     destination: $('#guideDestination').value.trim(),
     duration: $('#guideDuration').value.trim(),
     overview: $('#guideOverview').value.trim(),
-    schedules: schedules.filter(s=>s.time||s.item||s.duration),
+    schedules: schedules.filter(s=>s.time||s.item||s.duration||s.note),
     checklist: [...checklist],
     createdAt: new Date().toLocaleString('zh-CN')
   };
