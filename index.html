@@ -738,6 +738,9 @@ body{
 
 /* 制作攻略 */
 .guide-form{display:flex;flex-direction:column;gap:10px}
+.guide-label{font-size:13px;font-weight:600;color:var(--text);margin-top:6px}
+.guide-label:first-child{margin-top:0}
+.guide-req{color:var(--danger)}
 .guide-textarea{
   border:1px solid var(--border);border-radius:8px;
   padding:10px 14px;font-size:14px;background:#fafdfb;
@@ -751,7 +754,13 @@ body{
 }
 .schedule-item input{flex:1;min-width:120px;border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;background:#fff;font-family:inherit}
 .schedule-item input:focus{outline:none;border-color:var(--primary)}
-.schedule-time{flex:0 0 140px !important}
+.schedule-time{flex:0 0 92px !important}
+.schedule-move{
+  background:#fff;border:1px solid var(--border);border-radius:6px;
+  cursor:pointer;font-size:13px;padding:8px 10px;color:var(--text-soft);
+  line-height:1;font-family:inherit;transition:all .2s;
+}
+.schedule-move:hover{border-color:var(--primary);color:var(--primary-deep)}
 .schedule-del{background:transparent;border:none;color:var(--danger);cursor:pointer;font-size:16px;padding:4px 8px}
 
 .checklist-item{
@@ -759,7 +768,9 @@ body{
   padding:8px 12px;background:var(--primary-bg);
   border-radius:6px;margin-bottom:6px;border:1px solid var(--border);
 }
-.checklist-item .chk-text{flex:1;font-size:13px}
+.checklist-item .chk-text{flex:1;font-size:13px;cursor:pointer;padding:2px 4px;border-radius:4px;transition:all .2s}
+.checklist-item .chk-text:hover{background:var(--primary-light)}
+.checklist-item .chk-input{flex:1;min-width:0;border:1px solid var(--primary);border-radius:6px;padding:6px 10px;font-size:13px;font-family:inherit;background:#fff}
 .checklist-item .chk-del{background:transparent;border:none;color:var(--danger);cursor:pointer}
 .checklist-add{display:flex;gap:8px;margin-top:6px}
 .checklist-add .guide-input{flex:1}
@@ -1093,10 +1104,14 @@ body{
 <div class="guide-create-card">
 <div class="card-label">新建攻略</div>
 <div class="guide-form">
-<input class="guide-input" id="guideTitle" placeholder="攻略标题，例如：故宫一日游攻略" type="text"/>
-<input class="guide-input" id="guideDestination" placeholder="目的地" type="text"/>
-<input class="guide-input" id="guideDuration" placeholder="游玩时长，例如：1天 / 3天2晚" type="text"/>
-<textarea class="guide-textarea" id="guideOverview" placeholder="攻略概述：简述目的地亮点、最佳季节、注意事项..."></textarea>
+<label class="guide-label" for="guideTitle">攻略标题 <span class="guide-req">*</span></label>
+<input class="guide-input" id="guideTitle" placeholder="例如：故宫一日游攻略" type="text"/>
+<label class="guide-label" for="guideDestination">目的地</label>
+<input class="guide-input" id="guideDestination" placeholder="例如：北京" type="text"/>
+<label class="guide-label" for="guideDuration">游玩时长</label>
+<input class="guide-input" id="guideDuration" placeholder="例如：1天 / 3天2晚" type="text"/>
+<label class="guide-label" for="guideOverview">攻略概述</label>
+<textarea class="guide-textarea" id="guideOverview" placeholder="简述目的地亮点、最佳季节、注意事项..."></textarea>
 <div class="card-label" style="margin-top:16px">行程安排</div>
 <div id="scheduleList"></div>
 <button class="btn-secondary" id="addScheduleBtn">+ 添加一段行程</button>
@@ -2795,7 +2810,7 @@ renderCheckins();
 renderCalendar();
 
 
-let schedules = [];
+let schedules = [{time:'', item:''}];
 let checklist = [];
 
 function renderSchedules(){
@@ -2805,9 +2820,11 @@ function renderSchedules(){
     const item = document.createElement('div');
     item.className = 'schedule-item';
     item.innerHTML = `
-      <input type="text" class="schedule-time" placeholder="时间，如 09:00" value="${escapeAttr(s.time)}" data-i="${i}" data-k="time">
-      <input type="text" placeholder="行程内容" value="${escapeAttr(s.item)}" data-i="${i}" data-k="item">
-      <button class="schedule-del" data-i="${i}">✕</button>
+      <input type="text" class="schedule-time" placeholder="如 Day1 上午" value="${escapeAttr(s.time)}" data-i="${i}" data-k="time">
+      <input type="text" placeholder="行程内容，如：天安门广场" value="${escapeAttr(s.item)}" data-i="${i}" data-k="item">
+      <button class="schedule-move" data-i="${i}" data-dir="up" title="上移">↑</button>
+      <button class="schedule-move" data-i="${i}" data-dir="down" title="下移">↓</button>
+      <button class="schedule-del" data-i="${i}" title="删除">✕</button>
     `;
     box.appendChild(item);
   });
@@ -2818,8 +2835,17 @@ $('#scheduleList').addEventListener('input', e => {
   }
 });
 $('#scheduleList').addEventListener('click', e => {
-  if(e.target.classList.contains('schedule-del')){
-    schedules.splice(+e.target.dataset.i, 1);
+  const t = e.target;
+  if(t.classList.contains('schedule-del')){
+    schedules.splice(+t.dataset.i, 1);
+    renderSchedules();
+    return;
+  }
+  if(t.classList.contains('schedule-move')){
+    const i = +t.dataset.i;
+    const j = t.dataset.dir === 'up' ? i - 1 : i + 1;
+    if(j < 0 || j >= schedules.length) return;
+    [schedules[i], schedules[j]] = [schedules[j], schedules[i]];
     renderSchedules();
   }
 });
@@ -2834,14 +2860,35 @@ function renderChecklist(){
   checklist.forEach((c,i) => {
     const item = document.createElement('div');
     item.className = 'checklist-item';
-    item.innerHTML = `<span class="chk-text">${escapeHtml(c)}</span><button class="chk-del" data-i="${i}">✕</button>`;
+    item.innerHTML = `<span class="chk-text" data-i="${i}" title="点击修改">${escapeHtml(c)}</span><button class="chk-del" data-i="${i}">✕</button>`;
     box.appendChild(item);
   });
 }
 $('#checklist').addEventListener('click', e => {
-  if(e.target.classList.contains('chk-del')){
-    checklist.splice(+e.target.dataset.i,1);
+  const t = e.target;
+  if(t.classList.contains('chk-del')){
+    checklist.splice(+t.dataset.i,1);
     renderChecklist();
+    return;
+  }
+  if(t.classList.contains('chk-text')){
+    const i = +t.dataset.i;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'chk-input';
+    input.value = checklist[i];
+    t.replaceWith(input);
+    input.focus();
+    const commit = () => {
+      const v = input.value.trim();
+      if(v) checklist[i] = v; else checklist.splice(i,1);
+      renderChecklist();
+    };
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', e2 => {
+      if(e2.key === 'Enter'){ e2.preventDefault(); input.blur(); }
+      if(e2.key === 'Escape'){ renderChecklist(); }
+    });
   }
 });
 $('#addChecklistBtn').addEventListener('click', () => {
@@ -2946,7 +2993,7 @@ function fillGuideForm(g){
 function resetGuideForm(){
   $('#guideTitle').value=''; $('#guideDestination').value='';
   $('#guideDuration').value=''; $('#guideOverview').value='';
-  schedules = []; checklist = []; renderSchedules(); renderChecklist();
+  schedules = [{time:'', item:''}]; checklist = []; renderSchedules(); renderChecklist();
 }
 
 function startEditGuide(i){
@@ -2969,6 +3016,7 @@ document.querySelectorAll('.guide-tab').forEach(t => {
 
 $('#myGuidesList').addEventListener('click', e => {
   if(e.target.classList.contains('my-guide-del')){
+    if(!confirm('确定删除这篇攻略吗？删除后无法恢复。')) return;
     myGuides.splice(+e.target.dataset.i,1);
     save('myGuides', myGuides);
     renderMyGuides();
@@ -3007,6 +3055,8 @@ $('#saveGuideBtn').addEventListener('click', () => {
     myGuides.unshift(guide);
     save('myGuides', myGuides);
     renderMyGuides();
+    switchGuideTab('mine');
+    showGuideList();
     alert('✅ 攻略已保存到"我的攻略"！');
   }
 });
