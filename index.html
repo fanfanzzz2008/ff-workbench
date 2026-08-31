@@ -838,7 +838,7 @@ body{
 .wish-check.done::after{content:"✓";font-size:14px;font-weight:bold}
 .wish-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;cursor:pointer;padding:2px 4px;border-radius:4px;transition:background .2s}
 .wish-main:hover{background:var(--primary-light)}
-.wish-text{font-size:14px;word-break:break-all}
+.wish-text{font-size:14px;white-space:pre-wrap;word-break:break-word;line-height:1.5}
 .wish-item.done .wish-text{text-decoration:line-through;color:var(--text-light)}
 .wish-meta{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .wish-time{font-size:11px;color:var(--text-light)}
@@ -863,6 +863,7 @@ body{
 .wish-edit-input{
   width:100%;border:1px solid var(--border);border-radius:8px;
   padding:10px 14px;font-size:14px;background:#fafdfb;font-family:inherit;color:var(--text);
+  resize:vertical;min-height:88px;line-height:1.6;
 }
 .wish-edit-input:focus{outline:none;border-color:var(--primary);background:#fff}
 .wish-edit-imgzone{display:flex;flex-direction:column;gap:10px}
@@ -3566,7 +3567,7 @@ function openWishEdit(id){
         <button class="img-modal-close">✕</button>
       </div>
       <div class="card-label">内容</div>
-      <input class="wish-edit-input" id="wishEditInput" value="${escapeAttr(w.text)}" placeholder="写下你的心愿"/>
+      <textarea class="wish-edit-input" id="wishEditInput" rows="3" placeholder="写下你的心愿（可换行）">${escapeHtml(w.text)}</textarea>
       <div class="card-label">图片 <span style="color:var(--text-light);font-weight:400">（可选）</span></div>
       <div class="wish-edit-imgzone" id="wishEditImgZone"></div>
       <div class="inspire-edit-actions">
