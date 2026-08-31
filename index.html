@@ -962,7 +962,7 @@ body{
 <span class="nav-emoji">💫</span>
 <div class="nav-info">
 <div class="nav-title">心愿清单</div>
-<div class="nav-desc">想去的地方 · 想看的书影</div>
+<div class="nav-desc">想去的地方 · 想看的书</div>
 </div>
 </button>
 <button class="nav-item" data-module="today">
@@ -1230,7 +1230,6 @@ body{
 <button class="wish-tab active" data-cat="travel">🗺️ 旅游<span class="wish-badge" data-badge="travel"></span></button>
 <button class="wish-tab" data-cat="exhibition">🖼️ 展览<span class="wish-badge" data-badge="exhibition"></span></button>
 <button class="wish-tab" data-cat="book">📚 书<span class="wish-badge" data-badge="book"></span></button>
-<button class="wish-tab" data-cat="movie">🎬 电影<span class="wish-badge" data-badge="movie"></span></button>
 <button class="wish-tab" data-cat="other">✨ 其他<span class="wish-badge" data-badge="other"></span></button>
 </div>
 <div class="wish-input-card">
@@ -3397,13 +3396,12 @@ function showEditTipModal(tip){
 renderTips();
 
 /* ============================================
-   模块六：心愿清单（旅游 / 展览 / 书 / 电影 / 其他）
+   模块六：心愿清单（旅游 / 展览 / 书 / 其他）
 ============================================ */
 const WISH_CATS = {
   travel: { label:'想去哪里？', ph:'例如：日本京都、冰岛看极光', empty:'还没有心愿，写下第一个想去的地方吧～' },
   exhibition: { label:'想看什么展？', ph:'例如：故宫博物院特展、上海天文馆', empty:'还没有想看的展览，写下第一个吧～' },
   book:   { label:'想读什么书？', ph:'例如：《百年孤独》、《人类简史》', empty:'书架上还没有想读的书～' },
-  movie:  { label:'想看什么电影？', ph:'例如：《星际穿越》、《让子弹飞》', empty:'片单空空，快添加想看的电影吧～' },
   other:  { label:'想做什么事？', ph:'例如：学会潜水、跑一次马拉松', empty:'还没有想做的事，写下第一个目标吧～' }
 };
 let wishItems = load('wishlist') || [];
