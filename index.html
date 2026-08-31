@@ -836,16 +836,68 @@ body{
 }
 .wish-check.done{background:var(--primary);border-color:var(--primary);color:#fff}
 .wish-check.done::after{content:"✓";font-size:14px;font-weight:bold}
-.wish-text{flex:1;font-size:14px;cursor:pointer;padding:2px 4px;border-radius:4px;transition:all .2s}
-.wish-text:hover{background:var(--primary-light)}
+.wish-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;cursor:pointer;padding:2px 4px;border-radius:4px;transition:background .2s}
+.wish-main:hover{background:var(--primary-light)}
+.wish-text{font-size:14px;word-break:break-all}
 .wish-item.done .wish-text{text-decoration:line-through;color:var(--text-light)}
-.wish-edit-input{
-  flex:1;min-width:0;border:1px solid var(--primary);border-radius:6px;
-  padding:6px 10px;font-size:14px;font-family:inherit;background:#fff;
+.wish-meta{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.wish-time{font-size:11px;color:var(--text-light)}
+.wish-edit-hint{font-size:11px;color:var(--primary-deep);opacity:.75}
+.wish-thumb{
+  width:120px;height:84px;border-radius:8px;overflow:hidden;
+  border:1px solid var(--border);cursor:zoom-in;margin-top:4px;flex-shrink:0;
+  background:var(--bg-soft);transition:opacity .2s;
 }
-.wish-time{font-size:12px;color:var(--text-light)}
+.wish-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.wish-item.done .wish-thumb{opacity:.45}
 .wish-del{background:transparent;border:none;color:var(--text-light);cursor:pointer;font-size:16px;padding:4px 8px;border-radius:4px;transition:all .2s}
 .wish-del:hover{color:var(--danger);background:#ffebee}
+
+/* 心愿编辑弹窗 */
+.wish-edit-modal{
+  background:#fff;border-radius:var(--radius);padding:20px;
+  width:100%;max-width:480px;max-height:85vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+}
+.wish-edit-modal .card-label{margin:12px 0 6px}
+.wish-edit-input{
+  width:100%;border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;font-size:14px;background:#fafdfb;font-family:inherit;color:var(--text);
+}
+.wish-edit-input:focus{outline:none;border-color:var(--primary);background:#fff}
+.wish-edit-imgzone{display:flex;flex-direction:column;gap:10px}
+.wish-edit-addimg{
+  width:100%;border:1.5px dashed var(--border);background:var(--bg-soft);border-radius:8px;
+  padding:14px;font-size:14px;color:var(--text-soft);cursor:pointer;font-family:inherit;
+  transition:all .2s;
+}
+.wish-edit-addimg:hover{border-color:var(--primary);color:var(--primary-deep);background:var(--primary-bg)}
+.wish-edit-imgwrap{
+  position:relative;background:#f7faf7;border:1px solid var(--border-soft);
+  border-radius:8px;padding:8px;min-height:80px;touch-action:none;
+}
+.wish-edit-imgwrap img{display:block;border-radius:4px;max-width:100%}
+.wish-edit-handle{
+  position:absolute;right:3px;bottom:3px;width:22px;height:22px;
+  cursor:nwse-resize;touch-action:none;z-index:2;
+  display:flex;align-items:flex-end;justify-content:flex-end;
+}
+.wish-edit-handle::after{
+  content:"";width:10px;height:10px;margin:3px;
+  border-right:2px solid var(--primary);border-bottom:2px solid var(--primary);
+  border-bottom-right-radius:2px;
+}
+.wish-edit-imgbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.wish-edit-size-btn{
+  background:var(--bg-soft);border:1px solid var(--border);border-radius:6px;
+  padding:4px 14px;font-size:12px;color:var(--text-soft);cursor:pointer;font-family:inherit;
+  transition:all .2s;
+}
+.wish-edit-size-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.wish-edit-delimg{
+  margin-left:auto;background:transparent;border:none;color:var(--danger);
+  font-size:12px;cursor:pointer;padding:4px 6px;font-family:inherit;
+}
 
 .my-guide-card{
   background:var(--primary-bg);border-radius:8px;padding:14px;
@@ -3405,8 +3457,8 @@ const WISH_CATS = {
   book:   { label:'想读什么书？', ph:'例如：《百年孤独》、《人类简史》', empty:'书架上还没有想读的书～' },
   other:  { label:'想做什么事？', ph:'例如：学会潜水、跑一次马拉松', empty:'还没有想做的事，写下第一个目标吧～' }
 };
-let wishItems = load('wishlist') || [];
-let wishCat = 'travel';
+var wishItems = load('wishlist') || [];
+var wishCat = 'travel';
 
 function renderWish(){
   const list = $('#wishList');
@@ -3417,8 +3469,14 @@ function renderWish(){
     item.className = 'wish-item' + (w.done ? ' done' : '');
     item.innerHTML = `
       <div class="wish-check ${w.done?'done':''}" data-id="${w.id}"></div>
-      <div class="wish-text" data-id="${w.id}" title="点击编辑">${escapeHtml(w.text)}</div>
-      <span class="wish-time">${w.time || ''}</span>
+      <div class="wish-main" data-id="${w.id}" title="点击编辑">
+        <div class="wish-text">${escapeHtml(w.text)}</div>
+        ${w.img ? `<div class="wish-thumb" data-id="${w.id}"><img src="${w.img}" alt="心愿图片"/></div>` : ''}
+        <div class="wish-meta">
+          <span class="wish-time">${w.time || ''}</span>
+          <span class="wish-edit-hint">✏️ 点击编辑</span>
+        </div>
+      </div>
       <button class="wish-del" data-id="${w.id}" title="删除">✕</button>
     `;
     list.appendChild(item);
@@ -3462,8 +3520,14 @@ function addWish(){
 $('#wishAddBtn').addEventListener('click', addWish);
 $('#wishInput').addEventListener('keydown', e => { if(e.key==='Enter') addWish(); });
 
-// 勾选达成 / 删除 / 点击编辑
+// 勾选达成 / 删除 / 点击编辑 / 缩略图放大
 $('#wishList').addEventListener('click', e => {
+  const thumb = e.target.closest('.wish-thumb');
+  if(thumb){
+    const w = wishItems.find(x=>x.id===Number(thumb.dataset.id));
+    if(w && w.img) showImageModal(w.img);
+    return;
+  }
   const id = Number(e.target.dataset.id);
   if(e.target.classList.contains('wish-check')){
     const w = wishItems.find(x=>x.id===id);
@@ -3475,41 +3539,179 @@ $('#wishList').addEventListener('click', e => {
       save('wishlist', wishItems);
       renderWish();
     }
-  } else if(e.target.classList.contains('wish-text')){
-    startWishEdit(id);
+  } else if(e.target.closest('.wish-main')){
+    openWishEdit(Number(e.target.closest('.wish-main').dataset.id));
   }
 });
 
-// 点击文字进入编辑（回车/失焦保存，Esc 取消，清空则删除该项）
-function startWishEdit(id){
+/* ---- 心愿编辑弹窗（文字 + 图片 + 大小调整） ---- */
+let editWishId = null;
+let editImgData = null;   // 当前编辑中的图片 dataURL（未保存前）
+let editImgW = 65;        // 图片宽度百分比
+
+// 打开编辑面板
+function openWishEdit(id){
   const w = wishItems.find(x=>x.id===id); if(!w) return;
-  const textEl = document.querySelector(`.wish-text[data-id="${id}"]`);
-  if(!textEl) return;
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'wish-edit-input';
-  input.value = w.text;
-  textEl.replaceWith(input);
-  input.focus();
-  input.select();
-  let finished = false;
-  const finish = (saveIt) => {
-    if(finished) return; finished = true;
-    const val = input.value.trim();
-    if(saveIt && val){
-      w.text = val;
-      save('wishlist', wishItems);
-    } else if(saveIt && !val){
-      wishItems = wishItems.filter(x=>x.id!==id);
-      save('wishlist', wishItems);
-    }
-    renderWish();
-  };
-  input.addEventListener('blur', () => finish(true));
-  input.addEventListener('keydown', e => {
-    if(e.key==='Enter'){ e.preventDefault(); finish(true); }
-    if(e.key==='Escape'){ finish(false); }
+  editWishId = id;
+  editImgData = w.img || null;
+  editImgW = w.imgW || 65;
+  const modal = document.createElement('div');
+  modal.className = 'img-modal';
+  modal.style.alignItems = 'flex-start';
+  modal.style.paddingTop = '48px';
+  modal.innerHTML = `
+    <div class="wish-edit-modal">
+      <div class="inspire-edit-header">
+        <span>编辑心愿</span>
+        <button class="img-modal-close">✕</button>
+      </div>
+      <div class="card-label">内容</div>
+      <input class="wish-edit-input" id="wishEditInput" value="${escapeAttr(w.text)}" placeholder="写下你的心愿"/>
+      <div class="card-label">图片 <span style="color:var(--text-light);font-weight:400">（可选）</span></div>
+      <div class="wish-edit-imgzone" id="wishEditImgZone"></div>
+      <div class="inspire-edit-actions">
+        <button class="btn-secondary" id="wishEditCancel">取消</button>
+        <button class="btn-primary" id="wishEditSave">保存</button>
+      </div>
+    </div>
+  `;
+  modal.addEventListener('click', e => {
+    if(e.target === modal || e.target.classList.contains('img-modal-close')) modal.remove();
   });
+  document.body.appendChild(modal);
+  const escHandler = e => { if(e.key==='Escape'){ modal.remove(); document.removeEventListener('keydown', escHandler); } };
+  document.addEventListener('keydown', escHandler);
+  $('#wishEditCancel').addEventListener('click', () => modal.remove());
+  $('#wishEditSave').addEventListener('click', saveWishEdit);
+  renderWishEditImg();
+  setTimeout(() => { const inp = $('#wishEditInput'); if(inp) inp.focus(); }, 60);
+}
+
+// 渲染编辑面板内的图片区域
+function renderWishEditImg(){
+  const zone = $('#wishEditImgZone');
+  if(!zone) return;
+  if(!editImgData){
+    zone.innerHTML = `<button class="wish-edit-addimg" id="wishEditAddImg">📷 添加图片</button>
+      <input type="file" id="wishEditFile" accept="image/*" style="display:none"/>`;
+    $('#wishEditAddImg').addEventListener('click', () => $('#wishEditFile').click());
+    $('#wishEditFile').addEventListener('change', e => {
+      const f = e.target.files && e.target.files[0];
+      if(f) compressWishImage(f, dataUrl => { editImgData = dataUrl; renderWishEditImg(); });
+      e.target.value = '';
+    });
+    return;
+  }
+  zone.innerHTML = `
+    <div class="wish-edit-imgwrap" id="wishEditImgWrap">
+      <img id="wishEditImg" src="${editImgData}" style="width:${editImgW}%" alt="心愿图片"/>
+      <div class="wish-edit-handle" id="wishEditHandle"></div>
+    </div>
+    <div class="wish-edit-imgbar">
+      <button class="wish-edit-size-btn" data-w="40">小</button>
+      <button class="wish-edit-size-btn" data-w="65">中</button>
+      <button class="wish-edit-size-btn" data-w="90">大</button>
+      <button class="wish-edit-delimg" id="wishEditDelImg">🗑 删除图片</button>
+    </div>`;
+  updateWishSizeBtns();
+  $$('.wish-edit-size-btn').forEach(b => b.addEventListener('click', () => {
+    setWishEditImgW(Number(b.dataset.w));
+  }));
+  $('#wishEditDelImg').addEventListener('click', () => {
+    editImgData = null; editImgW = 65; renderWishEditImg();
+  });
+  bindWishImgDrag();
+}
+
+// 档位按钮高亮：小 <=45 / 中 46~78 / 大 >78
+function updateWishSizeBtns(){
+  $$('.wish-edit-size-btn').forEach(b => {
+    const v = Number(b.dataset.w);
+    b.classList.toggle('active', v===40 ? editImgW<=45 : v===65 ? (editImgW>45 && editImgW<=78) : editImgW>78);
+  });
+}
+function setWishEditImgW(v){
+  editImgW = Math.max(30, Math.min(100, v));
+  const img = $('#wishEditImg');
+  if(img) img.style.width = editImgW + '%';
+  updateWishSizeBtns();
+}
+
+// 拖动图片右下角手柄调整大小
+function bindWishImgDrag(){
+  const handle = $('#wishEditHandle');
+  const img = $('#wishEditImg');
+  if(!handle || !img) return;
+  const wrap = $('#wishEditImgWrap');
+  handle.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    if(handle.setPointerCapture) handle.setPointerCapture(e.pointerId);
+    const startX = e.clientX;
+    const startW = editImgW;
+    const onMove = ev => {
+      const rect = wrap.getBoundingClientRect();
+      if(!rect.width) return;
+      setWishEditImgW(startW + (ev.clientX - startX) / rect.width * 100);
+    };
+    const onUp = () => {
+      handle.removeEventListener('pointermove', onMove);
+      handle.removeEventListener('pointerup', onUp);
+      handle.removeEventListener('pointercancel', onUp);
+    };
+    handle.addEventListener('pointermove', onMove);
+    handle.addEventListener('pointerup', onUp);
+    handle.addEventListener('pointercancel', onUp);
+  });
+}
+
+// 保存编辑结果
+function saveWishEdit(){
+  const w = wishItems.find(x=>x.id===editWishId); if(!w) return;
+  const text = $('#wishEditInput').value.trim();
+  if(!text){ alert('内容不能为空'); return; }
+  w.text = text;
+  if(editImgData){ w.img = editImgData; w.imgW = editImgW; }
+  else delete w.img;
+  try{
+    save('wishlist', wishItems);
+  }catch(e){
+    alert('⚠️ 保存失败：本地存储空间不足。请删除这张图片（或换一张更小的图）再保存。');
+    return;
+  }
+  document.querySelector('.wish-edit-modal')?.closest('.img-modal')?.remove();
+  renderWish();
+}
+
+// 图片压缩：最长边 900px、JPEG 0.82；超 1.2MB 再压小
+function compressWishImage(file, cb){
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const doCompress = (maxSide, quality) => {
+        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        if(dataUrl.length > 1200000 && maxSide > 500){
+          doCompress(500, 0.72);
+        }else{
+          cb(dataUrl);
+        }
+      };
+      doCompress(900, 0.82);
+    };
+    img.onerror = () => alert('图片读取失败，请换一张试试');
+    img.src = reader.result;
+  };
+  reader.onerror = () => alert('图片读取失败，请换一张试试');
+  reader.readAsDataURL(file);
 }
 
 renderWish();
