@@ -793,12 +793,13 @@ body{
 
 /* ============ 心愿清单 ============ */
 .wish-wrap{display:flex;flex-direction:column;gap:16px;max-width:900px}
-.wish-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.wish-tabs{display:flex;gap:8px;flex-wrap:nowrap}
 .wish-tab{
   background:var(--card);border:1px solid var(--border);
-  padding:10px 16px;border-radius:8px;cursor:pointer;
+  padding:10px 0;border-radius:8px;cursor:pointer;
   font-size:14px;font-weight:500;color:var(--text-soft);font-family:inherit;
-  transition:all .2s;display:flex;align-items:center;gap:6px;
+  transition:all .2s;display:flex;align-items:center;justify-content:center;gap:4px;
+  flex:1 1 0;min-width:0;white-space:nowrap;
 }
 .wish-tab:hover{border-color:var(--primary)}
 .wish-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
