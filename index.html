@@ -819,12 +819,6 @@ body{
   padding:10px 14px;font-size:14px;background:#fafdfb;font-family:inherit;color:var(--text);
 }
 .wish-input:focus{outline:none;border-color:var(--primary);background:#fff}
-.wish-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.wish-stat{text-align:center;padding:10px;border-radius:8px;background:var(--primary-bg)}
-.wish-stat-num{font-size:24px;font-weight:700;color:var(--primary-deep);display:block}
-.wish-stat-done{color:var(--primary)}
-.wish-stat-pending{color:var(--warn)}
-.wish-stat-label{font-size:12px;color:var(--text-soft);margin-top:2px}
 .wish-list{display:flex;flex-direction:column;gap:8px}
 .wish-item{
   display:flex;align-items:center;gap:12px;
@@ -1234,6 +1228,7 @@ body{
 <div class="wish-wrap">
 <div class="wish-tabs">
 <button class="wish-tab active" data-cat="travel">🗺️ 旅游<span class="wish-badge" data-badge="travel"></span></button>
+<button class="wish-tab" data-cat="exhibition">🖼️ 展览<span class="wish-badge" data-badge="exhibition"></span></button>
 <button class="wish-tab" data-cat="book">📚 书<span class="wish-badge" data-badge="book"></span></button>
 <button class="wish-tab" data-cat="movie">🎬 电影<span class="wish-badge" data-badge="movie"></span></button>
 <button class="wish-tab" data-cat="other">✨ 其他<span class="wish-badge" data-badge="other"></span></button>
@@ -1244,11 +1239,6 @@ body{
 <input class="wish-input" id="wishInput" placeholder="例如：日本京都、冰岛看极光" type="text"/>
 <button class="btn-primary" id="wishAddBtn">＋ 添加</button>
 </div>
-</div>
-<div class="wish-stats">
-<div class="wish-stat"><span class="wish-stat-num" id="wishTotal">0</span><span class="wish-stat-label">总心愿</span></div>
-<div class="wish-stat"><span class="wish-stat-num wish-stat-done" id="wishDone">0</span><span class="wish-stat-label">已达成</span></div>
-<div class="wish-stat"><span class="wish-stat-num wish-stat-pending" id="wishPending">0</span><span class="wish-stat-label">待实现</span></div>
 </div>
 <div class="wish-list" id="wishList"></div>
 <div class="empty-state" id="wishEmpty">
@@ -3407,10 +3397,11 @@ function showEditTipModal(tip){
 renderTips();
 
 /* ============================================
-   模块六：心愿清单（旅游 / 书 / 电影 / 其他）
+   模块六：心愿清单（旅游 / 展览 / 书 / 电影 / 其他）
 ============================================ */
 const WISH_CATS = {
   travel: { label:'想去哪里？', ph:'例如：日本京都、冰岛看极光', empty:'还没有心愿，写下第一个想去的地方吧～' },
+  exhibition: { label:'想看什么展？', ph:'例如：故宫博物院特展、上海天文馆', empty:'还没有想看的展览，写下第一个吧～' },
   book:   { label:'想读什么书？', ph:'例如：《百年孤独》、《人类简史》', empty:'书架上还没有想读的书～' },
   movie:  { label:'想看什么电影？', ph:'例如：《星际穿越》、《让子弹飞》', empty:'片单空空，快添加想看的电影吧～' },
   other:  { label:'想做什么事？', ph:'例如：学会潜水、跑一次马拉松', empty:'还没有想做的事，写下第一个目标吧～' }
@@ -3435,10 +3426,6 @@ function renderWish(){
   });
   $('#wishEmpty').style.display = items.length ? 'none' : 'block';
   $('#wishEmptyText').textContent = WISH_CATS[wishCat].empty;
-  const total = wishItems.length, done = wishItems.filter(w=>w.done).length;
-  $('#wishTotal').textContent = total;
-  $('#wishDone').textContent = done;
-  $('#wishPending').textContent = total - done;
   Object.keys(WISH_CATS).forEach(cat => {
     const n = wishItems.filter(w=>w.cat===cat && !w.done).length;
     const b = document.querySelector(`.wish-badge[data-badge="${cat}"]`);
