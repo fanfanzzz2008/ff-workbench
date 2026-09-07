@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" name="viewport"/>
+<html lang="zh-CN" data-page-node-id="zbPaBIx95rSfnNDh5sM6AH">
+<head data-page-node-id="VjbFJELjOAPst3UqiARbvw">
+<meta charset="utf-8" data-page-node-id="4HzWpLbe0gWL4MkFBhBcOS"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" name="viewport" data-page-node-id="04BonDmfsMggdBxYoTfdMb"/>
 <title>FF · 工作台</title>
-<meta content="yes" name="apple-mobile-web-app-capable"/>
-<meta content="default" name="apple-mobile-web-app-status-bar-style"/>
-<meta content="FF" name="apple-mobile-web-app-title"/>
-<meta content="#3a7d44" name="theme-color"/>
-<meta content="FF 工作台 - 生活日常 · 饮茶日常 · 每日打卡 · 攻略制作 · 心愿清单 · 今日速览" name="description"/>
-<link href="manifest.json" rel="manifest"/>
-<link href="icon-192.png" rel="apple-touch-icon"/>
+<meta content="yes" name="apple-mobile-web-app-capable" data-page-node-id="C1NAzns3Ac8nWFU3QQJ12u"/>
+<meta content="default" name="apple-mobile-web-app-status-bar-style" data-page-node-id="kIfaJmaSxHn8BhsAmhJ01d"/>
+<meta content="FF" name="apple-mobile-web-app-title" data-page-node-id="vOprhvRO8wf6qcCiBmiiUQ"/>
+<meta content="#3a7d44" name="theme-color" data-page-node-id="UCF57xnW6aaaNIMRLDHXTS"/>
+<meta content="FF 工作台 - 生活日常 · 每日打卡 · 攻略制作 · 心愿清单 · 今日速览" name="description" data-page-node-id="PK9RRSMtX58fuqhckFxnZr"/>
+<link href="manifest.json" rel="manifest" data-page-node-id="Fsqlr9vLYXPEmgPlBwiZXI"/>
+<link href="icon-192.png" rel="apple-touch-icon" data-page-node-id="xOivjTE5jIAmNwyv2BIgxR"/>
 <style>
 :root{
   --bg:#f0f7f1;
@@ -440,96 +440,17 @@ body{
 .tea-daily-content{font-size:14px;color:var(--text-soft);line-height:1.7}
 .tea-daily-content p{margin:0}
 
-/* 紫砂壶泥料推荐 */
-.pot-recommend{
-  background:linear-gradient(135deg,#f3e5f5 0%,#e8d5b7 20%,#d7ccc8 50%,#c8b6a6 80%,#f5e6d3 100%);
-  border-radius:var(--radius-sm);padding:16px;
-  margin-top:14px;border:1px solid rgba(139,69,19,.15);
-}
-.pot-recommend-title{
-  font-size:14px;font-weight:600;color:#5d4037;
-  margin-bottom:4px;display:flex;align-items:center;gap:6px;
-}
-.pot-recommend-sub{font-size:12px;color:#8d6e63;margin-bottom:12px}
-.pot-recommend-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
-.pot-clay-item{
-  background:rgba(255,255,255,.85);border-radius:8px;padding:12px;
-  border:1px solid rgba(139,69,19,.1);
-}
-.pot-clay-best{border:2px solid #8d6e63;box-shadow:0 2px 8px rgba(139,69,19,.15)}
-.pot-clay-name{font-size:14px;font-weight:600;color:#5d4037;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.pot-clay-priority{
-  font-size:11px;background:#5d4037;color:#fff;padding:1px 8px;border-radius:8px;font-weight:500;
-}
-.pot-clay-reason{font-size:12px;color:#4e342e;line-height:1.6;margin-bottom:6px}
-.pot-clay-char{font-size:11px;color:#8d6e63;font-style:italic}
-.pot-clay-tea{font-size:11px;color:var(--primary-deep);margin-top:6px;font-weight:500}
-.pot-not-rec{
-  margin-top:10px;font-size:12px;color:#6d4c41;line-height:1.5;
-  background:rgba(255,243,224,.6);padding:8px 12px;border-radius:6px;
-  border-left:3px solid #ffb74d;
-}
-
-/* ============ 饮茶日常 ============ */
-.tea-wrap{display:grid;grid-template-columns:1fr;gap:18px;max-width:1000px}
-.tea-search-card,
+/* 攻略模块基础卡片与输入框（原与饮茶共用，饮茶移除后保留） */
 .guide-search-card,.guide-detail,.guide-create-card,.my-guides-card{
   background:var(--card);border-radius:var(--radius);
   padding:20px;box-shadow:var(--shadow);border:1px solid var(--border-soft);
 }
-.tea-search-row{display:flex;gap:10px;margin-bottom:14px}
-.tea-input,.guide-input{
+.guide-input{
   flex:1;border:1px solid var(--border);border-radius:8px;
   padding:10px 14px;font-size:14px;background:#fafdfb;
   font-family:inherit;color:var(--text);
 }
-.tea-input:focus,.guide-input:focus{outline:none;border-color:var(--primary);background:#fff}
-.tea-tags{display:flex;flex-wrap:wrap;gap:8px}
-.tea-tag{
-  background:var(--primary-bg);color:var(--primary-deep);
-  padding:5px 12px;border-radius:16px;font-size:13px;
-  cursor:pointer;border:1px solid var(--border);transition:all .2s;
-}
-.tea-tag:hover{background:var(--primary);color:#fff}
-
-.tea-welcome{text-align:center;padding:50px 20px}
-.welcome-icon{font-size:56px;margin-bottom:14px}
-.welcome-title{font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px}
-.welcome-desc{color:var(--text-light);font-size:14px}
-
-.tea-info{animation:fadein .3s ease}
-.tea-header{
-  display:flex;align-items:center;gap:16px;
-  padding-bottom:16px;border-bottom:2px solid var(--primary-bg);margin-bottom:18px;
-}
-.tea-emoji{font-size:48px}
-.tea-name{font-size:24px;font-weight:700;color:var(--text)}
-.tea-cat{font-size:13px;color:var(--text-light);margin-top:4px}
-.tea-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px}
-.tea-param{
-  background:var(--primary-bg);border-radius:8px;padding:12px;
-  border:1px solid var(--border);
-}
-.tea-param-label{font-size:12px;color:var(--text-soft);margin-bottom:4px}
-.tea-param-value{font-size:16px;font-weight:600;color:var(--primary-deep)}
-.tea-section{margin-bottom:16px}
-.tea-section-title{
-  font-size:15px;font-weight:600;color:var(--text);
-  margin-bottom:8px;padding-left:10px;border-left:3px solid var(--primary);
-}
-.tea-section-text{color:var(--text-soft);line-height:1.8;padding-left:13px}
-.tea-steps{list-style:none;padding-left:13px}
-.tea-steps li{
-  padding:6px 0;color:var(--text-soft);
-  display:flex;gap:10px;line-height:1.6;
-}
-.tea-steps li::before{
-  content:counter(step);counter-increment:step;
-  background:var(--primary);color:#fff;width:22px;height:22px;
-  border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:600;flex-shrink:0;
-}
-.tea-steps{counter-reset:step}
+.guide-input:focus{outline:none;border-color:var(--primary);background:#fff}
 
 /* ============ 每日打卡 ============ */
 .checkin-wrap{display:flex;flex-direction:column;gap:18px;max-width:900px}
@@ -975,302 +896,267 @@ body{
 
 </style>
 </head>
-<body>
-<div class="app">
+<body data-page-node-id="VJRNjAlk2pR2vCIIPS7ECl">
+<div class="app" data-page-node-id="Q2PRmc52l4qGPwt2R4nyAK">
 <!-- 侧边栏 -->
-<aside class="sidebar">
-<div class="logo">
-<div class="logo-icon">FF</div>
-<div class="logo-text">工作台</div>
+<aside class="sidebar" data-page-node-id="7bHGS3hU17qs8cBomgVFzn">
+<div class="logo" data-page-node-id="JA9lq1nc63f6hiKmRsFOst">
+<div class="logo-icon" data-page-node-id="xYhkGh0o6ptqzn5ampFyDk">FF</div>
+<div class="logo-text" data-page-node-id="QbKCsyBsLD2NTGEM2qycAT">工作台</div>
 </div>
-<nav class="nav">
-<button class="nav-item active" data-module="life">
-<span class="nav-emoji">📝</span>
-<div class="nav-info">
-<div class="nav-title">生活日常</div>
-<div class="nav-desc">记录每日待办事项</div>
-</div>
-</button>
-<button class="nav-item" data-module="tea">
-<span class="nav-emoji">🍵</span>
-<div class="nav-info">
-<div class="nav-title">饮茶日常</div>
-<div class="nav-desc">查询茶叶泡制品饮方法</div>
+<nav class="nav" data-page-node-id="2daNZVi48Eo1YGjGWynfEO">
+<button class="nav-item active" data-module="life" data-page-node-id="hHUGKLzoAAijDRjLpz6Y9V">
+<span class="nav-emoji" data-page-node-id="81aAqIbGG8YphbI9cg68Ja">📝</span>
+<div class="nav-info" data-page-node-id="yUNcIgRmhoEEnNLWT3sCw7">
+<div class="nav-title" data-page-node-id="FYWv2EJOT4kIUdaFBpbHay">生活日常</div>
+<div class="nav-desc" data-page-node-id="EEGtyN0x4cF4MDLOoFtTBF">记录每日待办事项</div>
 </div>
 </button>
-<button class="nav-item" data-module="english">
-<span class="nav-emoji">🎯</span>
-<div class="nav-info">
-<div class="nav-title">每日打卡</div>
-<div class="nav-desc">坚持每日好习惯</div>
+<button class="nav-item" data-module="english" data-page-node-id="FGUkaiNoBAH3XsmRtmO7sk">
+<span class="nav-emoji" data-page-node-id="8hfK1ZBGLdTWHE5EpJ4nZC">🎯</span>
+<div class="nav-info" data-page-node-id="Yuan89jt4gAdgceCHkqEFC">
+<div class="nav-title" data-page-node-id="rCXcP4w90vkxbt0fzsxCri">每日打卡</div>
+<div class="nav-desc" data-page-node-id="51tFp2jzroIyyxfTnxp2CL">坚持每日好习惯</div>
 </div>
 </button>
-<button class="nav-item" data-module="guide">
-<span class="nav-emoji">🗺️</span>
-<div class="nav-info">
-<div class="nav-title">攻略制作</div>
-<div class="nav-desc">旅游/景区博物馆攻略</div>
+<button class="nav-item" data-module="guide" data-page-node-id="woYksKXvR03OW9KKOHQ4Ey">
+<span class="nav-emoji" data-page-node-id="2aT1RqFfGlb6I4w2vOUnY0">🗺️</span>
+<div class="nav-info" data-page-node-id="5lnQRSAAyKUrbrEzCB2NVl">
+<div class="nav-title" data-page-node-id="z7qa6h2rCD3wFycvyOjwCT">攻略制作</div>
+<div class="nav-desc" data-page-node-id="CLM5xpG2XlrCS3poCROItQ">旅游/景区博物馆攻略</div>
 </div>
 </button>
-<button class="nav-item" data-module="wish">
-<span class="nav-emoji">💫</span>
-<div class="nav-info">
-<div class="nav-title">心愿清单</div>
-<div class="nav-desc">想去的地方 · 想看的书</div>
+<button class="nav-item" data-module="wish" data-page-node-id="X28DxgWKKMpeDrICoBA4LO">
+<span class="nav-emoji" data-page-node-id="CABp6jcEQtUNXExGQVL9hX">💫</span>
+<div class="nav-info" data-page-node-id="FLBtnPEjowGAIZ6HeB0KSr">
+<div class="nav-title" data-page-node-id="rnCGta5n0H9iNffXlZWWv8">心愿清单</div>
+<div class="nav-desc" data-page-node-id="pPuCp3AlvO2HlL7GskEhU7">想去的地方 · 想看的书</div>
 </div>
 </button>
-<button class="nav-item" data-module="today">
-<span class="nav-emoji">🌅</span>
-<div class="nav-info">
-<div class="nav-title">今日速览</div>
-<div class="nav-desc">天气 · 一言 · 茶知识</div>
+<button class="nav-item" data-module="today" data-page-node-id="pnq15nt6RJwR9sr5fPywu0">
+<span class="nav-emoji" data-page-node-id="8vrsVQr7jNoqfIG85BlM2q">🌅</span>
+<div class="nav-info" data-page-node-id="SOxaubA44onBX3VxgZDbdK">
+<div class="nav-title" data-page-node-id="JFrRTfMIMH4aUsBacwP8UG">今日速览</div>
+<div class="nav-desc" data-page-node-id="udHFGWXpMJSWFh6UctbInp">天气 · 一言 · 茶知识</div>
 </div>
 </button>
 </nav>
-<div class="sidebar-footer">
-<div class="data-mgmt">
-<button class="data-btn" id="exportDataBtn" title="导出所有数据">📤</button>
-<button class="data-btn" id="importDataBtn" title="从备份文件恢复数据">📥</button>
-<button class="data-btn" id="restoreBackupBtn" title="从自动备份恢复">🔄</button>
-<input accept=".json" id="importFileInput" style="display:none" type="file"/>
+<div class="sidebar-footer" data-page-node-id="geQi7yscFmPgODxefYecya">
+<div class="data-mgmt" data-page-node-id="rDxL0o13y0srr2yDlbXbj2">
+<button class="data-btn" id="exportDataBtn" title="导出所有数据" data-page-node-id="GAu2KhzjoM30kip5mJmCYH">📤</button>
+<button class="data-btn" id="importDataBtn" title="从备份文件恢复数据" data-page-node-id="63EaAnPDw78dPGz8tVZr35">📥</button>
+<button class="data-btn" id="restoreBackupBtn" title="从自动备份恢复" data-page-node-id="6arcVxF0XdNQtYeNvUaVWR">🔄</button>
+<input accept=".json" id="importFileInput" style="display:none" type="file" data-page-node-id="mARCH8SBh36pelTHSvteAw"/>
 </div>
 </div>
 </aside>
 <!-- 侧边栏遮罩 -->
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="sidebar-overlay" id="sidebarOverlay" data-page-node-id="oq7vdibpBdo9O0xpZZ87KH"></div>
 <!-- 主内容 -->
-<main class="main">
-<header class="topbar">
-<div class="topbar-left">
-<button class="sidebar-toggle" id="sidebarToggle" title="菜单">☰</button>
-<div>
-<h1 id="moduleTitle">生活日常</h1>
+<main class="main" data-page-node-id="FfoJzFkRZ6rNV1Am82ZZ6n">
+<header class="topbar" data-page-node-id="8l1roYYsDfvi0EowBBsacU">
+<div class="topbar-left" data-page-node-id="bX5LgyUMEPHAQgV4ov6pSk">
+<button class="sidebar-toggle" id="sidebarToggle" title="菜单" data-page-node-id="sNFgCfnbMDAM9T6DFKzjIj">☰</button>
+<div data-page-node-id="SkYTiAcX3tX09Wwk8Htdxp">
+<h1 id="moduleTitle" data-page-node-id="or2GTCSyeBIxXwHnafO7iu">生活日常</h1>
 </div>
 </div>
-<div class="topbar-right">
-<div class="date-display" id="dateDisplay"></div>
+<div class="topbar-right" data-page-node-id="F4k6GVeIuYbHd5s5zF3w1X">
+<div class="date-display" id="dateDisplay" data-page-node-id="zy9AIfD5ChTFxGbfS6Q8FW"></div>
 </div>
 </header>
-<div class="content">
+<div class="content" data-page-node-id="AXif4H66L3R31ovfZLEHun">
 <!-- 生活日常 -->
-<section class="module active" id="module-life">
-<div class="life-wrap">
+<section class="module active" id="module-life" data-page-node-id="1XzS9FWwUzsWNZGwufQTgN">
+<div class="life-wrap" data-page-node-id="WJbNYCNJMdqjz5HtYauAuh">
 <!-- 子 Tab -->
-<div class="life-tabs">
-<button class="life-tab active" data-sub="todo">📝 待办事项</button>
-<button class="life-tab" data-sub="inspire">💡 每日灵感</button>
-<button class="life-tab" data-sub="tips">📌 Tips</button>
+<div class="life-tabs" data-page-node-id="47XLf1BmQPGGuJemcoOUXh">
+<button class="life-tab active" data-sub="todo" data-page-node-id="rtqLjmlwLCQEw4DPWCfPHO">📝 待办事项</button>
+<button class="life-tab" data-sub="inspire" data-page-node-id="qDS9h7gO2iUyUgzTVmPOdJ">💡 每日灵感</button>
+<button class="life-tab" data-sub="tips" data-page-node-id="RsjHEZs5JdOk33EEmRn0BR">📌 Tips</button>
 </div>
 <!-- 待办子面板 -->
-<div class="life-panel active" id="panel-todo">
-<div class="todo-input-card">
-<div class="card-label">添加待办</div>
-<div class="todo-form">
-<input class="todo-input" id="todoInput" placeholder="今天要做什么？例如：晨跑30分钟" type="text"/>
-<select class="todo-select" id="todoPriority">
-<option value="high">🔥 高优先级</option>
-<option selected="" value="mid">⭐ 中等</option>
-<option value="low">🌱 低优先级</option>
+<div class="life-panel active" id="panel-todo" data-page-node-id="vOWCxh9jCIs1zFBbFa2PKc">
+<div class="todo-input-card" data-page-node-id="o9KiIZGxqp96i9esdX3MY2">
+<div class="card-label" data-page-node-id="LpUvcgy8IMb4AtLEeWgRda">添加待办</div>
+<div class="todo-form" data-page-node-id="KoGZvBOXM35kgcuIFRFBlQ">
+<input class="todo-input" id="todoInput" placeholder="今天要做什么？例如：晨跑30分钟" type="text" data-page-node-id="hOHFtxs0j265WkxxUFQZyk"/>
+<select class="todo-select" id="todoPriority" data-page-node-id="xQcDOrOAzJAupvSGB32bWT">
+<option value="high" data-page-node-id="MTf2X4tgdWE6erfCLCjXeb">🔥 高优先级</option>
+<option selected="" value="mid" data-page-node-id="8EHfRvKA0f7Vh1ZaHfEr5W">⭐ 中等</option>
+<option value="low" data-page-node-id="PagbkP6GcQ3E06N803RvGt">🌱 低优先级</option>
 </select>
-<button class="btn-primary" id="addTodoBtn">添加</button>
+<button class="btn-primary" id="addTodoBtn" data-page-node-id="rJpy9u87eny1HxplI2Z0PA">添加</button>
 </div>
 </div>
-<div class="todo-stats">
-<div class="stat-card">
-<div class="stat-num" id="statTotal">0</div>
-<div class="stat-label">总任务</div>
+<div class="todo-stats" data-page-node-id="Oh2rA0BtzptkD8CFii852B">
+<div class="stat-card" data-page-node-id="lafolQM95PMoFfKpA4GQH7">
+<div class="stat-num" id="statTotal" data-page-node-id="wFhGMEmUHDEUb3rqcmAtEC">0</div>
+<div class="stat-label" data-page-node-id="RUvV0mQR9KH15ESC1dk0Q3">总任务</div>
 </div>
-<div class="stat-card">
-<div class="stat-num stat-done" id="statDone">0</div>
-<div class="stat-label">已完成</div>
+<div class="stat-card" data-page-node-id="Q2P5L0QkbMsu9o75ipC1P9">
+<div class="stat-num stat-done" id="statDone" data-page-node-id="E439mLT3FFDYAEevDfmg1Q">0</div>
+<div class="stat-label" data-page-node-id="Akf0ddjEEEhp06unouDilR">已完成</div>
 </div>
-<div class="stat-card">
-<div class="stat-num stat-pending" id="statPending">0</div>
-<div class="stat-label">待办中</div>
+<div class="stat-card" data-page-node-id="70bdm6YqzpawEeZYkhDwSY">
+<div class="stat-num stat-pending" id="statPending" data-page-node-id="IYzjuBu294QLAhv6xWHhor">0</div>
+<div class="stat-label" data-page-node-id="CkB23hc6eMOZUCJJlHMDiu">待办中</div>
 </div>
-<div class="stat-card">
-<div class="stat-num stat-rate" id="statRate">0%</div>
-<div class="stat-label">完成率</div>
-</div>
-</div>
-<div class="todo-progress-wrap" id="todoProgressWrap" style="display:none">
-<div class="todo-progress-header">
-<span class="todo-progress-label">📊 今日进度</span>
-<span class="todo-progress-text" id="todoProgressText">0/0 已完成</span>
-</div>
-<div class="todo-progress-bar">
-<div class="todo-progress-fill" id="todoProgress" style="width:0%"></div>
+<div class="stat-card" data-page-node-id="cCzL3snrj7IFneNAPLaSHa">
+<div class="stat-num stat-rate" id="statRate" data-page-node-id="lhkbhWisvemSIBeFHtNqoD">0%</div>
+<div class="stat-label" data-page-node-id="OUgbZ2LavUj5CSCTpIc403">完成率</div>
 </div>
 </div>
-<div class="todo-filter">
-<button class="filter-btn active" data-filter="all">全部</button>
-<button class="filter-btn" data-filter="pending">待办</button>
-<button class="filter-btn" data-filter="done">已完成</button>
-<button class="filter-btn" data-filter="high">🔥 高优先级</button>
-<button class="btn-clear" id="clearDoneBtn">清除已完成</button>
+<div class="todo-progress-wrap" id="todoProgressWrap" style="display:none" data-page-node-id="F8sV5ZGbZzav97eX515kHp">
+<div class="todo-progress-header" data-page-node-id="22cipBCp1tF9ZPAtlbYgSK">
+<span class="todo-progress-label" data-page-node-id="JX0FTL06FeLm0Jzhk0M9hi">📊 今日进度</span>
+<span class="todo-progress-text" id="todoProgressText" data-page-node-id="UkJHXEu72KCiyUegZgNOWb">0/0 已完成</span>
 </div>
-<div class="todo-list" id="todoList"></div>
-<div class="empty-state" id="todoEmpty">
-<div class="empty-icon">📋</div>
-<div>今日还没有待办事项，开始添加吧～</div>
+<div class="todo-progress-bar" data-page-node-id="4CA2EvEnyBfiZhb6VTrebu">
+<div class="todo-progress-fill" id="todoProgress" style="width:0%" data-page-node-id="MsN0hyqPQazcfpPG4y5cYG"></div>
+</div>
+</div>
+<div class="todo-filter" data-page-node-id="TYdARG074k7QMvMb6pFU80">
+<button class="filter-btn active" data-filter="all" data-page-node-id="gfepRPOxNGgHDEQ5qJLjwu">全部</button>
+<button class="filter-btn" data-filter="pending" data-page-node-id="yPAGFzOygXenHsuqB7WjEw">待办</button>
+<button class="filter-btn" data-filter="done" data-page-node-id="bRiMFLbKEyv648WYTOW9MB">已完成</button>
+<button class="filter-btn" data-filter="high" data-page-node-id="QEeFmDImNcS4xLGAF5yMCl">🔥 高优先级</button>
+<button class="btn-clear" id="clearDoneBtn" data-page-node-id="SMlRkolLwrVlzW5D6ZwkA9">清除已完成</button>
+</div>
+<div class="todo-list" id="todoList" data-page-node-id="GVfgzuK8KANiS5Rx3wQ8jr"></div>
+<div class="empty-state" id="todoEmpty" data-page-node-id="iJnbhZCr2WCgT4dJCkE5vP">
+<div class="empty-icon" data-page-node-id="nVGl1hyZLFyI6rMdpir6ws">📋</div>
+<div data-page-node-id="YO2INLdhGXhoFmxZZaerI7">今日还没有待办事项，开始添加吧～</div>
 </div>
 </div>
 <!-- 每日灵感子面板 -->
-<div class="life-panel" id="panel-inspire">
-<div class="inspire-input-card">
-<div class="card-label">今天有什么想法？</div>
-<div class="inspire-form">
+<div class="life-panel" id="panel-inspire" data-page-node-id="USgRv0GXYJUyGXXmJg8AGF">
+<div class="inspire-input-card" data-page-node-id="41thOQRToxjgKOUA4dUkkT">
+<div class="card-label" data-page-node-id="9QC6HUybgIaBvlLudY76Gb">今天有什么想法？</div>
+<div class="inspire-form" data-page-node-id="6iKTCSBzTl3NbnImBjdM0S">
 <textarea class="inspire-textarea" id="inspireInput" placeholder="记录今天的灵感、想法、新鲜事……
 例如：突然想到一个项目点子 / 今天看到一篇有趣的文章 / 对某件事有了新看法"></textarea>
-<div class="inspire-img-row">
-<label class="inspire-img-btn" for="inspireImgInput">📷 添加图片</label>
-<input accept="image/*" id="inspireImgInput" multiple="" style="display:none" type="file"/>
-<span class="inspire-img-tip" id="inspireImgTip">可选，最多9张</span>
+<div class="inspire-img-row" data-page-node-id="DtPWC9BCstBjPHWpthqGGV">
+<label class="inspire-img-btn" for="inspireImgInput" data-page-node-id="HSkWcS6aK3loGnq7Qjvypo">📷 添加图片</label>
+<input accept="image/*" id="inspireImgInput" multiple="" style="display:none" type="file" data-page-node-id="hJmnFRHUWeToYW8CB4VF6z"/>
+<span class="inspire-img-tip" id="inspireImgTip" data-page-node-id="FIEofPzMo89BQ0aM8bLW4a">可选，最多9张</span>
 </div>
-<div class="inspire-img-preview" id="inspireImgPreview"></div>
-<button class="btn-primary" id="addInspireBtn">💡 记录灵感</button>
+<div class="inspire-img-preview" id="inspireImgPreview" data-page-node-id="BSOjqkTDx3A1Ssoy9euuKC"></div>
+<button class="btn-primary" id="addInspireBtn" data-page-node-id="4uK3lABgaO293MN53laMw4">💡 记录灵感</button>
 </div>
 </div>
-<div class="inspire-list" id="inspireList"></div>
-<div class="empty-state" id="inspireEmpty">
-<div class="empty-icon">💡</div>
-<div>还没有灵感记录，把今天的想法写下来吧～</div>
+<div class="inspire-list" id="inspireList" data-page-node-id="0wDA2uJGC7IdBMcTq3PHak"></div>
+<div class="empty-state" id="inspireEmpty" data-page-node-id="eFRwMMQRf4CqZBBKv7Pci2">
+<div class="empty-icon" data-page-node-id="YJ1obunimNvY8p9nZ2qkrx">💡</div>
+<div data-page-node-id="y7eptsgzx5OHvdXI46Bb1D">还没有灵感记录，把今天的想法写下来吧～</div>
 </div>
 </div>
 <!-- Tips 子面板 -->
-<div class="life-panel" id="panel-tips">
-<div class="tips-input-card">
-<div class="card-label">记录一条 Tips</div>
-<div class="tips-form">
+<div class="life-panel" id="panel-tips" data-page-node-id="axEM6KBUXciplTQPXA7zKY">
+<div class="tips-input-card" data-page-node-id="Dqvl3qOftqUoWf6qqWUSPz">
+<div class="card-label" data-page-node-id="2KrnKbcDhpzUgxWl9ZDxV9">记录一条 Tips</div>
+<div class="tips-form" data-page-node-id="g86pRI52oWpcx9qbT7IyGF">
 <textarea class="inspire-textarea" id="tipInput" placeholder="例如：煮饺子时加点盐不易破皮、Ctrl+Shift+T 恢复关闭的网页..." style="min-height:80px"></textarea>
-<div class="inspire-img-row">
-<label class="inspire-img-btn" for="tipImgInput">📷 添加图片</label>
-<input accept="image/*" id="tipImgInput" multiple="" style="display:none" type="file"/>
-<span class="inspire-img-tip" id="tipImgTip">可选，最多9张</span>
+<div class="inspire-img-row" data-page-node-id="HwvrCIdGvUHDQ7A05Ot3sI">
+<label class="inspire-img-btn" for="tipImgInput" data-page-node-id="g7JlU98yGU253Fs8RUravj">📷 添加图片</label>
+<input accept="image/*" id="tipImgInput" multiple="" style="display:none" type="file" data-page-node-id="gVF4nAKB5NhGxXJsx7A3sN"/>
+<span class="inspire-img-tip" id="tipImgTip" data-page-node-id="tiHHd3iMTF9bJJZq4EXo5G">可选，最多9张</span>
 </div>
-<div class="inspire-img-preview" id="tipImgPreview"></div>
-<button class="btn-primary" id="addTipBtn">📌 记录</button>
-</div>
-</div>
-<div class="tips-list" id="tipsList"></div>
-<div class="empty-state" id="tipsEmpty">
-<div class="empty-icon">📌</div>
-<div>还没有 Tips，把生活中的小妙招记录下来吧～</div>
+<div class="inspire-img-preview" id="tipImgPreview" data-page-node-id="FUXsaSSDS8YZXOSIDhMdHe"></div>
+<button class="btn-primary" id="addTipBtn" data-page-node-id="Ap9sv5kFiUsDBz4xJbFtJL">📌 记录</button>
 </div>
 </div>
-</div>
-</section>
-<!-- 饮茶日常 -->
-<section class="module" id="module-tea">
-<div class="tea-wrap">
-<!-- 每日茶知识推送 -->
-<div class="tea-daily-card" id="teaDailyCard">
-<div class="tea-daily-header">
-<span class="tea-daily-icon">📚</span>
-<span class="tea-daily-label">今日茶知识</span>
-</div>
-<div class="tea-daily-content" id="teaDailyContent"></div>
-</div>
-<div class="tea-search-card">
-<div class="card-label">查询茶叶</div>
-<div class="tea-search-row">
-<input class="tea-input" id="teaSearch" placeholder="搜索茶名，如：龙井、铁观音、普洱..." type="text"/>
-<button class="btn-primary" id="teaSearchBtn">🔍 搜索</button>
-</div>
-<div class="tea-tags" id="teaTags"></div>
-</div>
-<div class="tea-detail" id="teaDetail">
-<div class="tea-welcome">
-<div class="welcome-icon">🍵</div>
-<div class="welcome-title">饮茶日常</div>
-<div class="welcome-desc">选择或搜索一种茶，查看泡制参数与品饮要点</div>
+<div class="tips-list" id="tipsList" data-page-node-id="1P9bCyDk5JUdjqFbo8MvYW"></div>
+<div class="empty-state" id="tipsEmpty" data-page-node-id="qiMAqIv8VBbyqUYZwADXfU">
+<div class="empty-icon" data-page-node-id="fFMkKwA7Q43aIDeGNJBZKR">📌</div>
+<div data-page-node-id="YktKRynRvhsqIm5eYcc26I">还没有 Tips，把生活中的小妙招记录下来吧～</div>
 </div>
 </div>
 </div>
 </section>
 <!-- 每日打卡 -->
-<section class="module" id="module-english">
-<div class="checkin-wrap">
-<div class="checkin-cards" id="checkinGrid"></div>
-<div class="empty-state" id="checkinEmpty">
-<div class="empty-icon">🎯</div>
-<div>还没有打卡任务，添加一个开始吧～</div>
+<section class="module" id="module-english" data-page-node-id="FAz7ZubReRUouSEcurLNMD">
+<div class="checkin-wrap" data-page-node-id="PibMAaOvsmpaJHBEcsPryy">
+<div class="checkin-cards" id="checkinGrid" data-page-node-id="29k2WaIG84tlzKsG8nobrE"></div>
+<div class="empty-state" id="checkinEmpty" data-page-node-id="1vmiWpeLRzf0GU2WbsM1AR">
+<div class="empty-icon" data-page-node-id="1IbZWEZvhKjWsK3UE6OnVa">🎯</div>
+<div data-page-node-id="j3zW0f3bTnS6yVSCSvepJg">还没有打卡任务，添加一个开始吧～</div>
 </div>
-<div class="checkin-add-card">
-<div class="card-label">添加打卡任务</div>
-<div class="checkin-add-row">
-<input class="checkin-add-input" id="checkinAddInput" placeholder="例如：每天喝水8杯、冥想10分钟…" type="text"/>
-<button class="btn-primary" id="checkinAddBtn">+ 添加</button>
+<div class="checkin-add-card" data-page-node-id="gQpAwmCsNSKkZXBpXiMjcg">
+<div class="card-label" data-page-node-id="wQVwGNZ8reKywcoohd0zVh">添加打卡任务</div>
+<div class="checkin-add-row" data-page-node-id="M2P4MEeinFFPyCv9h9wYI8">
+<input class="checkin-add-input" id="checkinAddInput" placeholder="例如：每天喝水8杯、冥想10分钟…" type="text" data-page-node-id="UsDvYpAPy6PguHR0hYOGDP"/>
+<button class="btn-primary" id="checkinAddBtn" data-page-node-id="7CDiLs5xzosFtiPAH7edQZ">+ 添加</button>
 </div>
-<div class="checkin-tip" id="checkinTip"></div>
+<div class="checkin-tip" id="checkinTip" data-page-node-id="CzcEAy0vi0iaLHFL7ijP0W"></div>
 </div>
-<div class="checkin-calendar-card">
-<div class="checkin-cal-header">
-<button class="checkin-cal-nav" id="calPrev">‹</button>
-<span class="checkin-cal-title" id="calTitle"></span>
-<button class="checkin-cal-nav" id="calNext">›</button>
+<div class="checkin-calendar-card" data-page-node-id="BTcGuQOR8JQOcqSIY5LZPz">
+<div class="checkin-cal-header" data-page-node-id="79bo2JrRm53V6cvBluiFSd">
+<button class="checkin-cal-nav" id="calPrev" data-page-node-id="9H2c7Q5ivW896IuPGFVEGm">‹</button>
+<span class="checkin-cal-title" id="calTitle" data-page-node-id="MKiKelXcjC3ecSmriQWl8Q"></span>
+<button class="checkin-cal-nav" id="calNext" data-page-node-id="yEfOdfysFGq7pezl4bheoC">›</button>
 </div>
-<div class="checkin-cal-weekdays">
-<span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+<div class="checkin-cal-weekdays" data-page-node-id="3yOiwSZ0q8HZDTMGDVDpQ9">
+<span data-page-node-id="9x8gBL3n5og53IDVwDMTbV">日</span><span data-page-node-id="CCONAAPdSO68Ryz8wm95Ou">一</span><span data-page-node-id="NScHxt7zN6UnLfiZtMuAtR">二</span><span data-page-node-id="L4djt2TacHvZTPCwBoRp2b">三</span><span data-page-node-id="2GV8EDAsTYDADvhkgtHIFh">四</span><span data-page-node-id="kZyoV8mNJ6yrBdMByyKXen">五</span><span data-page-node-id="iVDwRjwFzlc1ClYcQ3kEw0">六</span>
 </div>
-<div class="checkin-cal-grid" id="calGrid"></div>
-<div class="checkin-cal-legend">
-<span class="cal-legend-item"><span class="cal-dot cal-dot-full"></span>全部完成</span>
-<span class="cal-legend-item"><span class="cal-dot cal-dot-partial"></span>部分完成</span>
-<span class="cal-legend-item"><span class="cal-dot cal-dot-none"></span>未打卡</span>
+<div class="checkin-cal-grid" id="calGrid" data-page-node-id="gwndD03TE6wIByNrORy1TV"></div>
+<div class="checkin-cal-legend" data-page-node-id="o3T6YdIIw99UlOBZH2zub5">
+<span class="cal-legend-item" data-page-node-id="JRW03gAZARQEPcPZvxT8oG"><span class="cal-dot cal-dot-full" data-page-node-id="Opr6F3Kj37tF8FzvsiuSAC"></span>全部完成</span>
+<span class="cal-legend-item" data-page-node-id="18RxXeJKoVQNdB6AzuFnBG"><span class="cal-dot cal-dot-partial" data-page-node-id="DPmRNcZFRaXBtITT6x2TR7"></span>部分完成</span>
+<span class="cal-legend-item" data-page-node-id="B4h62xFK7BLDXelXAM1RHy"><span class="cal-dot cal-dot-none" data-page-node-id="wwtuSNYPGfT1T87yQe9MnM"></span>未打卡</span>
 </div>
 </div>
 </div>
 </section>
 <!-- 攻略制作 -->
-<section class="module" id="module-guide">
-<div class="guide-wrap">
-<div class="guide-tabs">
-<button class="guide-tab active" data-tab="create">✍️ 制作攻略</button>
-<button class="guide-tab" data-tab="mine">📖 我的攻略</button>
+<section class="module" id="module-guide" data-page-node-id="eWjDZVqxqfSNCrzCqE9wMs">
+<div class="guide-wrap" data-page-node-id="GKP0IygxwxBA1G05GG1jhY">
+<div class="guide-tabs" data-page-node-id="6tEjsu6Czz8gMrI0fNbvES">
+<button class="guide-tab active" data-tab="create" data-page-node-id="oquTsZpDTUCGNCrWlKll1X">✍️ 制作攻略</button>
+<button class="guide-tab" data-tab="mine" data-page-node-id="41u8ZfqQMCgCCvgBvGCPu2">📖 我的攻略</button>
 </div>
 
-<div class="guide-panel active" id="panel-create">
-<div class="guide-create-card">
-<div class="card-label">新建攻略</div>
-<div class="guide-form">
-<label class="guide-label" for="guideTitle">攻略标题 <span class="guide-req">*</span></label>
-<input class="guide-input" id="guideTitle" placeholder="例如：故宫一日游攻略" type="text"/>
-<label class="guide-label" for="guideDestination">目的地</label>
-<input class="guide-input" id="guideDestination" placeholder="例如：北京" type="text"/>
-<label class="guide-label" for="guideDuration">游玩时长</label>
-<input class="guide-input" id="guideDuration" placeholder="例如：1天 / 3天2晚" type="text"/>
-<label class="guide-label" for="guideOverview">攻略概述</label>
+<div class="guide-panel active" id="panel-create" data-page-node-id="DIsBZ15JQjRgOBX0pjk1Ha">
+<div class="guide-create-card" data-page-node-id="XhF3ZNla9p8K7BurHafT9I">
+<div class="card-label" data-page-node-id="7noQtbZRcCLt1BvSHr4481">新建攻略</div>
+<div class="guide-form" data-page-node-id="wvzZ6sFTVjWhAQQOqBjElb">
+<label class="guide-label" for="guideTitle" data-page-node-id="NHUwAiuw456DREFLA7yElm">攻略标题 <span class="guide-req" data-page-node-id="qSKERH5KnAZidOSuoW5VQr">*</span></label>
+<input class="guide-input" id="guideTitle" placeholder="例如：故宫一日游攻略" type="text" data-page-node-id="2G82ojHVlPMSbeC4R8ZzWp"/>
+<label class="guide-label" for="guideDestination" data-page-node-id="cOh9k6po8KaIWqrSrjrmmP">目的地</label>
+<input class="guide-input" id="guideDestination" placeholder="例如：北京" type="text" data-page-node-id="AtOBPSN6BMFfp0HLqkjlGW"/>
+<label class="guide-label" for="guideDuration" data-page-node-id="tnHpDNhF1pB6Po5C5ZQcbu">游玩时长</label>
+<input class="guide-input" id="guideDuration" placeholder="例如：1天 / 3天2晚" type="text" data-page-node-id="5RgMyH3AgvEJY8JbBHWwFH"/>
+<label class="guide-label" for="guideOverview" data-page-node-id="bWXC3Ah80mLjpbolqmnM1q">攻略概述</label>
 <textarea class="guide-textarea" id="guideOverview" placeholder="简述目的地亮点、最佳季节、注意事项..."></textarea>
-<div class="card-label" style="margin-top:16px">行程安排</div>
-<div id="scheduleList"></div>
-<div class="schedule-add-btns">
-<button class="btn-secondary" id="addSpotBtn">🏞️ 添加游玩</button>
-<button class="btn-secondary" id="addTransportBtn">🚄 添加交通</button>
+<div class="card-label" style="margin-top:16px" data-page-node-id="NjDEgqZps2y7XQAGQ1DBKR">行程安排</div>
+<div id="scheduleList" data-page-node-id="3YUHlCYUWMLA63IiN1cVCi"></div>
+<div class="schedule-add-btns" data-page-node-id="OrFhPybsFB7BCe9TvNbqAC">
+<button class="btn-secondary" id="addSpotBtn" data-page-node-id="BGGkAODD3zl5By2fFb3y2j">🏞️ 添加游玩</button>
+<button class="btn-secondary" id="addTransportBtn" data-page-node-id="5MjfAL4hG80AvCFHXMtmO0">🚄 添加交通</button>
 </div>
-<div class="card-label" style="margin-top:16px">必备清单</div>
-<div id="checklist"></div>
-<div class="checklist-add">
-<input class="guide-input" id="checklistInput" placeholder="添加清单项，例如：身份证、充电宝..." type="text"/>
-<button class="btn-secondary" id="addChecklistBtn">添加</button>
+<div class="card-label" style="margin-top:16px" data-page-node-id="iBbez0dj8Q4AhEKuzQC45n">必备清单</div>
+<div id="checklist" data-page-node-id="DIDhP4VSNtTOxSCOnAxavj"></div>
+<div class="checklist-add" data-page-node-id="0G6q4DvZlZik0LVFStr08y">
+<input class="guide-input" id="checklistInput" placeholder="添加清单项，例如：身份证、充电宝..." type="text" data-page-node-id="anVmSSQ1IuLVqQWKvE2wek"/>
+<button class="btn-secondary" id="addChecklistBtn" data-page-node-id="gfmwPzu2FBkMmDigswwCsg">添加</button>
 </div>
-<div class="guide-actions">
-<button class="btn-primary" id="saveGuideBtn">💾 保存攻略</button>
-<button class="btn-secondary" id="clearGuideBtn">清空</button>
+<div class="guide-actions" data-page-node-id="DcU6VLwd19QFp6vcECLq6N">
+<button class="btn-primary" id="saveGuideBtn" data-page-node-id="ZKOofDbDCcoXd6ePe82iC0">💾 保存攻略</button>
+<button class="btn-secondary" id="clearGuideBtn" data-page-node-id="7tvEqh1mnnR2ASOLFl1clA">清空</button>
 </div>
 </div>
 </div>
 </div>
 
-<div class="guide-panel" id="panel-mine">
-<div class="my-guides-card">
-<div class="card-label">我的攻略</div>
-<div class="guide-detail" id="guideDetailView" style="display:none"></div>
-<div id="guideListView">
-<div id="myGuidesList"></div>
-<div class="empty-state" id="myGuidesEmpty">
-<div class="empty-icon">📂</div>
-<div>你还没有保存攻略，制作完成后点击"保存攻略"即可查看</div>
+<div class="guide-panel" id="panel-mine" data-page-node-id="QZ9QXUGegY9yyRFLiEZEDi">
+<div class="my-guides-card" data-page-node-id="tROZSuRvYcOeYJXYv0FQFY">
+<div class="card-label" data-page-node-id="ZAjcW3hsXrY3ZiWoKZcJKi">我的攻略</div>
+<div class="guide-detail" id="guideDetailView" style="display:none" data-page-node-id="ycak6j7dKosIuG0HKSnS7g"></div>
+<div id="guideListView" data-page-node-id="9N8QtlRz8OSZz2xb00BCMd">
+<div id="myGuidesList" data-page-node-id="RuWOySQAkAUCu6Xps6DALo"></div>
+<div class="empty-state" id="myGuidesEmpty" data-page-node-id="BPmlMm27utlqD1FBtGgoEL">
+<div class="empty-icon" data-page-node-id="nXpIHytAIEnSQWSjwpve93">📂</div>
+<div data-page-node-id="iF8yP0XQ78YwnbH8mOcf6k">你还没有保存攻略，制作完成后点击"保存攻略"即可查看</div>
 </div>
 </div>
 </div>
@@ -1278,47 +1164,55 @@ body{
 </div>
 </section>
 <!-- 心愿清单 -->
-<section class="module" id="module-wish">
-<div class="wish-wrap">
-<div class="wish-tabs">
-<button class="wish-tab active" data-cat="travel">🗺️ 旅游<span class="wish-badge" data-badge="travel"></span></button>
-<button class="wish-tab" data-cat="exhibition">🖼️ 展览<span class="wish-badge" data-badge="exhibition"></span></button>
-<button class="wish-tab" data-cat="book">📚 书<span class="wish-badge" data-badge="book"></span></button>
-<button class="wish-tab" data-cat="other">✨ 其他<span class="wish-badge" data-badge="other"></span></button>
+<section class="module" id="module-wish" data-page-node-id="QmhhdzPHXYBQdIDjYEGwoX">
+<div class="wish-wrap" data-page-node-id="KEoOgVscmCWqKS590dUm9p">
+<div class="wish-tabs" data-page-node-id="Ol18dqDgaaXkjzIbT6vEhU">
+<button class="wish-tab active" data-cat="travel" data-page-node-id="z4uAfZHgeZKzdrLS0SLezf">🗺️ 旅游<span class="wish-badge" data-badge="travel" data-page-node-id="G2Gc88tkAjkPJfMcDFPTYf"></span></button>
+<button class="wish-tab" data-cat="exhibition" data-page-node-id="EzwSFcwdny52mFPzq2EvQq">🖼️ 展览<span class="wish-badge" data-badge="exhibition" data-page-node-id="srGOS04iCBihHMl93jC6as"></span></button>
+<button class="wish-tab" data-cat="book" data-page-node-id="QUkAOwPX4cXAEvTYU2j6mg">📚 书<span class="wish-badge" data-badge="book" data-page-node-id="tbA9GnYceZxg9nKyABNU3j"></span></button>
+<button class="wish-tab" data-cat="other" data-page-node-id="iEmu8bs3NaBsvGnglM6m9i">✨ 其他<span class="wish-badge" data-badge="other" data-page-node-id="X6TENEwmTa43s8R6ZpCfiN"></span></button>
 </div>
-<div class="wish-input-card">
-<div class="card-label" id="wishInputLabel">想去哪里？</div>
-<div class="wish-input-row">
-<input class="wish-input" id="wishInput" placeholder="例如：日本京都、冰岛看极光" type="text"/>
-<button class="btn-primary" id="wishAddBtn">＋ 添加</button>
+<div class="wish-input-card" data-page-node-id="Zo4LngB1v8uKwYRZGW2KbF">
+<div class="card-label" id="wishInputLabel" data-page-node-id="jYphcBAnoo7wrnyrkHBLLb">想去哪里？</div>
+<div class="wish-input-row" data-page-node-id="r6AT1DQ8iO3dmKJ1E7Eom6">
+<input class="wish-input" id="wishInput" placeholder="例如：日本京都、冰岛看极光" type="text" data-page-node-id="oni205kQOzFENB1CD5P7QI"/>
+<button class="btn-primary" id="wishAddBtn" data-page-node-id="cGx6H40xGEUAprBRQw6SJ8">＋ 添加</button>
 </div>
 </div>
-<div class="wish-list" id="wishList"></div>
-<div class="empty-state" id="wishEmpty">
-<div class="empty-icon">🌟</div>
-<div id="wishEmptyText">还没有心愿，写下第一个想去的地方吧～</div>
+<div class="wish-list" id="wishList" data-page-node-id="HRCN2IaLe8qk7LBDLNzZ76"></div>
+<div class="empty-state" id="wishEmpty" data-page-node-id="tEmuSut4gHOeejJLMq2gG8">
+<div class="empty-icon" data-page-node-id="4UH9UDR4fj6pfbYWJfikfM">🌟</div>
+<div id="wishEmptyText" data-page-node-id="vKu8BqeQ3nEx8nl3yLVeZ9">还没有心愿，写下第一个想去的地方吧～</div>
 </div>
 </div>
 </section>
 <!-- 今日速览 -->
-<section class="module" id="module-today">
-<div class="today-wrap">
+<section class="module" id="module-today" data-page-node-id="pDmr9VrGEVvE6tBG3IgSvJ">
+<div class="today-wrap" data-page-node-id="SpLjuXKXlOKBdK3EIw5hcr">
 <!-- 天气卡片 -->
-<div class="today-weather-card" id="weatherCard">
-<div class="today-card-label">🌤️ 今日天气</div>
-<div class="weather-row">
-<span class="weather-icon" id="weatherIcon">⏳</span>
-<span class="weather-temp" id="weatherTemp">--°</span>
-<span class="weather-desc" id="weatherDesc">获取中...</span>
+<div class="today-weather-card" id="weatherCard" data-page-node-id="kIj5KgaHmWy1gj5QAM1TJ0">
+<div class="today-card-label" data-page-node-id="7Sol4gn8ilhlpGhbWrTEFr">🌤️ 今日天气</div>
+<div class="weather-row" data-page-node-id="wKn2dB09cRVbzP1h2xCQpm">
+<span class="weather-icon" id="weatherIcon" data-page-node-id="LEtM3qcSHVw2EjXeBdhcyA">⏳</span>
+<span class="weather-temp" id="weatherTemp" data-page-node-id="MZzg6cQMtoR8mLURYOzgY4">--°</span>
+<span class="weather-desc" id="weatherDesc" data-page-node-id="W7lACHq9IUcclkpT5oGVMW">获取中...</span>
 </div>
-<div class="weather-city" id="weatherCity"></div>
-<div class="weather-forecast" id="weatherForecast"></div>
+<div class="weather-city" id="weatherCity" data-page-node-id="LVNjMvV7LnCcAKrwjrMIWd"></div>
+<div class="weather-forecast" id="weatherForecast" data-page-node-id="uy3GjwcSmLv1JJtc7fx4sL"></div>
 </div>
 <!-- 每日一言 -->
-<div class="today-quote-card">
-<div class="today-card-label">💬 每日一言</div>
-<div class="today-quote-text" id="dailyQuote">加载中...</div>
-<div class="today-quote-source" id="dailySource"></div>
+<div class="today-quote-card" data-page-node-id="DsHVEC751c08JRxHhCzEki">
+<div class="today-card-label" data-page-node-id="yRflG5BEZDqzuICZgGdIXP">💬 每日一言</div>
+<div class="today-quote-text" id="dailyQuote" data-page-node-id="1yERAXy1A53RxAJF4GRwB5">加载中...</div>
+<div class="today-quote-source" id="dailySource" data-page-node-id="3qJ5W2Pe28Ue6CkJ2iQuJc"></div>
+</div>
+<!-- 每日茶知识推送 -->
+<div class="tea-daily-card" id="teaDailyCard" data-page-node-id="RLMCgWSKcDr6xPwiMWq57E">
+<div class="tea-daily-header" data-page-node-id="AsMGCAwApR7vGtOPNKePN">
+<span class="tea-daily-icon" data-page-node-id="YA7M6rE4iz3tyRVcCXzhMd">📚</span>
+<span class="tea-daily-label" data-page-node-id="iftZ0VgJ1pR2xY92vXY8EL">今日茶知识</span>
+</div>
+<div class="tea-daily-content" id="teaDailyContent" data-page-node-id="dm8csVe4R9NvZyifoQPc44"></div>
 </div>
 </div>
 </section>
@@ -1338,7 +1232,6 @@ const todayStr = () => new Date().toLocaleDateString('zh-CN',{year:'numeric',mon
 /* ---------- 侧边栏切换 ---------- */
 const moduleMap = {
   life: { title:'生活日常', desc:'记录每日待办事项与灵感想法' },
-  tea:  { title:'饮茶日常', desc:'查询茶叶泡制方法与品饮要点' },
   english:{ title:'每日打卡', desc:'坚持每日好习惯' },
   guide:{ title:'攻略制作', desc:'查询与制作旅游/博物馆攻略' },
   wish: { title:'心愿清单', desc:'想去的地方 · 想看的书影与想做的事' },
@@ -2139,575 +2032,6 @@ function showEditInspireModal(ins){
 renderInspires();
 
 
-/* ============================================
-   模块二：饮茶日常 - 茶叶库 + 紫砂壶 + 每日知识
-============================================ */
-const teaDB = [
-  {
-    name:'西湖龙井', cat:'绿茶 · 不发酵', emoji:'🌿', tags:['绿茶','龙井','杭州'],
-    params:{ 水温:'80-85℃', 茶水比:'1:50', 泡制时间:'2-3分钟', 茶具:'玻璃杯首选' },
-    intro:'西湖龙井产于浙江杭州西湖山区，是中国十大名茶之首。以"色绿、香郁、味甘、形美"四绝著称，叶片扁平挺直，色泽嫩绿。',
-    steps:[
-      '温杯：用热水烫洗玻璃杯，提升杯温并清洁',
-      '投茶：取3g茶叶投入杯中',
-      '润茶：注入少量80℃热水，轻摇使茶叶浸润',
-      '冲泡：沿杯壁缓缓注入热水至七分满',
-      '品饮：静置2-3分钟，待茶叶舒展后品饮'
-    ],
-    taste:'香气清幽带豆香/栗香，滋味鲜爽甘甜，回甘明显。前三泡风味最佳。',
-    // 从用户已有壶中推荐
-    potRecommend: [
-      { pot:'瓷壶', reason:'绿茶最怕闷熟，瓷壶不吸味、不闷茶，能展现龙井鲜爽本味。是四把壶里唯一适合绿茶的。', priority:'⭐ 首选' },
-      { pot:'玻璃杯', reason:'可观赏茶叶舒展，但若手头没有，瓷壶是最佳替代。', priority:'备选' }
-    ],
-    notRecommend: '朱泥/紫泥/柴烧朱泥透气性过强或易闷茶，会损失绿茶鲜爽度，不推荐。'
-  },
-  {
-    name:'碧螺春', cat:'绿茶 · 不发酵', emoji:'🌿', tags:['绿茶','江苏','洞庭'],
-    params:{ 水温:'75-80℃', 茶水比:'1:60', 泡制时间:'2分钟', 茶具:'玻璃杯首选' },
-    intro:'产于江苏苏州太湖洞庭山，条索紧结卷曲如螺，满披白毫。以"形美、色艳、香浓、味醇"闻名。',
-    steps:[
-      '温杯后投茶2-3g',
-      '注入75℃热水至三分满润茶',
-      '轻轻摇动杯身使茶叶舒展',
-      '再次注水至七分满',
-      '约2分钟后品饮，可冲泡3次'
-    ],
-    taste:'花果香馥郁，滋味鲜爽柔和，回甘悠长。',
-    potRecommend: [
-      { pot:'瓷壶', reason:'白毫银针类细嫩绿茶需低温不闷，瓷壶导热快、不吸香，能保住花果香。', priority:'⭐ 首选' }
-    ],
-    notRecommend: '紫砂类壶（朱泥/紫泥/柴烧朱泥）会吸附花香且易闷茶，不推荐用于碧螺春。'
-  },
-  {
-    name:'正山小种', cat:'红茶 · 全发酵', emoji:'🍂', tags:['红茶','武夷山','松烟香'],
-    params:{ 水温:'90-95℃', 茶水比:'1:40', 泡制时间:'3-5分钟', 茶具:'紫泥壶/瓷壶' },
-    intro:'产于福建武夷山桐木关，是世界红茶鼻祖。传统工艺以松柴熏制，带有独特的松烟香和桂圆汤味。',
-    steps:[
-      '温壶后投茶5g',
-      '注入95℃热水快速洗茶（5秒倒出）',
-      '第一泡注水后静置30秒出汤',
-      '后续每泡延长10-15秒',
-      '可冲泡8-10泡'
-    ],
-    taste:'松烟香明显，汤色红艳，滋味醇厚甘甜，带桂圆干香。',
-    potRecommend: [
-      { pot:'紫泥壶', reason:'紫泥透气性好，能柔化松烟香、让桂圆汤感更醇厚，是正山小种的最佳搭档。', priority:'⭐ 首选' },
-      { pot:'柴烧朱泥', reason:'柴烧壶经柴窑烧制，胎质有独特气孔，能让茶汤更顺滑，松烟香更内敛。', priority:'⭐ 次选' },
-      { pot:'瓷壶', reason:'想突出松烟香的原始风格时可用瓷壶，不吸味、还原度高。', priority:'备选' }
-    ],
-    notRecommend: '朱泥壶聚香过强，会让松烟香显得冲，不如紫泥柔和。'
-  },
-  {
-    name:'祁门红茶', cat:'红茶 · 全发酵', emoji:'🍂', tags:['红茶','安徽','祁红'],
-    params:{ 水温:'90-95℃', 茶水比:'1:50', 泡制时间:'3分钟', 茶具:'朱泥壶/瓷壶' },
-    intro:'产于安徽祁门，与印度大吉岭、斯里兰卡乌瓦并称世界三大高香红茶。独特的"祁门香"似花似果似蜜。',
-    steps:[
-      '温壶后投茶3-5g',
-      '注入95℃热水洗茶5秒',
-      '第一泡静置30秒出汤',
-      '逐泡延长10秒',
-      '可冲泡6-8泡'
-    ],
-    taste:'香气高长带蜜糖香与兰花香，滋味醇厚回甘。',
-    potRecommend: [
-      { pot:'朱泥壶', reason:'祁红以"祁门香"著称，朱泥聚香效果极佳，能放大花果蜜香，是祁红绝配。', priority:'⭐ 首选' },
-      { pot:'柴烧朱泥', reason:'同样聚香，柴烧质感让茶汤更柔顺，适合喜欢温和口感的茶友。', priority:'⭐ 次选' },
-      { pot:'瓷壶', reason:'想品鉴祁红原始香气层次时用瓷壶，不干扰茶味。', priority:'备选' }
-    ],
-    notRecommend: '紫泥透气性强，会散掉一部分祁门香，不如朱泥聚香。'
-  },
-  {
-    name:'铁观音', cat:'乌龙茶 · 半发酵', emoji:'🍃', tags:['乌龙','安溪','兰花香'],
-    params:{ 水温:'95-100℃', 茶水比:'1:20', 泡制时间:'30秒起', 茶具:'朱泥壶/盖碗' },
-    intro:'产于福建安溪，属半发酵乌龙茶。以"七泡有余香"著称，香气清高持久，有"观音韵"。',
-    steps:[
-      '温盖碗后投茶7-8g（盖碗容量120ml）',
-      '100℃热水高冲洗茶，立即倒出',
-      '第一泡注水后10秒出汤',
-      '第二泡15秒，逐泡延长5秒',
-      '优质铁观音可冲泡7-10泡'
-    ],
-    taste:'兰花香清幽持久，滋味醇厚甘鲜，回甘悠长，带独特"音韵"。',
-    potRecommend: [
-      { pot:'朱泥壶', reason:'铁观音核心是"高香"，朱泥聚香第一，能把兰花香和音韵集中呈现，公认铁观音的最佳壶。', priority:'⭐ 首选' },
-      { pot:'柴烧朱泥', reason:'聚香同时增加汤感厚度，适合清香型兼浓香型铁观音。', priority:'⭐ 次选' },
-      { pot:'瓷壶', reason:'试茶或想品鉴茶叶本味时用瓷壶，不吸香、还原度高。', priority:'备选' }
-    ],
-    notRecommend: '紫泥透气性会让铁观音香气散失过快，音韵出不来。'
-  },
-  {
-    name:'大红袍', cat:'乌龙茶 · 半发酵', emoji:'🍃', tags:['乌龙','武夷岩茶','岩韵'],
-    params:{ 水温:'95-100℃', 茶水比:'1:20', 泡制时间:'20秒起', 茶具:'紫泥壶/柴烧朱泥' },
-    intro:'武夷岩茶之王，产于福建武夷山九龙窠。以"岩骨花香"的岩韵著称，是乌龙茶中的珍品。',
-    steps:[
-      '温壶后投茶8g',
-      '100℃热水高冲洗茶5秒倒出',
-      '第一泡注水后15秒出汤',
-      '逐泡延长5-10秒',
-      '可冲泡8-12泡'
-    ],
-    taste:'岩韵明显，带焙火香与花果香，滋味醇厚回甘，汤色橙红明亮。',
-    potRecommend: [
-      { pot:'紫泥壶', reason:'岩茶焙火重，紫泥透气性好，能柔化焙火气、突出岩骨花香，是大红袍经典搭配。', priority:'⭐ 首选' },
-      { pot:'柴烧朱泥', reason:'柴烧壶能增加汤感醇厚度，让岩韵更立体，适合喜欢厚重口感的人。', priority:'⭐ 次选' },
-      { pot:'朱泥壶', reason:'聚香好，但会让焙火香略显尖锐，适合轻焙火大红袍。', priority:'备选' }
-    ],
-    notRecommend: '瓷壶泡岩茶会显得单薄，岩韵出不来。'
-  },
-  {
-    name:'普洱熟茶', cat:'黑茶 · 后发酵', emoji:'🟤', tags:['普洱','熟茶','云南'],
-    params:{ 水温:'95-100℃', 茶水比:'1:15', 泡制时间:'15秒起', 茶具:'紫泥壶首选' },
-    intro:'产于云南，经渥堆发酵工艺制成。茶性温和，汤色红浓明亮，有越陈越香的特点，适合日常饮用。',
-    steps:[
-      '温壶后投茶8g（可撬成小块）',
-      '100℃热水洗茶两次（每次5秒）',
-      '第一泡注水后立即出汤',
-      '第二泡15秒，逐泡延长5秒',
-      '可冲泡10-15泡'
-    ],
-    taste:'陈香明显，汤感醇厚顺滑，带糯香或枣香，回甘甘甜。',
-    potRecommend: [
-      { pot:'紫泥壶', reason:'普洱熟茶需高温闷泡，紫泥保温性最好、透气性佳，能让陈香充分释放，是普洱的"官配"。', priority:'⭐ 首选' },
-      { pot:'柴烧朱泥', reason:'柴烧气孔结构特殊，能软化水质、让熟普汤感更顺滑，老茶友最爱。', priority:'⭐ 次选' }
-    ],
-    notRecommend: '朱泥壶致密不透气，闷泡熟普容易出酸味；瓷壶保温不够，茶味出不来。'
-  },
-  {
-    name:'白毫银针', cat:'白茶 · 微发酵', emoji:'⚪', tags:['白茶','福鼎','银针'],
-    params:{ 水温:'85-90℃', 茶水比:'1:30', 泡制时间:'3-5分钟', 茶具:'瓷壶/盖碗' },
-    intro:'白茶中的极品，产于福建福鼎、政和。全部由芽头制成，满披白毫，色白如银，外形如针。',
-    steps:[
-      '温杯后投茶5g',
-      '注入85℃热水洗茶3秒',
-      '第一泡静置1分钟出汤',
-      '后续每泡延长30秒',
-      '可冲泡6-8泡，老白茶可煮饮'
-    ],
-    taste:'毫香显著，滋味鲜爽甘醇，汤色浅黄透亮，回甘清甜。',
-    potRecommend: [
-      { pot:'瓷壶', reason:'白毫银针毫香清雅，瓷壶不吸味，最能保留毫香鲜爽，是白茶首选。', priority:'⭐ 首选' }
-    ],
-    notRecommend: '朱泥/紫泥/柴烧朱泥都会吸附毫香，让白茶风味打折，不推荐。（注：老白茶煮饮时可用紫泥）'
-  },
-  {
-    name:'凤凰单丛', cat:'乌龙茶 · 半发酵', emoji:'🍃', tags:['乌龙','潮州','单丛'],
-    params:{ 水温:'95-100℃', 茶水比:'1:20', 泡制时间:'10秒起', 茶具:'朱泥壶/盖碗' },
-    intro:'产于广东潮州凤凰山，以"一树一香"闻名，有蜜兰香、芝兰香、黄枝香等众多香型，是工夫茶代表。',
-    steps:[
-      '温盖碗后投茶8g',
-      '100℃热水高冲洗茶5秒',
-      '第一泡注水后5-8秒快速出汤',
-      '逐泡延长3-5秒',
-      '可冲泡10泡以上'
-    ],
-    taste:'香气高锐持久，带花蜜香，滋味浓郁甘醇，回甘强烈。',
-    potRecommend: [
-      { pot:'朱泥壶', reason:'凤凰单丛是"高香型"代表，潮州工夫茶传统就用朱泥壶，聚香扬香无出其右。', priority:'⭐ 首选' },
-      { pot:'柴烧朱泥', reason:'聚香同时增加汤感，让单丛的花蜜香更有层次。', priority:'⭐ 次选' },
-      { pot:'瓷壶', reason:'试香型或品鉴时用瓷壶，还原度高。', priority:'备选' }
-    ],
-    notRecommend: '紫泥透气性会让高香散失，不适合单丛。'
-  },
-  {
-    name:'茉莉花茶', cat:'花茶 · 窨制', emoji:'🌸', tags:['花茶','茉莉','福州'],
-    params:{ 水温:'85-90℃', 茶水比:'1:50', 泡制时间:'2-3分钟', 茶具:'瓷壶/玻璃杯' },
-    intro:'以绿茶为茶坯，经多次茉莉花窨制而成。融合茶香与花香，是花茶中的经典，福州茉莉花茶最为著名。',
-    steps:[
-      '温杯后投茶3g',
-      '注入85℃热水至三分满润茶',
-      '轻摇后注水至七分满',
-      '静置2-3分钟',
-      '可冲泡3-4泡'
-    ],
-    taste:'茉莉花香浓郁持久，茶汤鲜爽甘甜，花香与茶香交融。',
-    potRecommend: [
-      { pot:'瓷壶', reason:'茉莉花茶灵魂在花香，瓷壶不吸味，能完整保留茉莉花香，是花茶首选。', priority:'⭐ 首选' }
-    ],
-    notRecommend: '朱泥/紫泥/柴烧朱泥都会吸附花香，且紫砂会带入泥料味干扰花香，均不推荐。'
-  },
-  // === 绿茶类 ===
-  {
-    name:'安吉白茶', cat:'绿茶 · 不发酵', emoji:'🌿', tags:['绿茶','安吉','白茶'],
-    params:{ 水温:'80-85℃', 茶水比:'1:50', 泡制时间:'2分钟', 茶具:'玻璃杯/瓷壶' },
-    intro:'产于浙江安吉，名为"白茶"实为绿茶，因其茶树的嫩叶在特定温度下呈玉白色而得名。氨基酸含量极高，是普通绿茶的2-3倍，口感极其鲜爽。',
-    steps:[
-      '温杯后投茶3g',
-      '注入80℃热水至三分满润茶',
-      '轻摇后注水至七分满',
-      '静置2分钟品饮',
-      '可冲泡3次，第一泡最鲜'
-    ],
-    taste:'鲜爽度极高，几乎无苦涩，汤色清澈明亮，有淡雅兰花香，回甘清甜持久。',
-    potRecommend: [
-      { pot:'瓷壶', reason:'安吉白茶灵魂在"鲜"，瓷壶不吸味、不闷茶，最能保留氨基酸带来的极致鲜爽。', priority:'⭐ 首选' }
-    ],
-    notRecommend: '紫砂类壶会吸附鲜爽物质，且高温会使茶汤变黄失鲜，不推荐。'
-  },
-  {
-    name:'六安瓜片', cat:'绿茶 · 不发酵', emoji:'🌿', tags:['绿茶','六安','瓜片'],
-    params:{ 水温:'85-90℃', 茶水比:'1:50', 泡制时间:'2-3分钟', 茶具:'玻璃杯/瓷壶' },
-    intro:'产于安徽六安，是世界唯一无芽无梗的片茶。由单片叶制成，形似瓜子，是中国十大名茶之一，以"浓而不苦、香而不涩"著称。',
-    steps:[
-      '温杯后投茶3g',
-      '注入85℃热水至三分满润茶',
-      '轻摇后注水至七分满',
-      '静置2-3分钟品饮',
-      '可冲泡3-4泡'
-    ],
-    taste:'香气清高带栗香，滋味浓醇鲜爽，回甘生津明显，耐泡度在绿茶中偏高。',
-    potRecommend: [
-      { pot:'瓷壶', reason:'瓜片茶汤浓郁，瓷壶不吸味，能完整呈现其"浓而不苦"的特点。', priority:'⭐ 首选' }
-    ],
-    notRecommend: '紫砂类壶容易闷出苦味，破坏瓜片特有的鲜爽。'
-  },
-  // === 黄茶类 ===
-  {
-    name:'君山银针', cat:'黄茶 · 轻发酵', emoji:'🌾', tags:['黄茶','湖南','君山'],
-    params:{ 水温:'80-85℃', 茶水比:'1:50', 泡制时间:'3-5分钟', 茶具:'玻璃杯/瓷壶' },
-    intro:'产于湖南岳阳君山岛，是中国黄茶之极品。全由芽头制成，冲泡后芽尖冲向水面悬空竖立，如"万笔书天"，极具观赏性。',
-    steps:[
-      '温杯后投茶3g',
-      '注入80℃热水至七分满',
-      '静置3-5分钟观察芽头竖立',
-      '待茶叶下沉后品饮',
-      '可冲泡3次'
-    ],
-    taste:'香气清鲜，滋味甘醇甜爽，汤色杏黄明亮，有独特的"闷黄"工艺带来的柔和甜韵。',
-    potRecommend: [
-      { pot:'瓷壶', reason:'黄茶与绿茶近似，瓷壶不闷不吸味，能保留闷黄工艺带来的独特甜润。', priority:'⭐ 首选' }
-    ],
-    notRecommend: '紫砂类壶会破坏黄茶细腻的甜韵，且无法观赏芽头竖立的姿态。'
-  },
-  // === 白茶类 ===
-  {
-    name:'白牡丹', cat:'白茶 · 微发酵', emoji:'⚪', tags:['白茶','福鼎','白牡丹'],
-    params:{ 水温:'85-90℃', 茶水比:'1:30', 泡制时间:'3-5分钟', 茶具:'盖碗/瓷壶' },
-    intro:'产于福建福鼎、政和，以一芽一二叶制成，形似花朵，绿叶夹银白毫心。是白茶中的中坚品种，价格亲民，日常品饮首选。',
-    steps:[
-      '温杯后投茶5g',
-      '注入85℃热水洗茶3秒',
-      '第一泡静置1分钟出汤',
-      '后续每泡延长30秒',
-      '可冲泡6-8泡'
-    ],
-    taste:'毫香花香交织，滋味醇和清甜，汤色杏黄透亮，年份越久甜度越高。',
-    potRecommend: [
-      { pot:'瓷壶', reason:'新白牡丹花香清雅，瓷壶不吸香，最能呈现其花香层次。', priority:'⭐ 首选' },
-      { pot:'紫泥壶', reason:'陈年白牡丹（3年以上）可用紫泥壶，透气性好能提升甜润度。', priority:'老茶可选' }
-    ],
-    notRecommend: '朱泥/柴烧朱泥聚香过强会让新白牡丹花香显得沉闷。'
-  },
-  {
-    name:'寿眉', cat:'白茶 · 微发酵', emoji:'🍂', tags:['白茶','福鼎','寿眉'],
-    params:{ 水温:'90-95℃', 茶水比:'1:25', 泡制时间:'2-5分钟', 茶具:'盖碗/紫砂壶' },
-    intro:'白茶中产量最大的品种，以粗老叶片制成，外形粗犷。陈化后药香、枣香明显，是性价比最高的老白茶选择，适合日常大壶泡或煮饮。',
-    steps:[
-      '温壶后投茶5-7g',
-      '90℃热水洗茶5秒',
-      '第一泡静置1分钟出汤',
-      '后续每泡延长30秒',
-      '老寿眉推荐煮饮：5g茶+500ml水煮5分钟'
-    ],
-    taste:'新茶清甜带草香，3年以上陈化后出药香、枣香，汤色橙红，滋味醇厚甘甜。',
-    potRecommend: [
-      { pot:'瓷壶', reason:'新寿眉用瓷壶品其清甜本味。', priority:'新茶首选' },
-      { pot:'紫泥壶', reason:'老寿眉用紫泥壶煮饮或冲泡，透气性好能提升枣香药香。', priority:'老茶首选' },
-      { pot:'柴烧朱泥', reason:'柴烧能软化水质，煮老寿眉时汤感更顺滑。', priority:'煮饮推荐' }
-    ],
-    notRecommend: '朱泥壶闷泡新寿眉会出青草味，不推荐。'
-  },
-  {
-    name:'贡眉', cat:'白茶 · 微发酵', emoji:'🍂', tags:['白茶','福鼎','贡眉'],
-    params:{ 水温:'90-95℃', 茶水比:'1:25', 泡制时间:'2-5分钟', 茶具:'盖碗/瓷壶' },
-    intro:'产于福建福鼎、政和等地，以群体种茶树（菜茶）的一芽二三叶制成，介于白牡丹与寿眉之间。外形较寿眉细嫩，芽叶连枝，毫心显露。是白茶中性价比与品质兼备的日常品饮之选。',
-    steps:[
-      '温杯后投茶5g',
-      '注入90℃热水洗茶5秒',
-      '第一泡静置1分钟出汤',
-      '后续每泡延长30秒',
-      '新茶可冲泡6-8泡；老贡眉推荐煮饮：5g茶+500ml水煮3-5分钟'
-    ],
-    taste:'新茶毫香与花香交织，滋味清甜醇和，汤色杏黄透亮。陈化3年以上出药香、蜜香，汤色转橙红，滋味更醇厚甜润。',
-    potRecommend: [
-      { pot:'瓷壶', reason:'新贡眉毫香清雅，瓷壶不吸味，最能呈现其细腻的花香毫香层次。', priority:'⭐ 首选' },
-      { pot:'紫泥壶', reason:'陈年贡眉（3年以上）用紫泥壶冲泡或煮饮，透气性好能提升药香蜜香和醇厚度。', priority:'老茶推荐' },
-      { pot:'柴烧朱泥', reason:'煮老贡眉时柴烧能软化水质，让汤感更柔顺甜润。', priority:'煮饮推荐' }
-    ],
-    notRecommend: '朱泥壶致密不透气，闷泡新贡眉会出青草味且花香发闷，不推荐。'
-  },
-  // === 乌龙茶类 ===
-  {
-    name:'冻顶乌龙', cat:'乌龙茶 · 半发酵', emoji:'🍃', tags:['乌龙','台湾','冻顶'],
-    params:{ 水温:'95-100℃', 茶水比:'1:20', 泡制时间:'30秒起', 茶具:'朱泥壶/瓷壶' },
-    intro:'产于台湾南投鹿谷冻顶山，是台湾乌龙茶的代表。中度发酵、中度焙火，茶汤金黄明亮，带独特的焙火香与花果香。',
-    steps:[
-      '温壶后投茶7-8g',
-      '100℃热水高冲洗茶5秒倒出',
-      '第一泡注水后30秒出汤',
-      '逐泡延长10秒',
-      '可冲泡6-8泡'
-    ],
-    taste:'焙火香与花果香交融，滋味醇厚甘润，有独特的"冻顶韵"——类似焦糖的甜感。',
-    potRecommend: [
-      { pot:'朱泥壶', reason:'冻顶乌龙焙火适中、香气丰富，朱泥聚香能放大焙火香与花果香的层次。', priority:'⭐ 首选' },
-      { pot:'柴烧朱泥', reason:'柴烧能让冻顶的焙火甜感更突出，汤感更柔。', priority:'⭐ 次选' },
-      { pot:'瓷壶', reason:'品鉴冻顶原香时用瓷壶，还原度高。', priority:'备选' }
-    ],
-    notRecommend: '紫泥透气性会让焙火香散失过快。'
-  },
-  {
-    name:'东方美人', cat:'乌龙茶 · 半发酵', emoji:'🫧', tags:['乌龙','台湾','东方美人'],
-    params:{ 水温:'85-90℃', 茶水比:'1:30', 泡制时间:'40秒起', 茶具:'瓷壶/朱泥壶' },
-    intro:'产于台湾新竹、苗栗，又称"白毫乌龙"或"膨风茶"。经小绿叶蝉叮咬后发酵，产生独特的蜂蜜香与熟果香，是乌龙茶中发酵度最高的品种（约60-70%）。',
-    steps:[
-      '温壶后投茶5g',
-      '85℃热水洗茶3秒（低温保护蜜香）',
-      '第一泡注水后40秒出汤',
-      '逐泡延长10秒',
-      '可冲泡5-7泡'
-    ],
-    taste:'蜂蜜香、熟果香浓郁，滋味甘甜如蜜，几乎无苦涩，茶汤呈琥珀色，是"茶中香槟"。',
-    potRecommend: [
-      { pot:'瓷壶', reason:'东方美人灵魂在蜜香，瓷壶不吸味，能完整保留小绿叶蝉叮咬产生的独特蜜甜香。', priority:'⭐ 首选' },
-      { pot:'朱泥壶', reason:'聚香好但需降低水温至85℃，否则蜜香会受损。', priority:'谨慎使用' }
-    ],
-    notRecommend: '紫泥/柴烧朱泥透气性会散失蜜香，且高温会破坏东方美人的细腻甜感。'
-  },
-  // === 红茶类 ===
-  {
-    name:'金骏眉', cat:'红茶 · 全发酵', emoji:'🍂', tags:['红茶','武夷山','金骏眉'],
-    params:{ 水温:'85-90℃', 茶水比:'1:40', 泡制时间:'2-3分钟', 茶具:'瓷壶/朱泥壶' },
-    intro:'产于福建武夷山桐木关，全由芽头制成，是顶级红茶的代表。条索紧细，金毫显露，被誉为"红茶中的极品"。',
-    steps:[
-      '温壶后投茶3g',
-      '85℃热水洗茶3秒（低温护芽）',
-      '第一泡静置30秒出汤',
-      '逐泡延长10秒',
-      '可冲泡8-10泡'
-    ],
-    taste:'花果蜜香复合，滋味甘甜细腻，汤色金黄透亮，回甘悠长，每一泡香气都在变化。',
-    potRecommend: [
-      { pot:'瓷壶', reason:'金骏眉芽头细嫩，瓷壶不闷不吸，能逐泡展现其花果蜜香的层次变化。', priority:'⭐ 首选' },
-      { pot:'朱泥壶', reason:'聚香好但需严格控制85℃低温，否则会烫坏芽头出涩味。', priority:'谨慎使用' }
-    ],
-    notRecommend: '紫泥/柴烧朱泥高温高透气性不适合细嫩芽头红茶。'
-  },
-  {
-    name:'滇红', cat:'红茶 · 全发酵', emoji:'🍂', tags:['红茶','云南','滇红'],
-    params:{ 水温:'90-95℃', 茶水比:'1:40', 泡制时间:'3-5分钟', 茶具:'紫泥壶/瓷壶' },
-    intro:'产于云南凤庆、临沧等地，以大叶种茶树鲜叶制成。条索肥壮，金毫显露，茶汤红艳明亮，以"浓、强、鲜"著称，是中国红茶的重要代表。',
-    steps:[
-      '温壶后投茶5g',
-      '注入90℃热水洗茶5秒',
-      '第一泡静置30秒出汤',
-      '逐泡延长10-15秒',
-      '可冲泡6-8泡'
-    ],
-    taste:'蜜糖香浓郁，滋味浓强鲜爽，汤色红艳明亮，适合加奶制成奶茶，也适合清饮。',
-    potRecommend: [
-      { pot:'紫泥壶', reason:'滇红滋味浓强，紫泥透气性好能柔化茶汤、增加醇厚度。', priority:'⭐ 首选' },
-      { pot:'瓷壶', reason:'喜欢滇红原始浓强风格时用瓷壶，还原度高。', priority:'备选' },
-      { pot:'柴烧朱泥', reason:'柴烧能让滇红汤感更顺滑，降低浓强感的刺激。', priority:'备选' }
-    ],
-    notRecommend: '朱泥聚香会让滇红的浓强感更冲，不太适合。'
-  },
-  // === 黑茶类 ===
-  {
-    name:'普洱生茶', cat:'黑茶 · 后发酵', emoji:'🟤', tags:['普洱','生茶','云南'],
-    params:{ 水温:'95-100℃', 茶水比:'1:15', 泡制时间:'10秒起', 茶具:'盖碗/紫泥壶' },
-    intro:'以云南大叶种晒青毛茶为原料，经蒸压成型后自然陈化。新茶茶性较烈，随着年份增长，苦涩褪去、甘甜显现，是"可以喝的古董"。',
-    steps:[
-      '温壶后投茶8g',
-      '100℃热水洗茶一次（5秒）',
-      '第一泡注水后立即出汤',
-      '新茶快速出汤，老茶可稍闷',
-      '老生普可冲泡15泡以上'
-    ],
-    taste:'新茶：花香清冽，苦涩明显但化得快，回甘生津强烈。老茶：陈香药香，滋味醇厚甘甜，茶气足。',
-    potRecommend: [
-      { pot:'紫泥壶', reason:'紫泥透气性好，新茶能加速苦涩转化，老茶能提升醇厚度，是普洱最佳搭档。', priority:'⭐ 首选' },
-      { pot:'瓷壶', reason:'试茶或品新茶山头韵时用瓷壶，不干扰本味。', priority:'试茶首选' },
-      { pot:'柴烧朱泥', reason:'泡老生普时柴烧能软化水质，让陈韵更圆润。', priority:'老茶推荐' }
-    ],
-    notRecommend: '朱泥透气性弱，新茶容易闷出苦涩，不推荐。'
-  },
-  {
-    name:'六堡茶', cat:'黑茶 · 后发酵', emoji:'🟤', tags:['黑茶','广西','六堡'],
-    params:{ 水温:'95-100℃', 茶水比:'1:15', 泡制时间:'20秒起', 茶具:'紫泥壶/瓷壶' },
-    intro:'产于广西梧州六堡镇，以"红、浓、陈、醇"著称。有独特的槟榔香，茶性温和，祛湿效果显著，是两广地区传统侨销茶。',
-    steps:[
-      '温壶后投茶8g',
-      '100℃热水洗茶两次（每次5秒）',
-      '第一泡注水后20秒出汤',
-      '逐泡延长10秒',
-      '可冲泡10-15泡'
-    ],
-    taste:'槟榔香独特，陈香明显，汤色红浓明亮，滋味醇厚顺滑，回甘甘甜。',
-    potRecommend: [
-      { pot:'紫泥壶', reason:'六堡茶与普洱熟茶类似，紫泥保温透气，能充分释放槟榔香和陈香。', priority:'⭐ 首选' },
-      { pot:'柴烧朱泥', reason:'柴烧能让六堡汤感更柔顺，槟榔香更内敛。', priority:'备选' }
-    ],
-    notRecommend: '朱泥致密不透气，闷泡六堡容易出酸味。瓷壶保温不够，陈香出不来。'
-  },
-  // === 花茶 / 再加工茶 ===
-  {
-    name:'桂花乌龙', cat:'花茶 · 窨制', emoji:'🌸', tags:['花茶','桂花','乌龙'],
-    params:{ 水温:'90-95℃', 茶水比:'1:30', 泡制时间:'2-3分钟', 茶具:'瓷壶/盖碗' },
-    intro:'以乌龙茶为茶坯，用新鲜桂花窨制而成。融合乌龙茶的醇厚与桂花的甜香，是秋季最应景的花茶。',
-    steps:[
-      '温壶后投茶5g',
-      '注入90℃热水洗茶3秒',
-      '第一泡静置30秒出汤',
-      '逐泡延长10秒',
-      '可冲泡5-7泡'
-    ],
-    taste:'桂花甜香扑鼻，乌龙茶底醇和，汤色橙黄明亮，回甘带桂花蜜甜。',
-    potRecommend: [
-      { pot:'瓷壶', reason:'花茶核心在花香，瓷壶不吸味不串味，能完整保留桂花甜香。', priority:'⭐ 首选' }
-    ],
-    notRecommend: '紫砂类壶会吸附桂花香，且紫砂泥料味会干扰花香纯度。'
-  },
-  {
-    name:'陈皮普洱', cat:'再加工茶', emoji:'🍊', tags:['普洱','陈皮','广东'],
-    params:{ 水温:'95-100℃', 茶水比:'1:15', 泡制时间:'20秒起', 茶具:'紫泥壶/柴烧朱泥' },
-    intro:'以普洱熟茶与新会陈皮拼配而成，融合普洱的陈香与陈皮的果香。理气健脾、化痰止咳，是广东地区经典的养生茶饮。',
-    steps:[
-      '温壶后投茶8g（连陈皮一起）',
-      '100℃热水洗茶两次',
-      '第一泡注水后20秒出汤',
-      '逐泡延长10秒',
-      '可冲泡10-15泡，也可煮饮'
-    ],
-    taste:'陈皮果香与普洱陈香交融，汤色红浓，滋味醇厚带甘甜，有独特的柑橘回韵。',
-    potRecommend: [
-      { pot:'紫泥壶', reason:'紫泥透气性好，能同时释放普洱陈香和陈皮果香，是最佳搭配。', priority:'⭐ 首选' },
-      { pot:'柴烧朱泥', reason:'柴烧煮饮陈皮普洱时汤感更顺滑，陈皮的甜润更突出。', priority:'煮饮推荐' }
-    ],
-    notRecommend: '朱泥致密不适合陈皮普洱这种需要充分释放的茶。瓷壶可以泡但不如紫泥醇厚。'
-  },
-  // === 再加工 / 特色茶 ===
-  {
-    name:'小青柑', cat:'再加工茶', emoji:'🍊', tags:['普洱','青柑','广东'],
-    params:{ 水温:'95-100℃', 茶水比:'1颗/壶', 泡制时间:'30秒起', 茶具:'紫泥壶/瓷壶' },
-    intro:'将普洱熟茶填入未成熟的新会小青柑中，经干燥制成。外形小巧可爱，一颗一泡，柑香与茶香交融，是近年最受欢迎的便携茶品。',
-    steps:[
-      '将一颗小青柑放入壶中',
-      '100℃热水洗茶一次',
-      '第一泡注水后30秒出汤',
-      '逐泡延长10-15秒',
-      '可冲泡8-12泡，尾水可煮饮'
-    ],
-    taste:'清新的柑橘果香与普洱陈香完美融合，汤色红亮，滋味甘醇，有独特的柑甜回韵。',
-    potRecommend: [
-      { pot:'紫泥壶', reason:'紫泥壶空间大、透气好，能让小青柑充分舒展，柑香和茶香释放更均匀。', priority:'⭐ 首选' },
-      { pot:'瓷壶', reason:'瓷壶泡小青柑柑香更直接，适合喜欢清爽口感的人。', priority:'备选' }
-    ],
-    notRecommend: '朱泥壶空间小，小青柑难以充分舒展，柑香和茶香出不来。'
-  }
-];
-
-// 你的壶 - 壶具知识库（基于用户实际拥有的四把壶）
-const myPotsDB = {
-  '瓷壶':     { material:'瓷器（釉面）', characteristic:'不吸味、不透气、导热快', strength:'还原茶叶本味，百搭新手', weakness:'保温性一般，无法提升茶汤厚度', care:'用清水冲洗即可，避免磕碰' },
-  '朱泥':     { material:'紫砂·朱泥（红泥）', characteristic:'含铁量高、致密、聚香强', strength:'放大高香型茶香气，铁观音/单丛绝配', weakness:'透气性弱于紫泥，易闷茶', care:'一壶一茶，勿骤冷骤热防开裂' },
-  '紫泥':     { material:'紫砂·紫泥', characteristic:'透气性好、砂质感、保温佳', strength:'柔化茶性，适合发酵茶，普洱/岩茶首选', weakness:'会吸附部分香气，不适合高香茶', care:'一壶一茶，养壶后温润古朴' },
-  '柴烧朱泥': { material:'紫砂·朱泥（柴窑烧制）', characteristic:'柴烧独特气孔、聚香兼增汤感', strength:'兼具聚香与软化水质，老茶友进阶之选', weakness:'数量稀少，需细心养护', care:'一壶一茶，柴烧痕迹需自然养出包浆' }
-};
-
-// 渲染茶类标签
-function renderTeaTags(){
-  const tagBox = $('#teaTags');
-  tagBox.innerHTML = '';
-  teaDB.forEach((t,i) => {
-    const tag = document.createElement('span');
-    tag.className = 'tea-tag';
-    tag.textContent = t.name;
-    tag.addEventListener('click', () => renderTea(i));
-    tagBox.appendChild(tag);
-  });
-}
-
-function renderTea(idx){
-  const t = teaDB[idx];
-  let potSection = '';
-  if(t.potRecommend && t.potRecommend.length){
-    const clayItems = t.potRecommend.map(rec => {
-      const info = myPotsDB[rec.pot] || { characteristic:'', strength:'' };
-      return `<div class="pot-clay-item${rec.priority.includes('首选')?' pot-clay-best':''}">
-        <div class="pot-clay-name">🫖 ${rec.pot} <span class="pot-clay-priority">${rec.priority}</span></div>
-        <div class="pot-clay-reason">${rec.reason}</div>
-        <div class="pot-clay-char">${info.characteristic}</div>
-      </div>`;
-    }).join('');
-    potSection = `
-      <div class="pot-recommend">
-        <div class="pot-recommend-title">🫖 从你的壶中推荐</div>
-        <div class="pot-recommend-sub">基于你已有的：瓷壶 · 朱泥 · 紫泥 · 柴烧朱泥</div>
-        <div class="pot-recommend-grid">${clayItems}</div>
-        ${t.notRecommend ? `<div class="pot-not-rec">⚠️ ${t.notRecommend}</div>` : ''}
-      </div>`;
-  }
-
-  const box = $('#teaDetail');
-  box.innerHTML = `
-    <div class="tea-info">
-      <div class="tea-header">
-        <div class="tea-emoji">${t.emoji}</div>
-        <div>
-          <div class="tea-name">${t.name}</div>
-          <div class="tea-cat">${t.cat}</div>
-        </div>
-      </div>
-      <div class="tea-grid">
-        ${Object.entries(t.params).map(([k,v])=>`
-          <div class="tea-param">
-            <div class="tea-param-label">${k}</div>
-            <div class="tea-param-value">${v}</div>
-          </div>
-        `).join('')}
-      </div>
-      ${potSection}
-      <div class="tea-section">
-        <div class="tea-section-title">📖 茶叶简介</div>
-        <div class="tea-section-text">${t.intro}</div>
-      </div>
-      <div class="tea-section">
-        <div class="tea-section-title">🫖 泡制步骤</div>
-        <ol class="tea-steps">
-          ${t.steps.map(s=>`<li>${s}</li>`).join('')}
-        </ol>
-      </div>
-      <div class="tea-section">
-        <div class="tea-section-title">👅 品饮要点</div>
-        <div class="tea-section-text">${t.taste}</div>
-      </div>
-    </div>
-  `;
-}
-
-function searchTea(){
-  const kw = $('#teaSearch').value.trim().toLowerCase();
-  if(!kw){ renderTeaTags(); return; }
-  const idx = teaDB.findIndex(t =>
-    t.name.toLowerCase().includes(kw) ||
-    t.cat.toLowerCase().includes(kw) ||
-    t.tags.some(tag => tag.toLowerCase().includes(kw))
-  );
-  if(idx >= 0) renderTea(idx);
-  else {
-    $('#teaDetail').innerHTML = `
-      <div class="tea-welcome">
-        <div class="welcome-icon">🔍</div>
-        <div class="welcome-title">未找到相关茶叶</div>
-        <div class="welcome-desc">试试搜索：龙井、红茶、乌龙、普洱...</div>
-      </div>`;
-  }
-}
-$('#teaSearchBtn').addEventListener('click', searchTea);
-$('#teaSearch').addEventListener('keydown', e => { if(e.key==='Enter') searchTea(); });
-renderTeaTags();
-
 // 每日茶知识推送（根据日期轮换）
 const teaFacts = [
   { title:'茶叶的分类', text:'中国茶叶按发酵程度分为六大类：<b>绿茶</b>（不发酵）、<b>白茶</b>（微发酵）、<b>黄茶</b>（轻发酵）、<b>乌龙茶</b>（半发酵）、<b>红茶</b>（全发酵）、<b>黑茶</b>（后发酵）。发酵程度越高，茶性越温和。' },
@@ -2726,7 +2050,7 @@ $('#teaDailyContent').innerHTML = `<b>${todayFact.title}</b>：${todayFact.text}
 
 
 /* ============================================
-   模块三：每日打卡（日历记录版）
+   模块二：每日打卡（日历记录版）
 ============================================ */
 const defaultCheckinTasks = ['💊 吃维生素', '🎙️ 听VOA', '🏃 运动'];
 let checkinTasks = load('checkinTasks') || [...defaultCheckinTasks];
@@ -3450,7 +2774,7 @@ function showEditTipModal(tip){
 renderTips();
 
 /* ============================================
-   模块六：心愿清单（旅游 / 展览 / 书 / 其他）
+   模块四：心愿清单（旅游 / 展览 / 书 / 其他）
 ============================================ */
 const WISH_CATS = {
   travel: { label:'想去哪里？', ph:'例如：日本京都、冰岛看极光', empty:'还没有心愿，写下第一个想去的地方吧～' },
