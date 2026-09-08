@@ -428,6 +428,20 @@ body{
 .inspire-edit-images{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .inspire-edit-actions{display:flex;gap:10px;margin-top:16px;justify-content:flex-end}
 
+/* 搜索栏（灵感/Tips 列表） */
+.life-search-card{
+  background:var(--card);border-radius:var(--radius-sm);
+  padding:10px 16px;box-shadow:var(--shadow);
+  border:1px solid var(--border-soft);
+  display:flex;align-items:center;gap:8px;
+}
+.life-search-card::before{content:"🔍";font-size:14px;flex-shrink:0}
+.life-search-card input{
+  flex:1;min-width:0;border:none;background:transparent;
+  font-size:14px;color:var(--text);font-family:inherit;outline:none;
+}
+.life-search-card input::placeholder{color:var(--text-light)}
+
 /* 每日茶知识 */
 .tea-daily-card{
   background:linear-gradient(135deg,#e8f5e9 0%,#c8e6c9 100%);
@@ -972,7 +986,7 @@ body{
 <!-- 子 Tab -->
 <div class="life-tabs" data-page-node-id="47XLf1BmQPGGuJemcoOUXh">
 <button class="life-tab active" data-sub="todo" data-page-node-id="rtqLjmlwLCQEw4DPWCfPHO">📝 待办事项</button>
-<button class="life-tab" data-sub="inspire" data-page-node-id="qDS9h7gO2iUyUgzTVmPOdJ">💡 每日灵感</button>
+<button class="life-tab" data-sub="inspire" data-page-node-id="qDS9h7gO2iUyUgzTVmPOdJ">💡 每日记录</button>
 <button class="life-tab" data-sub="tips" data-page-node-id="RsjHEZs5JdOk33EEmRn0BR">📌 Tips</button>
 </div>
 <!-- 待办子面板 -->
@@ -1042,13 +1056,20 @@ body{
 <span class="inspire-img-tip" id="inspireImgTip" data-page-node-id="FIEofPzMo89BQ0aM8bLW4a">可选，最多9张</span>
 </div>
 <div class="inspire-img-preview" id="inspireImgPreview" data-page-node-id="BSOjqkTDx3A1Ssoy9euuKC"></div>
-<button class="btn-primary" id="addInspireBtn" data-page-node-id="4uK3lABgaO293MN53laMw4">💡 记录灵感</button>
+<button class="btn-primary" id="addInspireBtn" data-page-node-id="4uK3lABgaO293MN53laMw4">💡 记录</button>
 </div>
+</div>
+<div class="life-search-card" data-page-node-id="newInspireSearch">
+<input id="inspireSearch" placeholder="搜索记录…" type="text"/>
 </div>
 <div class="inspire-list" id="inspireList" data-page-node-id="0wDA2uJGC7IdBMcTq3PHak"></div>
 <div class="empty-state" id="inspireEmpty" data-page-node-id="eFRwMMQRf4CqZBBKv7Pci2">
 <div class="empty-icon" data-page-node-id="YJ1obunimNvY8p9nZ2qkrx">💡</div>
-<div data-page-node-id="y7eptsgzx5OHvdXI46Bb1D">还没有灵感记录，把今天的想法写下来吧～</div>
+<div data-page-node-id="y7eptsgzx5OHvdXI46Bb1D">还没有记录，把今天的想法写下来吧～</div>
+</div>
+<div class="empty-state" id="inspireNoMatch" style="display:none">
+<div class="empty-icon">🔍</div>
+<div>没有匹配的记录，换个关键词试试～</div>
 </div>
 </div>
 <!-- Tips 子面板 -->
@@ -1066,10 +1087,17 @@ body{
 <button class="btn-primary" id="addTipBtn" data-page-node-id="Ap9sv5kFiUsDBz4xJbFtJL">📌 记录</button>
 </div>
 </div>
+<div class="life-search-card" data-page-node-id="newTipSearch">
+<input id="tipSearch" placeholder="搜索 Tips…" type="text"/>
+</div>
 <div class="tips-list" id="tipsList" data-page-node-id="1P9bCyDk5JUdjqFbo8MvYW"></div>
 <div class="empty-state" id="tipsEmpty" data-page-node-id="qiMAqIv8VBbyqUYZwADXfU">
 <div class="empty-icon" data-page-node-id="fFMkKwA7Q43aIDeGNJBZKR">📌</div>
 <div data-page-node-id="YktKRynRvhsqIm5eYcc26I">还没有 Tips，把生活中的小妙招记录下来吧～</div>
+</div>
+<div class="empty-state" id="tipsNoMatch" style="display:none">
+<div class="empty-icon">🔍</div>
+<div>没有匹配的 Tips，换个关键词试试～</div>
 </div>
 </div>
 </div>
@@ -1750,8 +1778,12 @@ let pendingImages = []; // 待上传的图片（base64）
 
 function renderInspires(){
   const list = $('#inspireList');
+  const kw = ($('#inspireSearch')?.value || '').trim().toLowerCase();
+  const filtered = kw
+    ? inspires.filter(ins => (ins.content||'').toLowerCase().includes(kw))
+    : inspires;
   list.innerHTML = '';
-  inspires.forEach(ins => {
+  filtered.forEach(ins => {
     const item = document.createElement('div');
     item.className = 'inspire-item';
     const imgHtml = (ins.images && ins.images.length)
@@ -1772,7 +1804,8 @@ function renderInspires(){
     `;
     list.appendChild(item);
   });
-  $('#inspireEmpty').style.display = inspires.length ? 'none' : 'block';
+  $('#inspireEmpty').style.display = (!kw && !inspires.length) ? 'block' : 'none';
+  $('#inspireNoMatch').style.display = (kw && !filtered.length) ? 'block' : 'none';
 }
 
 function renderPendingImages(){
@@ -1848,11 +1881,18 @@ function addInspire(){
   });
   save('inspires', inspires);
   input.value = '';
+  localStorage.removeItem('ff_inspireDraft');
   pendingImages = [];
   renderPendingImages();
   renderInspires();
 }
 $('#addInspireBtn').addEventListener('click', addInspire);
+
+// 草稿保留（未保存文字实时存本地，刷新/切换后自动回填）
+$('#inspireInput').value = (load('inspireDraft') || {}).text || '';
+$('#inspireInput').addEventListener('input', () => save('inspireDraft', { text: $('#inspireInput').value }));
+// 搜索（实时过滤）
+$('#inspireSearch').addEventListener('input', renderInspires);
 
 // 点击放大图片
 $('#inspireList').addEventListener('click', e => {
@@ -2588,9 +2628,13 @@ let pendingTipImages = [];
 
 function renderTips(){
   const list = $('#tipsList');
+  const kw = ($('#tipSearch')?.value || '').trim().toLowerCase();
+  const filtered = kw
+    ? tips.filter(t => (t.content||'').toLowerCase().includes(kw))
+    : tips;
   list.innerHTML = '';
   const groups = {};
-  tips.forEach(t => {
+  filtered.forEach(t => {
     const d = t.date || '未标注日期';
     if(!groups[d]) groups[d] = [];
     groups[d].push(t);
@@ -2625,7 +2669,8 @@ function renderTips(){
       list.appendChild(item);
     });
   });
-  $('#tipsEmpty').style.display = tips.length ? 'none' : 'block';
+  $('#tipsEmpty').style.display = (!kw && !tips.length) ? 'block' : 'none';
+  $('#tipsNoMatch').style.display = (kw && !filtered.length) ? 'block' : 'none';
 }
 
 function renderPendingTipImages(){
@@ -2653,6 +2698,7 @@ function addTip(){
   });
   save('tips', tips);
   input.value = '';
+  localStorage.removeItem('ff_tipDraft');
   pendingTipImages = [];
   renderPendingTipImages();
   renderTips();
@@ -2660,6 +2706,10 @@ function addTip(){
 
 $('#addTipBtn').addEventListener('click', addTip);
 $('#tipInput').addEventListener('keydown', e => { if(e.key==='Enter') addTip(); });
+// 草稿保留 + 搜索（实时过滤）
+$('#tipInput').value = (load('tipDraft') || {}).text || '';
+$('#tipInput').addEventListener('input', () => save('tipDraft', { text: $('#tipInput').value }));
+$('#tipSearch').addEventListener('input', renderTips);
 
 // 图片选择
 $('#tipImgInput').addEventListener('change', e => {
