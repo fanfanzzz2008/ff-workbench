@@ -441,6 +441,12 @@ body{
   font-size:14px;color:var(--text);font-family:inherit;outline:none;
 }
 .life-search-card input::placeholder{color:var(--text-light)}
+.search-clear{
+  background:transparent;border:none;cursor:pointer;flex-shrink:0;
+  font-size:13px;color:var(--text-light);padding:2px 5px;
+  border-radius:50%;transition:all .2s;line-height:1;
+}
+.search-clear:hover{color:var(--danger);background:#ffebee}
 
 /* 每日茶知识 */
 .tea-daily-card{
@@ -1061,6 +1067,7 @@ body{
 </div>
 <div class="life-search-card" data-page-node-id="newInspireSearch">
 <input id="inspireSearch" placeholder="搜索记录…" type="text"/>
+<button class="search-clear" id="inspireSearchClear" style="display:none" title="清除搜索">✕</button>
 </div>
 <div class="inspire-list" id="inspireList" data-page-node-id="0wDA2uJGC7IdBMcTq3PHak"></div>
 <div class="empty-state" id="inspireEmpty" data-page-node-id="eFRwMMQRf4CqZBBKv7Pci2">
@@ -1089,6 +1096,7 @@ body{
 </div>
 <div class="life-search-card" data-page-node-id="newTipSearch">
 <input id="tipSearch" placeholder="搜索 Tips…" type="text"/>
+<button class="search-clear" id="tipSearchClear" style="display:none" title="清除搜索">✕</button>
 </div>
 <div class="tips-list" id="tipsList" data-page-node-id="1P9bCyDk5JUdjqFbo8MvYW"></div>
 <div class="empty-state" id="tipsEmpty" data-page-node-id="qiMAqIv8VBbyqUYZwADXfU">
@@ -2710,6 +2718,20 @@ $('#tipInput').addEventListener('keydown', e => { if(e.key==='Enter') addTip(); 
 $('#tipInput').value = (load('tipDraft') || {}).text || '';
 $('#tipInput').addEventListener('input', () => save('tipDraft', { text: $('#tipInput').value }));
 $('#tipSearch').addEventListener('input', renderTips);
+
+// 搜索清除按钮（有内容显示，点击清空并恢复列表）
+function bindSearchClear(inputId, btnId, renderFn){
+  const input = $('#'+inputId), btn = $('#'+btnId);
+  input.addEventListener('input', () => { btn.style.display = input.value ? 'block' : 'none'; });
+  btn.addEventListener('click', () => {
+    input.value = '';
+    btn.style.display = 'none';
+    renderFn();
+    input.focus();
+  });
+}
+bindSearchClear('inspireSearch', 'inspireSearchClear', renderInspires);
+bindSearchClear('tipSearch', 'tipSearchClear', renderTips);
 
 // 图片选择
 $('#tipImgInput').addEventListener('change', e => {
