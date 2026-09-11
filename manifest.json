@@ -1,8 +1,9 @@
 {
   "name": "FF · 工作台",
   "short_name": "FF",
-  "description": "生活日常 · 饮茶日常 · 英语口语 · 攻略制作",
-  "start_url": "/",
+  "description": "生活日常 · 每日打卡 · 攻略制作 · 心愿清单 · 今日速览",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f0f7f1",
