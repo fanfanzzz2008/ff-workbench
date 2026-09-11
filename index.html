@@ -177,6 +177,25 @@ body{
   transition:all .2s;
 }
 .topbar-action-btn:hover{background:var(--primary);color:#fff}
+/* 存储用量指示 */
+.storage-chip{
+  font-size:12px;color:var(--text-soft);background:var(--card);
+  border:1px solid var(--border-soft);border-radius:12px;
+  padding:3px 10px;white-space:nowrap;box-shadow:var(--shadow);
+}
+.storage-chip.warn{color:#c62828;background:#ffebee;border-color:#ef9a9a;font-weight:600}
+/* 轻提示 */
+#ffToastBox{
+  position:fixed;top:14px;left:50%;transform:translateX(-50%);
+  z-index:99999;display:flex;flex-direction:column;gap:8px;
+  width:min(92vw,420px);pointer-events:none;
+}
+.ff-toast{
+  background:rgba(33,33,33,.92);color:#fff;font-size:13px;line-height:1.6;
+  padding:10px 16px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.25);
+  opacity:0;transform:translateY(-8px);transition:all .35s;
+}
+.ff-toast.show{opacity:1;transform:translateY(0)}
 .breadcrumb{font-size:13px;color:var(--text-light);margin-top:2px}
 .date-display{
   font-size:13px;color:var(--text-soft);
@@ -982,6 +1001,7 @@ body{
 </div>
 </div>
 <div class="topbar-right" data-page-node-id="F4k6GVeIuYbHd5s5zF3w1X">
+<div class="storage-chip" id="storageChip" style="display:none" title="本地存储用量">💾</div>
 <div class="date-display" id="dateDisplay" data-page-node-id="zy9AIfD5ChTFxGbfS6Q8FW"></div>
 </div>
 </header>
@@ -1261,9 +1281,111 @@ body{
 /* ---------- 工具函数 ---------- */
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
-const save = (k, v) => localStorage.setItem('ff_' + k, JSON.stringify(v));
+const save = (k, v) => {
+  try{
+    localStorage.setItem('ff_' + k, JSON.stringify(v));
+    if(typeof updateStorageChip === 'function') updateStorageChip();
+  }catch(e){
+    if(e && (e.name === 'QuotaExceededError' || e.code === 22 || e.code === 1014)){
+      ffToast('⚠️ 本地存储空间已满，刚才的修改可能没有保存！建议删除一些带图片的记录，或点 📤 导出备份后再清理。', 6500);
+    }else{
+      ffToast('⚠️ 数据保存失败：' + ((e && e.message) || e), 6500);
+    }
+  }
+};
 const load = k => { try { return JSON.parse(localStorage.getItem('ff_' + k)) || null } catch(e){ return null } };
 const todayStr = () => new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'long'});
+
+/* ---------- 稳定性工具：轻提示 / 存储用量 / 模块隔离 / 启动自检 ---------- */
+// 轻提示（替代直接崩掉的报错）
+function ffToast(msg, duration){
+  try{
+    const box = document.getElementById('ffToastBox') || (() => {
+      const d = document.createElement('div');
+      d.id = 'ffToastBox';
+      document.body.appendChild(d);
+      return d;
+    })();
+    const t = document.createElement('div');
+    t.className = 'ff-toast';
+    t.textContent = msg;
+    box.appendChild(t);
+    setTimeout(() => t.classList.add('show'), 30);
+    setTimeout(() => {
+      t.classList.remove('show');
+      setTimeout(() => t.remove(), 400);
+    }, duration || 4000);
+  }catch(e){ console.error(msg, e); }
+}
+// 本地存储用量（ff_ 开头的数据，按 UTF-16 实际占用估算）
+function storageUsedBytes(){
+  let chars = 0;
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(k && k.startsWith('ff_')) chars += k.length + (localStorage.getItem(k) || '').length;
+  }
+  return chars * 2;
+}
+function updateStorageChip(){
+  const chip = document.getElementById('storageChip');
+  if(!chip) return;
+  try{
+    const bytes = storageUsedBytes();
+    const mb = bytes / 1024 / 1024;
+    const limit = 5; // 浏览器 localStorage 一般约 5MB
+    chip.style.display = '';
+    chip.textContent = mb >= 0.1 ? ('💾 ' + mb.toFixed(1) + 'MB') : ('💾 ' + Math.max(1, Math.round(bytes/1024)) + 'KB');
+    chip.title = '本地存储已用约 ' + mb.toFixed(2) + 'MB（上限约 ' + limit + 'MB）。存满会导致保存失败，建议定期导出备份、清理不用的图片。';
+    chip.classList.toggle('warn', mb > limit * 0.8);
+    if(mb > limit * 0.95) ffToast('⚠️ 本地存储即将存满（' + mb.toFixed(1) + 'MB），继续添加图片可能导致保存失败！', 6500);
+  }catch(e){ chip.style.display = 'none'; }
+}
+// 模块隔离：单个模块初始化失败不拖垮其他模块
+function safeInit(name, fn){
+  try{ fn(); }
+  catch(e){
+    console.error('【' + name + '】模块启动异常:', e);
+    ffToast('⚠️ 「' + name + '」模块启动异常，其他功能不受影响。可尝试刷新页面，数据不会丢失。', 6000);
+  }
+}
+// 启动自检：发现损坏的数据自动从最近快照恢复
+function healthCheck(){
+  const broken = [];
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(k && k.startsWith('ff_') && !k.startsWith('ff_autoBackup_')){
+      try{ JSON.parse(localStorage.getItem(k)); }catch(e){ broken.push(k); }
+    }
+  }
+  if(!broken.length) return;
+  // 收集快照，按时间从新到旧
+  const snaps = [];
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(k && k.startsWith('ff_autoBackup_')){
+      try{
+        const snap = JSON.parse(localStorage.getItem(k));
+        if(snap && snap.data) snaps.push({ time: new Date(snap.time).getTime() || 0, data: snap.data });
+      }catch(e){}
+    }
+  }
+  snaps.sort((a,b) => b.time - a.time);
+  const fixed = [], still = [];
+  broken.forEach(k => {
+    for(const s of snaps){
+      if(Object.prototype.hasOwnProperty.call(s.data, k)){
+        try{
+          localStorage.setItem(k, JSON.stringify(s.data[k]));
+          fixed.push(k);
+          return;
+        }catch(e){}
+      }
+    }
+    still.push(k);
+  });
+  if(fixed.length) ffToast('🛠 检测到数据损坏，已自动从备份恢复：' + fixed.map(k=>k.replace('ff_','')).join('、'), 6500);
+  if(still.length) alert('⚠️ 以下数据已损坏且无法自动修复：' + still.map(k=>k.replace('ff_','')).join('、') + '\n\n建议：① 点 📤 先导出当前所有数据；② 点 🔄 从自动备份中选择恢复。');
+}
 
 /* ---------- 侧边栏切换 ---------- */
 const moduleMap = {
@@ -1371,7 +1493,7 @@ if(cachedQuote && cachedQuote.date === new Date().toLocaleDateString('zh-CN')){
   $('#dailyQuote').textContent = fallbackQuotes[new Date().getDate() % fallbackQuotes.length];
 }
 // 异步更新为网络版
-fetchHitokoto();
+safeInit('每日一言', fetchHitokoto);
 
 /* ---------- 天气（wttr.in + 自动定位） ---------- */
 const weatherCodeMap = {
@@ -1529,7 +1651,7 @@ function exportAllData(){
   const allData = {};
   for(let i = 0; i < localStorage.length; i++){
     const key = localStorage.key(i);
-    if(key.startsWith('ff_') && !key.startsWith('ff_autoBackup_')) allData[key] = JSON.parse(localStorage.getItem(key));
+    if(key.startsWith('ff_') && !key.startsWith('ff_autoBackup_')){ try{ allData[key] = JSON.parse(localStorage.getItem(key)); }catch(e){ console.warn('跳过损坏数据:', key); } }
   }
   allData['_exportTime'] = new Date().toISOString();
   const blob = new Blob([JSON.stringify(allData, null, 2)], {type:'application/json'});
@@ -1568,7 +1690,7 @@ function autoBackup(){
   const allData = {};
   for(let i = 0; i < localStorage.length; i++){
     const key = localStorage.key(i);
-    if(key.startsWith('ff_') && !key.startsWith('ff_autoBackup_')) allData[key] = JSON.parse(localStorage.getItem(key));
+    if(key.startsWith('ff_') && !key.startsWith('ff_autoBackup_')){ try{ allData[key] = JSON.parse(localStorage.getItem(key)); }catch(e){ console.warn('跳过损坏数据:', key); } }
   }
   const today = new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'});
   // 存今天的数据快照
@@ -1660,8 +1782,10 @@ $('#restoreBackupBtn').addEventListener('click', () => {
 });
 
 // 页面加载时自动备份 + 检查提醒
-autoBackup();
-checkBackupReminder();
+healthCheck();
+safeInit('自动备份', autoBackup);
+safeInit('备份提醒', checkBackupReminder);
+updateStorageChip();
 
 
 /* ============================================
@@ -1778,7 +1902,7 @@ $('#clearDoneBtn').addEventListener('click', () => {
   todos = todos.filter(t=>!t.done); save('todos',todos); renderTodos();
 });
 
-renderTodos();
+safeInit('待办', renderTodos);
 
 // --- 每日记录 ---
 let inspires = load('inspires') || [];
@@ -2077,7 +2201,7 @@ function showEditInspireModal(ins){
     modal.remove();
   });
 }
-renderInspires();
+safeInit('每日记录', renderInspires);
 
 
 // 每日茶知识推送（根据日期轮换）
@@ -2335,8 +2459,8 @@ function showDayDetail(dateStr, anchorEl){
   }, 10);
 }
 
-renderCheckins();
-renderCalendar();
+safeInit('每日打卡', renderCheckins);
+safeInit('打卡日历', renderCalendar);
 
 
 let schedules = [{type:'spot', time:'', duration:'', item:'', note:''}];
@@ -2624,9 +2748,9 @@ $('#clearGuideBtn').addEventListener('click', () => {
   }
 });
 
-renderSchedules();
-renderChecklist();
-renderMyGuides();
+safeInit('攻略行程', renderSchedules);
+safeInit('攻略清单', renderChecklist);
+safeInit('我的攻略', renderMyGuides);
 
 /* ============================================
    Tips - 小经验记录（支持图片）
@@ -2843,7 +2967,7 @@ function showEditTipModal(tip){
   });
 }
 
-renderTips();
+safeInit('Tips', renderTips);
 
 /* ============================================
    模块四：心愿清单（旅游 / 展览 / 书 / 其他）
@@ -3111,7 +3235,7 @@ function compressWishImage(file, cb){
   reader.readAsDataURL(file);
 }
 
-renderWish();
+safeInit('心愿清单', renderWish);
 
 /* ---------- 工具：HTML 转义 ---------- */
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
