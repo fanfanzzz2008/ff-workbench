@@ -1330,14 +1330,23 @@ function updateStorageChip(){
   const chip = document.getElementById('storageChip');
   if(!chip) return;
   try{
-    const bytes = storageUsedBytes();
-    const mb = bytes / 1024 / 1024;
-    const limit = 5; // 浏览器 localStorage 一般约 5MB
-    chip.style.display = '';
-    chip.textContent = mb >= 0.1 ? ('💾 ' + mb.toFixed(1) + 'MB') : ('💾 ' + Math.max(1, Math.round(bytes/1024)) + 'KB');
-    chip.title = '本地存储已用约 ' + mb.toFixed(2) + 'MB（上限约 ' + limit + 'MB）。存满会导致保存失败，建议定期导出备份、清理不用的图片。';
-    chip.classList.toggle('warn', mb > limit * 0.8);
-    if(mb > limit * 0.95) ffToast('⚠️ 本地存储即将存满（' + mb.toFixed(1) + 'MB），继续添加图片可能导致保存失败！', 6500);
+    const localMB = storageUsedBytes() / 1048576;
+    const renderChip = (totalMB, quotaMB) => {
+      chip.style.display = '';
+      chip.textContent = totalMB >= 0.1 ? ('💾 ' + totalMB.toFixed(1) + 'MB') : ('💾 ' + Math.max(1, Math.round(totalMB * 1024)) + 'KB');
+      chip.title = quotaMB > 100
+        ? `本地存储（文字+图片）已用约 ${totalMB.toFixed(1)}MB，浏览器配额约 ${Math.round(quotaMB)}MB，非常充足。`
+        : `本地存储已用约 ${totalMB.toFixed(2)}MB（上限约 ${quotaMB}MB）。存满会导致保存失败，建议定期导出备份。`;
+      chip.classList.toggle('warn', localMB > 4 || (quotaMB > 0 && totalMB > quotaMB * 0.9));
+    };
+    if(navigator.storage && navigator.storage.estimate){
+      navigator.storage.estimate().then(est => {
+        renderChip(Math.max((est.usage || 0) / 1048576, localMB), (est.quota || 0) / 1048576);
+      }).catch(() => renderChip(localMB, 5));
+    } else {
+      renderChip(localMB, 5);
+    }
+    if(localMB > 4.75) ffToast('⚠️ 文字存储（localStorage）接近上限，建议导出备份并减少图片内联存储。', 6500);
   }catch(e){ chip.style.display = 'none'; }
 }
 // 模块隔离：单个模块初始化失败不拖垮其他模块
@@ -1654,15 +1663,18 @@ function exportAllData(){
     if(key.startsWith('ff_') && !key.startsWith('ff_autoBackup_')){ try{ allData[key] = JSON.parse(localStorage.getItem(key)); }catch(e){ console.warn('跳过损坏数据:', key); } }
   }
   allData['_exportTime'] = new Date().toISOString();
-  const blob = new Blob([JSON.stringify(allData, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'FF-backup-' + new Date().toISOString().slice(0,10) + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  // 记录上次导出时间
-  save('lastExportDate', new Date().toLocaleDateString('zh-CN'));
+  // 先把 IndexedDB 里的图片还原进备份内容，再打包下载
+  deepResolveIdb(allData).then(resolved => {
+    const blob = new Blob([JSON.stringify(resolved, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'FF-backup-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    // 记录上次导出时间
+    save('lastExportDate', new Date().toLocaleDateString('zh-CN'));
+  });
 }
 function importAllData(file){
   if(!file) return;
@@ -1672,11 +1684,14 @@ function importAllData(file){
       const data = JSON.parse(ev.target.result);
       const count = Object.keys(data).length;
       if(confirm(`即将导入 ${count} 组数据。\n\n当前数据会被覆盖，确定继续吗？`)){
-        Object.entries(data).forEach(([k,v]) => {
-          if(k.startsWith('ff_')) localStorage.setItem(k, JSON.stringify(v));
-        });
-        alert('✅ 数据导入成功！页面将刷新以应用更改。');
-        location.reload();
+        // 大图片自动吸收进 IndexedDB，避免撑爆 localStorage（旧备份文件同样适用）
+        const keys = Object.keys(data).filter(k => k.startsWith('ff_'));
+        Promise.all(keys.map(k => deepAbsorbIdb(data[k]).then(v => {
+          localStorage.setItem(k, JSON.stringify(v));
+        }))).then(() => {
+          alert('✅ 数据导入成功！页面将刷新以应用更改。');
+          location.reload();
+        }).catch(() => alert('❌ 导入过程中出现问题，请重试。'));
       }
     }catch(err){
       alert('❌ 文件格式错误，请选择有效的 FF 备份文件 (.json)');
@@ -1938,6 +1953,7 @@ function renderInspires(){
   });
   $('#inspireEmpty').style.display = (!kw && !inspires.length) ? 'block' : 'none';
   $('#inspireNoMatch').style.display = (kw && !filtered.length) ? 'block' : 'none';
+  hydrateIdbImages(list);
 }
 
 function renderPendingImages(){
@@ -1993,6 +2009,97 @@ function compressImage(dataUrl, maxWidth, quality, callback){
   img.src = dataUrl;
 }
 
+/* ---------- IndexedDB 图片仓库：大图存这里，突破 localStorage 约 5MB 上限 ---------- */
+const IDB_IMG_THRESHOLD = 50000; // 约 50KB 以上的图片存入 IndexedDB，其余内联
+const IDB_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAUwAOw==';
+let _idbPromise = null;
+function idbOpen(){
+  if(_idbPromise) return _idbPromise;
+  _idbPromise = new Promise((resolve, reject) => {
+    const req = indexedDB.open('ff_workbench', 1);
+    req.onupgradeneeded = () => { if(!req.result.objectStoreNames.contains('images')) req.result.createObjectStore('images'); };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+  _idbPromise.catch(() => { _idbPromise = null; });
+  return _idbPromise;
+}
+function idbPut(key, val){
+  return idbOpen().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction('images', 'readwrite');
+    tx.objectStore('images').put(val, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  }));
+}
+function idbGet(key){
+  return idbOpen().then(db => new Promise((resolve, reject) => {
+    const rq = db.transaction('images', 'readonly').objectStore('images').get(key);
+    rq.onsuccess = () => resolve(rq.result);
+    rq.onerror = () => reject(rq.error);
+  }));
+}
+function idbDel(key){
+  return idbOpen().then(db => new Promise(resolve => {
+    const tx = db.transaction('images', 'readwrite');
+    tx.objectStore('images').delete(key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => resolve();
+  })).catch(() => {});
+}
+function isIdbRef(s){ return typeof s === 'string' && s.indexOf('idb:') === 0; }
+function idbRefKey(s){ return s.slice(4); }
+// 大图存 IDB 返回引用；小图原样内联；引用原样透传；IDB 不可用时回退内联（不影响使用）
+function storeImageRef(val){
+  return new Promise(resolve => {
+    if(isIdbRef(val)) return resolve(val);
+    if(typeof val !== 'string' || val.indexOf('data:image/') !== 0 || val.length < IDB_IMG_THRESHOLD) return resolve(val);
+    if(!window.indexedDB) return resolve(val);
+    const key = 'img_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    idbPut(key, val).then(() => resolve('idb:' + key)).catch(() => resolve(val));
+  });
+}
+function storeImageRefs(list){ return Promise.all((list || []).map(storeImageRef)); }
+// 对比新旧图片列表，删除已不再使用的 IDB 引用
+function releaseImages(oldList, newList){
+  const keep = new Set((newList || []).filter(isIdbRef));
+  (oldList || []).filter(isIdbRef).forEach(ref => { if(!keep.has(ref)) idbDel(idbRefKey(ref)); });
+}
+// 渲染后异步补回 IndexedDB 里的图片（同步先移除无效 src，避免 404 与闪烁）
+function hydrateIdbImages(root){
+  (root || document).querySelectorAll('img[src^="idb:"]').forEach(img => {
+    const ref = img.getAttribute('src');
+    img.removeAttribute('src');
+    img.style.opacity = '.2';
+    idbGet(idbRefKey(ref)).then(v => {
+      if(v){ img.src = v; img.style.opacity = ''; }
+      else { img.alt = '图片丢失'; img.style.opacity = '.35'; }
+    }).catch(() => {});
+  });
+}
+// 深度遍历：导出时把 idb 引用还原为真实图片数据
+function deepResolveIdb(val){
+  if(isIdbRef(val)) return idbGet(idbRefKey(val)).then(v => v || val).catch(() => val);
+  if(Array.isArray(val)) return Promise.all(val.map(deepResolveIdb));
+  if(val && typeof val === 'object'){
+    const out = {};
+    return Promise.all(Object.keys(val).map(k => deepResolveIdb(val[k]).then(v => { out[k] = v; }))).then(() => out);
+  }
+  return Promise.resolve(val);
+}
+// 深度遍历：导入时把大图片数据吸收进 IndexedDB（旧备份文件也自动瘦身）
+function deepAbsorbIdb(val){
+  if(typeof val === 'string' && val.indexOf('data:image/') === 0 && val.length >= IDB_IMG_THRESHOLD && window.indexedDB){
+    return storeImageRef(val).catch(() => val);
+  }
+  if(Array.isArray(val)) return Promise.all(val.map(deepAbsorbIdb));
+  if(val && typeof val === 'object'){
+    const out = {};
+    return Promise.all(Object.keys(val).map(k => deepAbsorbIdb(val[k]).then(v => { out[k] = v; }))).then(() => out);
+  }
+  return Promise.resolve(val);
+}
+
 // 删除待上传图片
 $('#inspireImgPreview').addEventListener('click', e => {
   if(e.target.classList.contains('thumb-del')){
@@ -2005,18 +2112,22 @@ function addInspire(){
   const input = $('#inspireInput');
   const content = input.value.trim();
   if(!content && !pendingImages.length) return;
-  inspires.unshift({
+  const record = {
     id: Date.now(),
     content: content || '（图片记录）',
     images: [...pendingImages],
     date: new Date().toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})
+  };
+  storeImageRefs(record.images).then(images => {
+    record.images = images;
+    inspires.unshift(record);
+    save('inspires', inspires);
+    input.value = '';
+    localStorage.removeItem('ff_inspireDraft');
+    pendingImages = [];
+    renderPendingImages();
+    renderInspires();
   });
-  save('inspires', inspires);
-  input.value = '';
-  localStorage.removeItem('ff_inspireDraft');
-  pendingImages = [];
-  renderPendingImages();
-  renderInspires();
 }
 $('#addInspireBtn').addEventListener('click', addInspire);
 
@@ -2034,6 +2145,8 @@ $('#inspireList').addEventListener('click', e => {
   }
 });
 function showImageModal(src){
+  if(isIdbRef(src)){ idbGet(idbRefKey(src)).then(v => { if(v) showImageModal(v); }).catch(() => {}); return; }
+  if(!src) return;
   const modal = document.createElement('div');
   modal.className = 'img-modal';
   modal.innerHTML = `<button class="img-modal-close">✕</button><div class="img-modal-stage"><img src="${src}"></div>`;
@@ -2182,6 +2295,7 @@ function showEditInspireModal(ins){
       thumb.innerHTML = `<img src="${src}"><button class="thumb-del" data-i="${i}">✕</button>`;
       imgBox.appendChild(thumb);
     });
+    hydrateIdbImages(imgBox);
   }
   renderEditImages();
   imgBox.addEventListener('click', e => {
@@ -2195,10 +2309,13 @@ function showEditInspireModal(ins){
   modal.querySelector('#editInspireSave').addEventListener('click', () => {
     const newContent = modal.querySelector('#editInspireInput').value.trim();
     ins.content = newContent || '（图片记录）';
-    ins.images = editImages;
-    save('inspires', inspires);
-    renderInspires();
-    modal.remove();
+    storeImageRefs(editImages).then(images => {
+      releaseImages(ins.images, images);
+      ins.images = images;
+      save('inspires', inspires);
+      renderInspires();
+      modal.remove();
+    });
   });
 }
 safeInit('每日记录', renderInspires);
@@ -2803,6 +2920,7 @@ function renderTips(){
   });
   $('#tipsEmpty').style.display = (!kw && !tips.length) ? 'block' : 'none';
   $('#tipsNoMatch').style.display = (kw && !filtered.length) ? 'block' : 'none';
+  hydrateIdbImages(list);
 }
 
 function renderPendingTipImages(){
@@ -2821,19 +2939,23 @@ function addTip(){
   const input = $('#tipInput');
   const content = input.value.trim();
   if(!content && !pendingTipImages.length) return;
-  tips.unshift({
+  const record = {
     id: Date.now(),
     content: content || '（图片记录）',
     images: [...pendingTipImages],
     date: new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'}),
     time: new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})
+  };
+  storeImageRefs(record.images).then(images => {
+    record.images = images;
+    tips.unshift(record);
+    save('tips', tips);
+    input.value = '';
+    localStorage.removeItem('ff_tipDraft');
+    pendingTipImages = [];
+    renderPendingTipImages();
+    renderTips();
   });
-  save('tips', tips);
-  input.value = '';
-  localStorage.removeItem('ff_tipDraft');
-  pendingTipImages = [];
-  renderPendingTipImages();
-  renderTips();
 }
 
 $('#addTipBtn').addEventListener('click', addTip);
@@ -2903,6 +3025,8 @@ $('#tipsList').addEventListener('click', e => {
   if(!btn) return;
   const id = Number(btn.dataset.id);
   if(btn.classList.contains('tip-item-del')){
+    const delTip = tips.find(x=>x.id===id);
+    if(delTip) (delTip.images||[]).filter(isIdbRef).forEach(r => idbDel(idbRefKey(r)));
     tips = tips.filter(x=>x.id!==id);
     save('tips', tips);
     renderTips();
@@ -2947,6 +3071,7 @@ function showEditTipModal(tip){
       thumb.innerHTML = `<img src="${src}"><button class="thumb-del" data-i="${i}">✕</button>`;
       imgBox.appendChild(thumb);
     });
+    hydrateIdbImages(imgBox);
   }
   renderEditImages();
   imgBox.addEventListener('click', e => {
@@ -2960,10 +3085,13 @@ function showEditTipModal(tip){
   modal.querySelector('#editTipSave').addEventListener('click', () => {
     const newContent = modal.querySelector('#editTipInput').value.trim();
     tip.content = newContent || '（图片记录）';
-    tip.images = editImages;
-    save('tips', tips);
-    renderTips();
-    modal.remove();
+    storeImageRefs(editImages).then(images => {
+      releaseImages(tip.images, images);
+      tip.images = images;
+      save('tips', tips);
+      renderTips();
+      modal.remove();
+    });
   });
 }
 
@@ -3009,6 +3137,7 @@ function renderWish(){
     const b = document.querySelector(`.wish-badge[data-badge="${cat}"]`);
     if(b){ b.textContent = n; b.classList.toggle('show', n>0); }
   });
+  hydrateIdbImages(list);
 }
 
 // Tab 切换分类
@@ -3056,6 +3185,7 @@ $('#wishList').addEventListener('click', e => {
   } else if(e.target.classList.contains('wish-del')){
     const w = wishItems.find(x=>x.id===id);
     if(w && confirm(`确定删除"${w.text}"吗？`)){
+      if(isIdbRef(w.img)) idbDel(idbRefKey(w.img));
       wishItems = wishItems.filter(x=>x.id!==id);
       save('wishlist', wishItems);
       renderWish();
@@ -3142,6 +3272,7 @@ function renderWishEditImg(){
     editImgData = null; editImgW = 65; renderWishEditImg();
   });
   bindWishImgDrag();
+  hydrateIdbImages(zone);
 }
 
 // 档位按钮高亮：小 <=45 / 中 46~78 / 大 >78
@@ -3192,16 +3323,20 @@ function saveWishEdit(){
   const text = $('#wishEditInput').value.trim();
   if(!text){ alert('内容不能为空'); return; }
   w.text = text;
-  if(editImgData){ w.img = editImgData; w.imgW = editImgW; }
-  else delete w.img;
-  try{
+  const oldImg = w.img || null;
+  const finish = imgVal => {
+    if(imgVal){ w.img = imgVal; w.imgW = editImgW; }
+    else delete w.img;
+    if(oldImg && isIdbRef(oldImg) && oldImg !== w.img) idbDel(idbRefKey(oldImg));
     save('wishlist', wishItems);
-  }catch(e){
-    alert('⚠️ 保存失败：本地存储空间不足。请删除这张图片（或换一张更小的图）再保存。');
-    return;
+    document.querySelector('.wish-edit-modal')?.closest('.img-modal')?.remove();
+    renderWish();
+  };
+  if(editImgData){
+    storeImageRef(editImgData).then(finish).catch(() => finish(editImgData));
+  } else {
+    finish(null);
   }
-  document.querySelector('.wish-edit-modal')?.closest('.img-modal')?.remove();
-  renderWish();
 }
 
 // 图片压缩：最长边 900px、JPEG 0.82；超 1.2MB 再压小
