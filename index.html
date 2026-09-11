@@ -1337,7 +1337,8 @@ function updateStorageChip(){
       chip.title = quotaMB > 100
         ? `本地存储（文字+图片）已用约 ${totalMB.toFixed(1)}MB，浏览器配额约 ${Math.round(quotaMB)}MB，非常充足。`
         : `本地存储已用约 ${totalMB.toFixed(2)}MB（上限约 ${quotaMB}MB）。存满会导致保存失败，建议定期导出备份。`;
-      chip.classList.toggle('warn', localMB > 4 || (quotaMB > 0 && totalMB > quotaMB * 0.9));
+      const nearLimit = quotaMB > 0 ? totalMB > quotaMB * 0.9 : localMB > 4.5;
+      chip.classList.toggle('warn', nearLimit);
     };
     if(navigator.storage && navigator.storage.estimate){
       navigator.storage.estimate().then(est => {
@@ -1346,7 +1347,14 @@ function updateStorageChip(){
     } else {
       renderChip(localMB, 5);
     }
-    if(localMB > 4.75) ffToast('⚠️ 文字存储（localStorage）接近上限，建议导出备份并减少图片内联存储。', 6500);
+    // 接近上限提醒：每天最多弹一次，避免频繁操作时反复打扰
+    if(localMB > 4.75){
+      const todayKey = new Date().toISOString().slice(0, 10);
+      if(load('storageWarnDate') !== todayKey){
+        save('storageWarnDate', todayKey);
+        ffToast('⚠️ 文字存储（localStorage）接近上限，建议导出备份并减少图片内联存储。', 6500);
+      }
+    }
   }catch(e){ chip.style.display = 'none'; }
 }
 // 模块隔离：单个模块初始化失败不拖垮其他模块
