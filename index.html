@@ -1713,42 +1713,60 @@ function autoBackup(){
   const allData = {};
   for(let i = 0; i < localStorage.length; i++){
     const key = localStorage.key(i);
-    if(key.startsWith('ff_') && !key.startsWith('ff_autoBackup_')){ try{ allData[key] = JSON.parse(localStorage.getItem(key)); }catch(e){ console.warn('跳过损坏数据:', key); } }
+    if(key && key.startsWith('ff_') && !key.startsWith('ff_autoBackup_')){ try{ allData[key] = JSON.parse(localStorage.getItem(key)); }catch(e){ console.warn('跳过损坏数据:', key); } }
   }
   const today = new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'});
-  // 存今天的数据快照
-  localStorage.setItem('ff_autoBackup_' + today, JSON.stringify({
+  const writeBackup = () => localStorage.setItem('ff_autoBackup_' + today, JSON.stringify({
     time: new Date().toISOString(),
     data: allData
   }));
-  // 清理 7 天前的自动备份
-  const cutoff = Date.now() - 7 * 86400000;
-  for(let i = localStorage.length - 1; i >= 0; i--){
-    const key = localStorage.key(i);
-    if(key && key.startsWith('ff_autoBackup_')){
-      try{
-        const snap = JSON.parse(localStorage.getItem(key));
-        if(new Date(snap.time).getTime() < cutoff) localStorage.removeItem(key);
-      }catch(e){ localStorage.removeItem(key); }
+  // 清理自动备份：keepDays=0 表示除今天外全删（空间不足时腾地方用）
+  const cleanBackups = keepDays => {
+    const cutoff = Date.now() - 7 * 86400000;
+    for(let i = localStorage.length - 1; i >= 0; i--){
+      const key = localStorage.key(i);
+      if(key && key.startsWith('ff_autoBackup_') && key !== 'ff_autoBackup_' + today){
+        try{
+          const snap = JSON.parse(localStorage.getItem(key));
+          if(keepDays === 0 || new Date(snap.time).getTime() < cutoff) localStorage.removeItem(key);
+        }catch(e){ localStorage.removeItem(key); }
+      }
     }
+  };
+  try{
+    writeBackup();
+  }catch(e1){
+    // 空间不足：先清掉所有旧备份腾出空间，重试一次；仍失败则静默跳过（非关键功能，避免打扰）
+    try{
+      cleanBackups(0);
+      writeBackup();
+    }catch(e2){ console.warn('自动备份跳过（存储空间不足）:', e2); }
   }
+  cleanBackups(7);
 }
 
 /* ---------- 备份提醒 ---------- */
+// 健壮解析中文日期（兼容 "2026/9/15"、"2026/09/15"、"2026-9-15" 等，iOS Safari 对不补零日期解析会失败）
+function parseCNDate(s){
+  if(!s) return null;
+  const m = String(s).match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+  if(m) return new Date(+m[1], +m[2] - 1, +m[3]);
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+function isSameDay(a, b){
+  return !!a && !!b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
 function checkBackupReminder(){
-  const lastExport = load('lastExportDate');
+  const now = new Date();
   const today = new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'});
-  if(lastExport === today) return; // 今天已导出过
-  
+  if(isSameDay(parseCNDate(load('lastBackupReminder')), now)) return; // 今天已提醒过
+  const lastExp = parseCNDate(load('lastExportDate'));
+  if(lastExp && isSameDay(lastExp, now)) return; // 今天已导出过
+
   // 计算距上次导出天数
-  const lastReminder = load('lastBackupReminder');
-  if(lastReminder === today) return; // 今天已提醒过
-  
   let daysSince = 999;
-  if(lastExport){
-    const last = new Date(lastExport.replace(/\//g,'-'));
-    daysSince = Math.floor((Date.now() - last.getTime()) / 86400000);
-  }
+  if(lastExp) daysSince = Math.floor((now - lastExp) / 86400000);
   
   // 超过 7 天未导出备份，提醒
   if(daysSince >= 7){
@@ -1796,11 +1814,15 @@ $('#restoreBackupBtn').addEventListener('click', () => {
   }
   const snap = JSON.parse(localStorage.getItem(backups[idx].key));
   if(confirm(`确定恢复 ${new Date(snap.time).toLocaleString('zh-CN')} 的备份吗？\n\n当前数据会被覆盖！`)){
-    Object.entries(snap.data).forEach(([k,v]) => {
-      if(k.startsWith('ff_')) localStorage.setItem(k, JSON.stringify(v));
-    });
-    alert('✅ 备份恢复成功！页面将刷新。');
-    location.reload();
+    try{
+      Object.entries(snap.data).forEach(([k,v]) => {
+        if(k.startsWith('ff_')) localStorage.setItem(k, JSON.stringify(v));
+      });
+      alert('✅ 备份恢复成功！页面将刷新。');
+      location.reload();
+    }catch(e){
+      alert('⚠️ 恢复时存储空间不足，部分数据未恢复。建议先删除一些带图片的记录后重试。');
+    }
   }
 });
 
