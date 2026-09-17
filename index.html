@@ -1826,10 +1826,51 @@ $('#restoreBackupBtn').addEventListener('click', () => {
   }
 });
 
+/* ---------- 防浏览器清理：申请持久存储 + 图片丢失自检 ---------- */
+// 申请持久存储：未申请时，浏览器在空间紧张或系统清理时有权清空 IndexedDB（图片仓库）
+function initStoragePersist(){
+  try{
+    if(navigator.storage && navigator.storage.persist){
+      navigator.storage.persisted().then(p => {
+        if(!p) navigator.storage.persist().catch(() => {});
+      }).catch(() => {});
+    }
+  }catch(e){}
+}
+// 启动自检：统计记录里的图片引用有多少已丢失（被浏览器/系统清理），每天最多提醒一次
+function checkIdbLoss(){
+  if(!window.indexedDB) return;
+  const refs = new Set();
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(!k || !k.startsWith('ff_') || k.startsWith('ff_autoBackup_') || k === 'ff_lastExportDate' || k === 'ff_lastBackupReminder' || k === 'ff_storageWarnDate' || k === 'ff_idbLossWarnDate') continue;
+    try{
+      const walk = v => {
+        if(typeof v === 'string' && isIdbRef(v)) refs.add(v);
+        else if(Array.isArray(v)) v.forEach(walk);
+        else if(v && typeof v === 'object') Object.values(v).forEach(walk);
+      };
+      walk(JSON.parse(localStorage.getItem(k)));
+    }catch(e){}
+  }
+  if(!refs.size) return;
+  Promise.all(Array.from(refs).map(r => idbGet(idbRefKey(r)).catch(() => null))).then(vals => {
+    const lost = vals.filter(v => !v).length;
+    if(lost > 0 && load('idbLossWarnDate') !== new Date().toISOString().slice(0, 10)){
+      save('idbLossWarnDate', new Date().toISOString().slice(0, 10));
+      setTimeout(() => {
+        ffToast(`⚠️ 检测到 ${lost} 张图片被手机浏览器/系统清理掉了（文字内容完好）。建议：① 将本应用添加到手机主屏幕再使用；② 定期点 📤 导出备份（备份文件含图片）。`, 8000);
+      }, 3500);
+    }
+  }).catch(() => {});
+}
+
 // 页面加载时自动备份 + 检查提醒
 healthCheck();
 safeInit('自动备份', autoBackup);
 safeInit('备份提醒', checkBackupReminder);
+safeInit('持久存储', initStoragePersist);
+safeInit('图片自检', checkIdbLoss);
 updateStorageChip();
 
 
