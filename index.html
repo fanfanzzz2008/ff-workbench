@@ -1854,15 +1854,17 @@ function checkIdbLoss(){
     }catch(e){}
   }
   if(!refs.size) return;
-  Promise.all(Array.from(refs).map(r => idbGet(idbRefKey(r)).catch(() => null))).then(vals => {
-    const lost = vals.filter(v => !v).length;
-    if(lost > 0 && load('idbLossWarnDate') !== new Date().toISOString().slice(0, 10)){
-      save('idbLossWarnDate', new Date().toISOString().slice(0, 10));
-      setTimeout(() => {
-        ffToast(`⚠️ 检测到 ${lost} 张图片被手机浏览器/系统清理掉了（文字内容完好）。建议：① 将本应用添加到手机主屏幕再使用；② 定期点 📤 导出备份（备份文件含图片）。`, 8000);
-      }, 3500);
-    }
-  }).catch(() => {});
+  try{
+    Promise.all(Array.from(refs).map(r => idbGet(idbRefKey(r)).catch(() => null))).then(vals => {
+      const lost = vals.filter(v => !v).length;
+      if(lost > 0 && load('idbLossWarnDate') !== new Date().toISOString().slice(0, 10)){
+        save('idbLossWarnDate', new Date().toISOString().slice(0, 10));
+        setTimeout(() => {
+          ffToast(`⚠️ 检测到 ${lost} 张图片被手机浏览器/系统清理掉了（文字内容完好）。建议：① 将本应用添加到手机主屏幕再使用；② 定期点 📤 导出备份（备份文件含图片）。`, 8000);
+        }, 3500);
+      }
+    }).catch(() => {});
+  }catch(e){ console.warn('图片自检跳过:', e); } // 兜底：IndexedDB 同步抛异常时不打扰用户
 }
 
 // 页面加载时自动备份 + 检查提醒
@@ -2087,7 +2089,10 @@ let _idbPromise = null;
 function idbOpen(){
   if(_idbPromise) return _idbPromise;
   _idbPromise = new Promise((resolve, reject) => {
-    const req = indexedDB.open('ff_workbench', 1);
+    let req;
+    try{
+      req = indexedDB.open('ff_workbench', 1);
+    }catch(e){ reject(e); return; } // 部分手机浏览器（无痕模式/老内核）会同步抛异常
     req.onupgradeneeded = () => { if(!req.result.objectStoreNames.contains('images')) req.result.createObjectStore('images'); };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
